@@ -1,0 +1,27 @@
+{
+  "name": "shell",
+  "version": "0.0.4",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "configure": "npx lerna exec npm install",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rondymesquita/shell.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rondymesquita/shell/issues"
+  },
+  "homepage": "https://github.com/rondymesquita/shell#readme",
+  "dependencies": {
+    "lerna": "^6.1.0"
+  },
+  "workspaces": [
+    "packages/*"
+  ]
+}
