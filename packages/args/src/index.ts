@@ -1,3 +1,9 @@
+export type Options = Record<string, any>
+export interface Argv {
+  options: Options
+  params: Array<string>
+}
+
 const isBoolean = (value: string) => {
   return ['true', 'false'].includes(value)
 }
@@ -16,9 +22,11 @@ const parseValue = (value: any) => {
 
 const SINGLE_DASH_REGEX = /^-(\w*)(=(.*))?$/
 const DOUBLE_DASH_REGEX = /^--(\w*)(=(.*))?$/
-export = (args: string[]) => {
-  const options: Record<string, any> = {}
-  const params: string[] = []
+
+export const args = (args: string[]): Argv => {
+  const options: Options = {}
+  const params: Array<string> = []
+
   args.map((arg: string) => {
     const regex = [SINGLE_DASH_REGEX, DOUBLE_DASH_REGEX].find((regex) => {
       return !!arg.match(regex)

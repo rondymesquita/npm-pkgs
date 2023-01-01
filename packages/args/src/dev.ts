@@ -1,3 +1,3 @@
 import args from './index'
-const argv = args(process.argv.splice(2))
+const argv = args('--debug test:watch --alpha=alphavalue --beta'.split(' '))
 console.log(argv)
