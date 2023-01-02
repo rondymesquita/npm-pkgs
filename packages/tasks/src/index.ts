@@ -6,54 +6,63 @@ export interface TaskContext {
   argv: Argv
 }
 export type Task = (ctx: TaskContext) => void
-// export type TaskDef = Record<string, Task | Record<string, Task>>
 export interface TaskDef {
   [key: string]: Task | TaskDef
 }
 
-const createTasks = (taskDef: TaskDef, name: string = ''): any => {
-  // console.log(taskDef)
-  const entries = Object.entries(taskDef).map((def: any) => {
-    // console.log(def[1], typeof def[1])
-    const taskName = name ? `${name}:${def[0]}` : def[0]
-    if (typeof def[1] === 'function') {
-      return [taskName, def[1]]
-    } else {
-      return createTasks(def[1], taskName)
+const buildTaskName = (namespace: string, fnName: string) => {
+  let name: string = namespace ? `${namespace}:${fnName}` : fnName
+
+  if (name !== 'default' && name.includes('default')) {
+    name = name.replace(':default', '')
+  }
+
+  return name
+}
+
+const createTasks = (
+  taskDef: TaskDef,
+  tasks: any = {},
+  namespace: string = '',
+): any => {
+  Object.entries(taskDef).forEach((def: any) => {
+    const fnName = def[0]
+    let name = buildTaskName(namespace, fnName)
+
+    const fnOrNamespaceDef = def[1]
+    if (typeof fnOrNamespaceDef === 'function') {
+      tasks[name] = fnOrNamespaceDef
+      return
     }
+
+    createTasks(fnOrNamespaceDef, tasks, name)
   })
 
-  return entries.flatMap((x) => {
-    console.log(x)
-    return x
-  })
+  return tasks
 }
 
 export const tasks = async (taskDef: TaskDef) => {
   const argv = args(process.argv.slice(2))
-  const taskName = argv.params[0]
+  // const argv = args('test:watch --dev --name=fulano sicrano'.split(' '))
+  const name = argv.params[0]
 
   const ctx: TaskContext = {
     argv,
   }
 
-  let tasks = createTasks(taskDef)
+  const tasks = createTasks(taskDef)
   console.log(tasks)
 
-  for (let index = 0; index < tasks.length; index += 2) {
-    const name = tasks[index]
-    const handler = tasks[index + 1]
+  let task: Task
+  if (name) {
+    task = tasks[name] as Task
+  } else {
+    task = tasks.default as Task
   }
 
-  // if (taskName) {
-  //   task = taskDef[taskName]
-  // } else {
-  //   task = taskDef.default
-  // }
+  if (!task) {
+    throw new TaskNotFoundError(name)
+  }
 
-  // if (!task) {
-  //   throw new TaskNotFoundError()
-  // }
-
-  // await task(ctx)
+  await task(ctx)
 }
