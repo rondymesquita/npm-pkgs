@@ -33,7 +33,7 @@
   "scripts": {
     "test": "jest",
     "test:watch": "npm run test -- --watchAll",
-    "dev": "nodemon -w ./src ./src/dev.ts build2 --dev --name=fulano sicrano",
+    "dev": "nodemon -w ./src ./src/dev.ts build --dev --name=fulano",
     "dev:bin": "nodemon -w './src' --ext 'ts,js,json' --exec ts-node ./src/bin.ts ./src/example.js",
     "build": "rimraf ./dist && tsc && copyfiles ./example ./dist",
     "release": "release-it --ci",

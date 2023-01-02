@@ -3,3 +3,9 @@ export class TaskNotFoundError extends Error {
     super(`Task with name "${name}" was not found`)
   }
 }
+
+export class TaskNameNotInformedError extends Error {
+  constructor() {
+    super(`Task name was not informed`)
+  }
+}

@@ -1,5 +1,5 @@
 import { args, Argv } from '@rondymesquita/args'
-import { TaskNotFoundError } from './errors'
+import { TaskNameNotInformedError, TaskNotFoundError } from './errors'
 
 export { Options } from '@rondymesquita/args'
 export interface TaskContext {
@@ -8,6 +8,10 @@ export interface TaskContext {
 export type Task = (ctx: TaskContext) => void
 export interface TaskDef {
   [key: string]: Task | TaskDef
+}
+
+export interface PlainTaskDef {
+  [key: string]: Task
 }
 
 const buildTaskName = (namespace: string, fnName: string) => {
@@ -24,7 +28,7 @@ const createTasks = (
   taskDef: TaskDef,
   tasks: any = {},
   namespace: string = '',
-): any => {
+): PlainTaskDef => {
   Object.entries(taskDef).forEach((def: any) => {
     const fnName = def[0]
     let name = buildTaskName(namespace, fnName)
@@ -43,21 +47,30 @@ const createTasks = (
 
 export const tasks = async (taskDef: TaskDef) => {
   const argv = args(process.argv.slice(2))
-  // const argv = args('test:watch --dev --name=fulano sicrano'.split(' '))
   const name = argv.params[0]
+
+  console.log(argv)
 
   const ctx: TaskContext = {
     argv,
   }
 
   const tasks = createTasks(taskDef)
-  console.log(tasks)
 
   let task: Task
   if (name) {
-    task = tasks[name] as Task
+    task = tasks[name]
   } else {
-    task = tasks.default as Task
+    task = tasks.default
+  }
+
+  console.log({ name, task, t: Object.keys(tasks) })
+
+  const isThereAnyNonDefaultTask =
+    Object.keys(tasks).filter((name: string) => name !== 'default').length > 0
+
+  if (!name && isThereAnyNonDefaultTask) {
+    throw new TaskNameNotInformedError()
   }
 
   if (!task) {
