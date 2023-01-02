@@ -11,9 +11,18 @@ const test = {
   default: (ctx: TaskContext) => {
     console.log('test')
   },
+  clean: {
+    watch: (ctx: TaskContext) => {
+      console.log('test:watch')
+    },
+    default: (ctx: TaskContext) => {
+      console.log('test')
+    },
+  },
 }
 
 tasks({
   default: build,
+  build,
   test,
 })
