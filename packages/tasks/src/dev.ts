@@ -1,6 +1,6 @@
 import { TaskContext, tasks } from './index'
 
-const build = (ctx: TaskContext) => {
+function build(ctx: TaskContext) {
   console.log('building', ctx)
 }
 
@@ -25,7 +25,6 @@ const test: any = {
 }
 
 tasks({
-  // default: [clean, build],
   clean,
   build: [clean, build],
   test,

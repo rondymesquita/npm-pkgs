@@ -24,7 +24,7 @@ const buildTaskName = (namespace: string, fnName: string) => {
   return name
 }
 
-const createTasks = (
+const createTasks2 = (
   taskDef: TaskDef | Task | Task[],
   tasks: any = {},
   namespace: string = '',
@@ -36,11 +36,31 @@ const createTasks = (
     if (typeof handler === 'function' || Array.isArray(handler)) {
       tasks[name] = handler
     } else {
-      createTasks(handler, tasks, name)
+      createTasks2(handler, tasks, name)
     }
   }
 
   return tasks
+}
+
+function deepFlattenObject(obj: any, namespace = '', tasks: any = {}) {
+  for (let key in obj) {
+    let propName: string = namespace ? namespace + ':' + key : key
+    if (typeof obj[key] == 'object' && !Array.isArray(obj[key])) {
+      deepFlattenObject(obj[key], propName, tasks)
+    } else {
+      tasks[propName] = obj[key]
+    }
+  }
+  return tasks
+}
+
+const createTasks = (
+  taskDef: TaskDef | Task | Task[],
+  tasks: any = {},
+  namespace: string = '',
+) => {
+  return deepFlattenObject(taskDef)
 }
 
 export const tasks = async (taskDef: TaskDef) => {
@@ -52,7 +72,6 @@ export const tasks = async (taskDef: TaskDef) => {
   }
 
   const tasks = createTasks(taskDef)
-  // console.log('>>>> tasks', tasks)
 
   const task = name ? tasks[name] : tasks.default
 
