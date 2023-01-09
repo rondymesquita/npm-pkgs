@@ -4,25 +4,29 @@ const build = (ctx: TaskContext) => {
   console.log('building', ctx)
 }
 
-const test = {
+const clean = async (ctx: TaskContext) => {
+  console.log('cleaning', ctx)
+  await new Promise((res) => setTimeout(res, 2000))
+}
+
+const test: any = {
   watch: (ctx: TaskContext) => {
     console.log('test:watch')
   },
   default: (ctx: TaskContext) => {
     console.log('test')
   },
-  clean: {
+  cov: {
     watch: (ctx: TaskContext) => {
-      console.log('test:watch')
+      console.log('test:cov:watch')
     },
-    default: (ctx: TaskContext) => {
-      console.log('test')
-    },
+    default: [clean, build],
   },
 }
 
 tasks({
-  default: build,
-  build,
+  // default: [clean, build],
+  clean,
+  build: [clean, build],
   test,
 })

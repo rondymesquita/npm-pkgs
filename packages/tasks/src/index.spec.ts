@@ -14,6 +14,22 @@ describe('tasks', () => {
     expect(tasksMock.alpha).toBeCalledTimes(1)
   })
 
+  it('calls tasks in sequence when task is an array of tasks', async () => {
+    process.argv = ['bin', 'file', 'alpha']
+
+    const order: string[] = []
+    const beta = jest.fn(() => order.push('beta'))
+    const gamma = jest.fn(() => order.push('gamma'))
+    const delta = jest.fn(() => order.push('delta'))
+    const tasksMock = {
+      alpha: [beta, gamma, delta],
+    }
+
+    expect(order).toEqual([])
+    await tasks(tasksMock)
+    expect(order).toEqual(['beta', 'gamma', 'delta'])
+  })
+
   it('calls a default task when passing no param', () => {
     process.argv = ['bin', 'file']
 

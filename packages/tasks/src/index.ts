@@ -5,9 +5,9 @@ export { Options } from '@rondymesquita/args'
 export interface TaskContext {
   argv: Argv
 }
-export type Task = (ctx: TaskContext) => void
+export type Task = (ctx: TaskContext) => Promise<any> | any
 export interface TaskDef {
-  [key: string]: Task | TaskDef
+  [key: string]: Task | TaskDef | Task[]
 }
 
 export interface PlainTaskDef {
@@ -25,22 +25,20 @@ const buildTaskName = (namespace: string, fnName: string) => {
 }
 
 const createTasks = (
-  taskDef: TaskDef,
+  taskDef: TaskDef | Task | Task[],
   tasks: any = {},
   namespace: string = '',
 ): PlainTaskDef => {
-  Object.entries(taskDef).forEach((def: any) => {
-    const fnName = def[0]
-    let name = buildTaskName(namespace, fnName)
+  for (const key in taskDef) {
+    const handler = (taskDef as any)[key]
+    let name = buildTaskName(namespace, key)
 
-    const fnOrNamespaceDef = def[1]
-    if (typeof fnOrNamespaceDef === 'function') {
-      tasks[name] = fnOrNamespaceDef
-      return
+    if (typeof handler === 'function' || Array.isArray(handler)) {
+      tasks[name] = handler
+    } else {
+      createTasks(handler, tasks, name)
     }
-
-    createTasks(fnOrNamespaceDef, tasks, name)
-  })
+  }
 
   return tasks
 }
@@ -49,22 +47,14 @@ export const tasks = async (taskDef: TaskDef) => {
   const argv = args(process.argv.slice(2))
   const name = argv.params[0]
 
-  console.log(argv)
-
   const ctx: TaskContext = {
     argv,
   }
 
   const tasks = createTasks(taskDef)
+  // console.log('>>>> tasks', tasks)
 
-  let task: Task
-  if (name) {
-    task = tasks[name]
-  } else {
-    task = tasks.default
-  }
-
-  console.log({ name, task, t: Object.keys(tasks) })
+  const task = name ? tasks[name] : tasks.default
 
   const isThereAnyNonDefaultTask =
     Object.keys(tasks).filter((name: string) => name !== 'default').length > 0
@@ -75,6 +65,13 @@ export const tasks = async (taskDef: TaskDef) => {
 
   if (!task) {
     throw new TaskNotFoundError(name)
+  }
+
+  if (Array.isArray(task)) {
+    for (const step of task) {
+      await step(ctx)
+    }
+    return
   }
 
   await task(ctx)
