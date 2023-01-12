@@ -55,14 +55,6 @@ function deepFlattenObject(obj: any, namespace = '', tasks: any = {}) {
   return tasks
 }
 
-// const createTasks = (
-//   taskDef: TaskDef | Task | Task[],
-//   tasks: any = {},
-//   namespace: string = '',
-// ) => {
-//   return deepFlattenObject(taskDef)
-// }
-
 const helpMessages: { [key: string]: string } = {}
 
 export const help = (task: Task, description: string) => {
@@ -118,7 +110,12 @@ export async function tasks(taskDef: TaskDef) {
 
   const createTasks = createTasksFunction()
   const tasks = createTasks(taskDef)
-  console.log(tasks)
+  // console.log(tasks)
+
+  if (argv.options.test) {
+    console.log(helpMessages)
+    return
+  }
 
   // const task = name ? tasks[name] : tasks.default
 

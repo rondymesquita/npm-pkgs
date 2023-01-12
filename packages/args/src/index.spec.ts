@@ -1,8 +1,8 @@
-import args from './index'
+import { parseArgs, defineArgs, number } from './index'
 
 describe('test', () => {
   it('parses integers', () => {
-    const options = args('--alpha=1 -b=0'.split(' '))
+    const options = parseArgs('--alpha=1 -b=0'.split(' '))
     expect(options).toEqual({
       options: {
         alpha: 1,
@@ -12,7 +12,7 @@ describe('test', () => {
     })
   })
   it('parses double', () => {
-    const options = args('--alpha=1.0 -b=0.5'.split(' '))
+    const options = parseArgs('--alpha=1.0 -b=0.5'.split(' '))
     expect(options).toEqual({
       options: {
         alpha: 1.0,
@@ -22,7 +22,7 @@ describe('test', () => {
     })
   })
   it('parses string', () => {
-    const options = args('--alpha=alphavalue -b=bvalue'.split(' '))
+    const options = parseArgs('--alpha=alphavalue -b=bvalue'.split(' '))
     expect(options).toEqual({
       options: {
         alpha: 'alphavalue',
@@ -32,7 +32,7 @@ describe('test', () => {
     })
   })
   it('parses boolean', () => {
-    const options = args('--alpha -b'.split(' '))
+    const options = parseArgs('--alpha -b'.split(' '))
     expect(options).toEqual({
       options: {
         alpha: true,
@@ -42,7 +42,7 @@ describe('test', () => {
     })
   })
   it('parses boolean values', () => {
-    const options = args('--alpha=true -b=false'.split(' '))
+    const options = parseArgs('--alpha=true -b=false'.split(' '))
     expect(options).toEqual({
       options: {
         alpha: true,
@@ -52,7 +52,7 @@ describe('test', () => {
     })
   })
   it('parses parameters', () => {
-    const options = args(
+    const options = parseArgs(
       '--alpha=alphavalue -b=false fulano sicrano'.split(' '),
     )
     expect(options).toEqual({
@@ -63,17 +63,38 @@ describe('test', () => {
       params: ['fulano', 'sicrano'],
     })
   })
+  it('defines args parsing options', () => {
+    const parseArgs = defineArgs({})
 
-  it('parses parameters', () => {
-    const options = args(
-      '--alpha=alphavalue -b=false fulano sicrano'.split(' '),
+    const argv = parseArgs(
+      '--alpha=1 -a=0 --beta=1.0 -b=0.5 --gama=gama -g=gama --delta -d --epsilon=true -e=false'.split(
+        ' ',
+      ),
     )
-    expect(options).toEqual({
+    expect(argv).toEqual({
       options: {
-        alpha: 'alphavalue',
-        b: false,
+        a: 0,
+        alpha: 1,
+        b: 0.5,
+        beta: 1,
+        d: true,
+        delta: true,
+        g: 'gama',
+        gama: 'gama',
+        e: false,
+        epsilon: true,
       },
-      params: ['fulano', 'sicrano'],
+      params: [],
     })
+  })
+
+  it('throws an error when type', () => {
+    const parseArgs = defineArgs({
+      options: [number('alpha')],
+    })
+
+    const assert = () => parseArgs('--gama=gama'.split(' '))
+
+    expect(assert()).rejects.toEqual(new Error('alpha'))
   })
 })

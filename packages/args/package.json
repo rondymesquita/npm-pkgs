@@ -33,7 +33,7 @@
   "scripts": {
     "test": "jest",
     "test:watch": "npm run test -- --watchAll",
-    "dev": "nodemon -w ./src ./src/dev.ts --alpha=alphavalue --beta --gama=true --delta=false -c -a=avalue fulano sicrano",
+    "dev": "nodemon -w ./src ./src/dev.ts --alpha=1 -a=0 --beta=1.0 -b=0.5 --gama=gama -g=gama --delta -d --epsilon=true -e=false",
     "dev:bin": "nodemon -w './src' --ext 'ts,js,json' --exec ts-node ./src/bin.ts ./src/example.js",
     "build": "rimraf ./dist && tsc && copyfiles ./example ./dist",
     "release": "release-it --ci",
@@ -56,5 +56,8 @@
     "ts-node": "^10.4.0",
     "typedoc": "^0.23.10",
     "typescript": "^4.4.4"
+  },
+  "dependencies": {
+    "cliui": "^8.0.1"
   }
 }
