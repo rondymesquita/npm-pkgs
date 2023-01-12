@@ -11,10 +11,7 @@ export const showHelp = (definition: ArgsDefinition) => {
     padding: [1],
   })
 
-  console.log(definition)
-  const options = []
   definition.options.forEach((option) => {
-    console.log(option)
     const paramName = {
       text: `--${option.name}`,
       padding: [0],
@@ -28,17 +25,16 @@ export const showHelp = (definition: ArgsDefinition) => {
       text: helpText,
       padding: [0],
     }
+
+    const modifiersArray = option.modifiers
+      .filter((modifier: Modifier<any>) => modifier.name !== 'help')
+      .map((modifier: Modifier<any>) => `[${modifier.name}:${modifier.value}]`)
+    modifiersArray.unshift(`[${option.type}]`)
     const modifiers = {
-      text: option.modifiers
-        .filter((modifier: Modifier<any>) => modifier.name !== 'help')
-        .map(
-          (modifier: Modifier<any>) => `[${modifier.name}:${modifier.value}]`,
-        )
-        .join(', '),
+      text: modifiersArray.join(', '),
       padding: [0],
     }
     ui.div(paramName, helpMessage, modifiers)
-    // ui.div()
   })
 
   console.log(ui.toString())

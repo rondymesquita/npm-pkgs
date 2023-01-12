@@ -1,15 +1,17 @@
 import { printErrors } from './errors'
-import { Modifier, validators } from './modifiers'
+import { defaultValue, help, Modifier, required, validators } from './modifiers'
 import { parseValue } from './utils'
-import { OptionType } from './types'
+import { boolean, OptionType } from './types'
 import { showHelp } from './help'
+import { flow, Status } from '@rondymesquita/flow'
 
 export * from './modifiers'
 export * from './types'
 export * from './command'
 export * from './help'
 
-export type Options = Record<string, any>
+export type OptionValue = string | number | boolean
+export type Options = Record<string, OptionValue>
 export interface Argv {
   options: Options
   params: Array<string>
@@ -22,7 +24,7 @@ export interface ArgsDefinition {
 const SINGLE_DASH_REGEX = /^-(\w*)(=(.*))?$/
 const DOUBLE_DASH_REGEX = /^--(\w*)(=(.*))?$/
 
-const errors: string[] = []
+let errors: string[] = []
 
 export const param = (...params: any[]) => {}
 
@@ -31,33 +33,109 @@ export const showErrors = () => {
   printErrors(errors)
 }
 
+export const helpOption = () => {
+  return boolean('help', [help('Show help message'), required(false)])
+}
+
+const checkRequiredAndNull = (option: OptionType, value: OptionValue) => {
+  const requiredOption = option.modifiers.find(
+    (mod: Modifier<boolean>) => mod.name === 'required',
+  )
+  const isRequired = requiredOption ? requiredOption.value : true
+  // console.log({ isRequired, name: option.name, value })
+
+  if (isRequired && (value === undefined || value === null)) {
+    throw new Error(`'${option.name}' is required'`)
+  }
+}
+
+const checkType = (option: OptionType, value: OptionValue) => {
+  if (typeof value != option.type) {
+    throw new Error(`'${option.name}' must be of type '${option.type}'`)
+  }
+}
+
+const fillOptionsDefaultValues = (
+  option: OptionType,
+  argv: Argv,
+  value: any,
+): Options => {
+  // console.log(option)
+  const cloneArgOptions: Options = { ...argv.options }
+
+  if (value) {
+    return cloneArgOptions
+  }
+
+  if (!argv.options[option.name]) {
+    const defaultModifier: Modifier<any> = option.modifiers.find(
+      (mod: Modifier<any>) => mod.name === 'default',
+    )
+    console.log(defaultModifier)
+
+    if (defaultModifier) {
+      cloneArgOptions[option.name] = defaultModifier.value
+    }
+  }
+
+  console.log(cloneArgOptions)
+
+  return cloneArgOptions
+}
+
 export const defineArgs = (definition: ArgsDefinition) => {
-  showHelp(definition)
-  // const def = definition
+  // console.log(definition)
+
   const args = (args: string[]): Argv => {
     const argv = parseArgs(args)
-    definition.options.forEach((option: any) => {
+    // console.log(argv)
+
+    // definition.options.forEach((option: any) => {
+    for (let index = 0; index < definition.options.length; index++) {
+      const option = definition.options[index]
       const value = argv.options[option.name]
       // console.log({ option, value }, typeof value)
-      if (typeof value != option.type) {
-        errors.push(`'${option.name}' must be of type '${option.type}'`)
-        // throw new Error('type error')
+
+      argv.options = fillOptionsDefaultValues(option, argv, value)
+
+      const requiredModifier: Modifier<any> = option.modifiers.find(
+        (mod: Modifier<any>) => mod.name === 'required',
+      )
+
+      if (requiredModifier && !requiredModifier.value) {
+        continue
       }
+      const execute = flow([
+        () => checkRequiredAndNull(option, value),
+        () => checkType(option, value),
+      ])
+      const result = execute()
+      const optionErrors = result
+        .filter((data) => data.status === Status.FAIL)
+        .map((data) => data.result)
+
+      errors = errors.concat(optionErrors)
 
       option.modifiers.forEach((modifier: any) => {
         const { name: modifierName, value: modifierValue } = modifier
         // const modifierValue = modifier[name]
 
         const modifierValidator = validators[modifierName]
+        // console.log({ modifierName, modifierValue, modifierValidator })
+
         if (modifierValidator && !modifierValidator(modifierValue, value)) {
-          // console.log(validate, value)
+          console.log(option.name, modifierValidator, modifierValue, value)
+          errors.push(
+            `'${option.name}' must satisfy '${modifierName}' contraint. Expected:'${modifierValue}'. Received:'${value}'.`,
+          )
           // throw new Error('errors')
         }
       })
-    })
+    }
 
     if (errors.length > 0) {
       showErrors()
+      showHelp(definition)
     }
 
     return argv as Argv

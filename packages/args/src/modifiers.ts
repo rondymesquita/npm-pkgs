@@ -19,8 +19,9 @@ export type NumberModifier =
 
 export const validators: { [key: string]: Function } = {
   required: (rule: boolean, value: string | number | boolean) =>
-    rule && value !== null && value !== undefined,
+    rule ? rule && value !== null && value !== undefined : true,
   max: (rule: number, value: number) => value <= rule,
+  min: (rule: number, value: number) => value >= rule,
 }
 
 /**
@@ -31,6 +32,9 @@ export const required = (value: boolean = true): Modifier<boolean> => {
 }
 export const help = (value: string) => {
   return { name: 'help', value }
+}
+export const defaultValue = (value: any) => {
+  return { name: 'default', value }
 }
 /**
  *
