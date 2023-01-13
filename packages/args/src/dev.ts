@@ -1,13 +1,11 @@
 import {
   boolean,
-  command,
   defineArgs,
   help,
-  helpArgs,
   helpOption,
   number,
-  param,
   required,
+  showHelp,
   string,
 } from './index'
 
@@ -22,7 +20,8 @@ const parseArgs = defineArgs({
     number('beta'),
     string('gama', [help('A sample help message'), required(false)]),
     boolean('delta', []),
-    helpOption(),
+    boolean('ajuda', [help('Show help message'), required(false), showHelp()]),
+    // helpOption(),
   ],
   // commands: [command('hello', {}), command('bye', {})],
   // command: command('hello', {s

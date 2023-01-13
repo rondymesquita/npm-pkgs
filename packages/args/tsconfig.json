@@ -10,7 +10,8 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "declaration": true,
+    "declaration": true
+    // "types": ["./src/types.d.ts"]
     // "strictBindCallApply": true
   },
   "exclude": ["**/**.spec*", "./jest.config.js", "./example/**", "./dist/*"]

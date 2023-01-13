@@ -3,7 +3,7 @@ import { ArgsDefinition, Modifier } from '.'
 
 const ui = cliui({} as any)
 
-export const showHelp = (definition: ArgsDefinition) => {
+export const printHelp = (definition: ArgsDefinition) => {
   // console.log('Options')
   ui.div('Usage: $0 [options]')
   ui.div({
@@ -38,4 +38,5 @@ export const showHelp = (definition: ArgsDefinition) => {
   })
 
   console.log(ui.toString())
+  return ui.toString()
 }

@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/rondymesquita/shell#readme",
   "dependencies": {
-    "lerna": "^6.1.0"
+    "lerna": "^6.4.1"
   },
   "workspaces": [
     "packages/*"

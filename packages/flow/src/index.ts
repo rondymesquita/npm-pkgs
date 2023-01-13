@@ -1,8 +1,6 @@
 import { Result, Stage, Status } from './types'
 export * from './types'
 
-// const stages =
-
 export const flow = (stages: Array<Stage>) => {
   const result: Array<Result> = []
   return () => {

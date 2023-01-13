@@ -8,13 +8,12 @@ import {
 } from './modifiers'
 import { parseValue } from './utils'
 import { boolean, OptionType } from './types'
-import { showHelp } from './help'
+import { printHelp } from './help'
 import { flow, Status } from '@rondymesquita/flow'
 
 export * from './modifiers'
 export * from './types'
 export * from './command'
-export * from './help'
 
 export type OptionValue = string | number | boolean
 export type Options = Record<string, OptionValue>
@@ -31,10 +30,7 @@ export interface ArgsDefinition {
 const SINGLE_DASH_REGEX = /^-(\w*)(=(.*))?$/
 const DOUBLE_DASH_REGEX = /^--(\w*)(=(.*))?$/
 
-export const param = (...params: any[]) => {}
-
-export const helpArgs = () => {}
-export const showErrors = (errors: string[]) => {
+const showErrors = (errors: string[]) => {
   printErrors(errors)
 }
 
@@ -47,7 +43,6 @@ const checkRequired = (option: OptionType, value: OptionValue) => {
     (mod: Modifier) => mod.name === 'required',
   )
   const isRequired = requiredOption ? requiredOption.value : false
-  // console.log({ isRequired, name: option.name, value })
   const isEmpty = value === undefined || value === null
   if (isRequired && isEmpty) {
     throw new Error(`"${option.name}" is required`)
@@ -55,8 +50,6 @@ const checkRequired = (option: OptionType, value: OptionValue) => {
 }
 
 const checkType = (option: OptionType, value: OptionValue) => {
-  console.log({ value })
-
   if (typeof value != option.type) {
     throw new Error(`"${option.name}" must be of type "${option.type}"`)
   }
@@ -67,7 +60,6 @@ const fillOptionsDefaultValues = (
   argv: Argv,
   value: any,
 ): Options => {
-  // console.log(option)
   const cloneArgOptions: Options = { ...argv.options }
 
   if (value) {
@@ -78,14 +70,11 @@ const fillOptionsDefaultValues = (
     const defaultModifier: Modifier = option.modifiers.find(
       (mod: Modifier) => mod.name === 'default',
     )
-    console.log(defaultModifier)
 
     if (defaultModifier) {
       cloneArgOptions[option.name] = defaultModifier.value
     }
   }
-
-  console.log(cloneArgOptions)
 
   return cloneArgOptions
 }
@@ -99,30 +88,34 @@ export const defineArgs = (definition?: ArgsDefinition) => {
   let errors: string[] = []
   const args = (args: string[]): Argv => {
     const argv = parseArgs(args)
+
+    console.log(JSON.stringify(definition, null, 2))
+    console.log(JSON.stringify(argv, null, 2))
+
+    // const isHelp = option
+
+    if (argv.options.help) {
+      printHelp(definition)
+      return argv
+    }
+
     for (let index = 0; index < definition.options.length; index++) {
       const option = definition.options[index]
       const value = argv.options[option.name]
-      // console.log({ option, value }, typeof value)
+      argv.options = fillOptionsDefaultValues(option, argv, value)
+    }
 
-      // argv.options = fillOptionsDefaultValues(option, argv, value)
+    for (let index = 0; index < definition.options.length; index++) {
+      const option = definition.options[index]
+      const value = argv.options[option.name]
 
-      // const requiredModifier: Modifier<any> = option.modifiers.find(
-      //   (mod: Modifier<any>) => mod.name === 'required',
-      // )
-
-      // if (requiredModifier && !requiredModifier.value) {
-      //   continue
-      // }
-      const execute = flow([
+      const result = flow([
         () => checkRequired(option, value),
         () => checkType(option, value),
-      ])
-      const result = execute()
+      ])()
       const optionErrors = result
         .filter((data) => data.status === Status.FAIL)
         .map((data) => data.result)
-
-      // console.log({ optionErrors })
 
       errors = errors.concat(optionErrors)
 
@@ -145,7 +138,7 @@ export const defineArgs = (definition?: ArgsDefinition) => {
 
     if (errors.length > 0) {
       showErrors(errors)
-      showHelp(definition)
+      printHelp(definition)
     }
 
     return argv

@@ -5,7 +5,13 @@ import {
   string,
   boolean,
   required,
+  defaultValue,
 } from './index'
+
+import { promisify } from 'util'
+import { exec as nodeExec, spawn } from 'child_process'
+const exec = promisify(nodeExec)
+// const spawn = promisify(nodeSpawn)
 
 describe('test', () => {
   it('parses options', () => {
@@ -83,6 +89,26 @@ describe('test', () => {
       errors: [],
     })
   })
+  it('fill default values when option is not passed', () => {
+    const parseArgs = defineArgs({
+      options: [
+        number('alpha', [defaultValue(5)]),
+        string('beta', [defaultValue('beta')]),
+        boolean('gama', [defaultValue(true)]),
+      ],
+    })
+
+    const argv = parseArgs([])
+    expect(argv).toEqual({
+      options: {
+        alpha: 5,
+        beta: 'beta',
+        gama: true,
+      },
+      params: [],
+      errors: [],
+    })
+  })
   it('returns errors when options are not passed', () => {
     const parseArgs = defineArgs({
       options: [number('alpha'), string('beta'), boolean('gamma')],
@@ -142,4 +168,6 @@ describe('test', () => {
       ],
     })
   })
+
+  it.only('show help when passing help option', () => {})
 })

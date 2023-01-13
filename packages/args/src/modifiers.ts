@@ -19,3 +19,6 @@ export const help = (value: string): Modifier => {
 export const defaultValue = (value: any): Modifier => {
   return { name: 'default', value }
 }
+export const showHelp = (): Modifier => {
+  return { name: 'showhelp', value: true }
+}
