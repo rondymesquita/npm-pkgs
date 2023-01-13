@@ -5,8 +5,6 @@ import {
   help,
   helpArgs,
   helpOption,
-  max,
-  min,
   number,
   param,
   required,
@@ -20,7 +18,7 @@ const parseArgs = defineArgs({
   // params: [string('alpha', [required()]), boolean('debug')],
   // options: [number('id', [required(), max(5)])],
   options: [
-    number('alpha', [min(6), max(6)]),
+    number('alpha', []),
     number('beta'),
     string('gama', [help('A sample help message'), required(false)]),
     boolean('delta', []),

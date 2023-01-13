@@ -1,54 +1,34 @@
-import { parseArgs, defineArgs, number } from './index'
+import {
+  parseArgs,
+  defineArgs,
+  number,
+  string,
+  boolean,
+  required,
+} from './index'
 
 describe('test', () => {
-  it('parses integers', () => {
-    const options = parseArgs('--alpha=1 -b=0'.split(' '))
+  it('parses options', () => {
+    const options = parseArgs(
+      '--alpha=1 -a=0 --beta=1.0 -b=0.5 --gama=gama -g=gama --delta -d --epsilon=true -e=false'.split(
+        ' ',
+      ),
+    )
     expect(options).toEqual({
       options: {
+        a: 0,
         alpha: 1,
-        b: 0,
-      },
-      params: [],
-    })
-  })
-  it('parses double', () => {
-    const options = parseArgs('--alpha=1.0 -b=0.5'.split(' '))
-    expect(options).toEqual({
-      options: {
-        alpha: 1.0,
         b: 0.5,
+        beta: 1,
+        d: true,
+        delta: true,
+        g: 'gama',
+        gama: 'gama',
+        e: false,
+        epsilon: true,
       },
       params: [],
-    })
-  })
-  it('parses string', () => {
-    const options = parseArgs('--alpha=alphavalue -b=bvalue'.split(' '))
-    expect(options).toEqual({
-      options: {
-        alpha: 'alphavalue',
-        b: 'bvalue',
-      },
-      params: [],
-    })
-  })
-  it('parses boolean', () => {
-    const options = parseArgs('--alpha -b'.split(' '))
-    expect(options).toEqual({
-      options: {
-        alpha: true,
-        b: true,
-      },
-      params: [],
-    })
-  })
-  it('parses boolean values', () => {
-    const options = parseArgs('--alpha=true -b=false'.split(' '))
-    expect(options).toEqual({
-      options: {
-        alpha: true,
-        b: false,
-      },
-      params: [],
+      errors: [],
     })
   })
   it('parses parameters', () => {
@@ -61,10 +41,11 @@ describe('test', () => {
         b: false,
       },
       params: ['fulano', 'sicrano'],
+      errors: [],
     })
   })
-  it('defines args parsing options', () => {
-    const parseArgs = defineArgs({})
+  it('defines args without options', () => {
+    const parseArgs = defineArgs()
 
     const argv = parseArgs(
       '--alpha=1 -a=0 --beta=1.0 -b=0.5 --gama=gama -g=gama --delta -d --epsilon=true -e=false'.split(
@@ -85,16 +66,80 @@ describe('test', () => {
         epsilon: true,
       },
       params: [],
+      errors: [],
     })
   })
-
-  it('throws an error when type', () => {
+  it('defines args with options', () => {
     const parseArgs = defineArgs({
       options: [number('alpha')],
     })
 
-    const assert = () => parseArgs('--gama=gama'.split(' '))
+    const argv = parseArgs('--alpha=1'.split(' '))
+    expect(argv).toEqual({
+      options: {
+        alpha: 1,
+      },
+      params: [],
+      errors: [],
+    })
+  })
+  it('returns errors when options are not passed', () => {
+    const parseArgs = defineArgs({
+      options: [number('alpha'), string('beta'), boolean('gamma')],
+    })
 
-    expect(assert()).rejects.toEqual(new Error('alpha'))
+    const argv = parseArgs(''.split(''))
+    expect(argv).toEqual({
+      options: {},
+      params: [],
+      errors: [
+        '"alpha" must be of type "number"',
+        '"beta" must be of type "string"',
+        '"gamma" must be of type "boolean"',
+      ],
+    })
+  })
+  it('returns errors when type does not match', () => {
+    const parseArgs = defineArgs({
+      options: [string('alpha'), boolean('beta'), number('gamma')],
+    })
+
+    const argv = parseArgs('--alpha=1 --beta=1.0 --gama=gama'.split(' '))
+    expect(argv).toEqual({
+      options: {
+        alpha: 1,
+        beta: 1,
+        gama: 'gama',
+      },
+      params: [],
+      errors: [
+        '"alpha" must be of type "string"',
+        '"beta" must be of type "boolean"',
+        '"gamma" must be of type "number"',
+      ],
+    })
+  })
+  it('returns errors when constraint does not satisfy', () => {
+    const parseArgs = defineArgs({
+      options: [
+        string('alpha'),
+        boolean('beta', [required(true)]),
+        number('gamma', []),
+      ],
+    })
+
+    const argv = parseArgs('--alpha=1 --gama=6'.split(' '))
+    expect(argv).toEqual({
+      options: {
+        alpha: 1,
+        gama: 6,
+      },
+      params: [],
+      errors: [
+        '"alpha" must be of type "string"',
+        '"beta" is required',
+        '"gamma" must be of type "number"',
+      ],
+    })
   })
 })

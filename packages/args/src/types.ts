@@ -1,4 +1,4 @@
-import { NumberModifier, StringModifier } from './modifiers'
+import { Modifier } from './modifiers'
 
 export interface OptionType {
   name: string
@@ -8,7 +8,7 @@ export interface OptionType {
 
 export const string = (
   name: string,
-  modifiers: StringModifier[] = [],
+  modifiers: Modifier[] = [],
 ): OptionType => {
   return { name, type: 'string', modifiers }
 }
@@ -17,7 +17,7 @@ export const boolean = (name: string, modifiers: any[] = []): OptionType => {
 }
 export const number = (
   name: string,
-  modifiers: NumberModifier[] = [],
+  modifiers: Modifier[] = [],
 ): OptionType => {
   return { name, type: 'number', modifiers }
 }

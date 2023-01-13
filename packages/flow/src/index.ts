@@ -1,14 +1,7 @@
-export enum Status {
-  OK = 'OK',
-  FAIL = 'FAIL',
-}
+import { Result, Stage, Status } from './types'
+export * from './types'
 
-export interface Result {
-  status: Status
-  result: any
-}
-
-export type Stage = () => any
+// const stages =
 
 export const flow = (stages: Array<Stage>) => {
   const result: Array<Result> = []

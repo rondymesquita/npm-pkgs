@@ -18,7 +18,7 @@ export const showHelp = (definition: ArgsDefinition) => {
     }
 
     const helpModifier = option.modifiers.find(
-      (mod: Modifier<string>) => mod.name === 'help',
+      (mod: Modifier) => mod.name === 'help',
     )
     const helpText = helpModifier ? helpModifier.value : ''
     const helpMessage = {
@@ -27,8 +27,8 @@ export const showHelp = (definition: ArgsDefinition) => {
     }
 
     const modifiersArray = option.modifiers
-      .filter((modifier: Modifier<any>) => modifier.name !== 'help')
-      .map((modifier: Modifier<any>) => `[${modifier.name}:${modifier.value}]`)
+      .filter((modifier: Modifier) => modifier.name !== 'help')
+      .map((modifier: Modifier) => `[${modifier.name}:${modifier.value}]`)
     modifiersArray.unshift(`[${option.type}]`)
     const modifiers = {
       text: modifiersArray.join(', '),
@@ -38,5 +38,4 @@ export const showHelp = (definition: ArgsDefinition) => {
   })
 
   console.log(ui.toString())
-  // console.log(definition.options)
 }
