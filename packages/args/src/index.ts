@@ -9,7 +9,7 @@ import {
 import { parseValue } from './utils'
 import { boolean, OptionType } from './types'
 import { printHelp } from './help'
-import { flow, Status } from '@rondymesquita/flow'
+import { Context, flow, Status } from '@rondymesquita/flow'
 
 export * from './modifiers'
 export * from './types'
@@ -38,12 +38,28 @@ export const helpOption = () => {
   return boolean('help', [help('Show help message'), required(false)])
 }
 
-const checkRequired = (option: OptionType, value: OptionValue) => {
+const checkRequired = (
+  option: OptionType,
+  value: OptionValue,
+  ctx: Context,
+) => {
+  const requiredOption = option.modifiers.find(
+    (mod: Modifier) => mod.name === 'required',
+  )
+  const isRequired = requiredOption ? requiredOption.value : false
+
+  if (!isRequired) {
+    ctx.interrupt()
+  }
+}
+const checkValue = (option: OptionType, value: OptionValue, ctx: Context) => {
   const requiredOption = option.modifiers.find(
     (mod: Modifier) => mod.name === 'required',
   )
   const isRequired = requiredOption ? requiredOption.value : false
   const isEmpty = value === undefined || value === null
+  console.log({ isRequired, isEmpty })
+
   if (isRequired && isEmpty) {
     throw new Error(`"${option.name}" is required`)
   }
@@ -89,12 +105,13 @@ export const defineArgs = (definition?: ArgsDefinition) => {
   const args = (args: string[]): Argv => {
     const argv = parseArgs(args)
 
-    console.log(JSON.stringify(definition, null, 2))
-    console.log(JSON.stringify(argv, null, 2))
+    const isHelp = definition.options.find((option) => {
+      return option.modifiers.find((mod) => {
+        return mod.name === 'showhelp'
+      })
+    })
 
-    // const isHelp = option
-
-    if (argv.options.help) {
+    if (argv.options[isHelp?.name!]) {
       printHelp(definition)
       return argv
     }
@@ -110,7 +127,8 @@ export const defineArgs = (definition?: ArgsDefinition) => {
       const value = argv.options[option.name]
 
       const result = flow([
-        () => checkRequired(option, value),
+        (ctx: Context) => checkRequired(option, value, ctx),
+        (ctx: Context) => checkValue(option, value, ctx),
         () => checkType(option, value),
       ])()
       const optionErrors = result

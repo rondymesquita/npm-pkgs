@@ -17,10 +17,10 @@ const parseArgs = defineArgs({
   // options: [number('id', [required(), max(5)])],
   options: [
     number('alpha', []),
-    number('beta'),
-    string('gama', [help('A sample help message'), required(false)]),
+    number('beta', []),
+    string('gama', [help('A sample help message')]),
     boolean('delta', []),
-    boolean('ajuda', [help('Show help message'), required(false), showHelp()]),
+    boolean('ajuda', [help('Show help message'), showHelp()]),
     // helpOption(),
   ],
   // commands: [command('hello', {}), command('bye', {})],

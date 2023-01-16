@@ -8,4 +8,8 @@ export interface Result {
   result: any
 }
 
-export type Stage = () => any
+export type Stage = (ctx: Context) => any
+
+export interface Context {
+  interrupt: () => void
+}
