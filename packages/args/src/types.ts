@@ -15,9 +15,13 @@ export const string = (
 export const boolean = (name: string, modifiers: any[] = []): OptionType => {
   return { name, type: 'boolean', modifiers }
 }
-export const number = (
-  name: string,
-  modifiers: Modifier[] = [],
-): OptionType => {
+// export const number = (
+//   name: string,
+//   modifiers: Modifier[] = [],
+// ): OptionType => {
+//   return { name, type: 'number', modifiers }
+// }
+
+export const number = (name: string, modifiers: any[] = []): OptionType => {
   return { name, type: 'number', modifiers }
 }

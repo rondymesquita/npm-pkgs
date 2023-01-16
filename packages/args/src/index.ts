@@ -1,10 +1,14 @@
 import { printErrors } from './errors'
 import {
-  defaultValue,
-  help,
+  // defaultValue,
+  // help,
   Modifier,
-  required,
-  constraints,
+  // required,
+  ValidatorModifier,
+  ConfigModifier,
+  help,
+  showHelp,
+  // showHelp,
 } from './modifiers'
 import { parseValue } from './utils'
 import { boolean, OptionType } from './types'
@@ -35,7 +39,7 @@ const showErrors = (errors: string[]) => {
 }
 
 export const helpOption = () => {
-  return boolean('help', [help('Show help message'), required(false)])
+  return boolean('ajuda', [help('Show help message'), showHelp()])
 }
 
 const checkRequired = (
@@ -52,7 +56,7 @@ const checkRequired = (
     ctx.interrupt()
   }
 }
-const checkValue = (option: OptionType, value: OptionValue, ctx: Context) => {
+const checkValue = (option: OptionType, value: OptionValue) => {
   const requiredOption = option.modifiers.find(
     (mod: Modifier) => mod.name === 'required',
   )
@@ -83,7 +87,7 @@ const fillOptionsDefaultValues = (
   }
 
   if (!argv.options[option.name]) {
-    const defaultModifier: Modifier = option.modifiers.find(
+    const defaultModifier: ConfigModifier = option.modifiers.find(
       (mod: Modifier) => mod.name === 'default',
     )
 
@@ -95,8 +99,26 @@ const fillOptionsDefaultValues = (
   return cloneArgOptions
 }
 
+export const defineModifier = (...modifiers: Modifier[]) => {
+  console.log(modifiers)
+}
+
+export function defineValidator(
+  name: string,
+  validator: (rule: any, value: any) => any,
+) {
+  return (rule: any): ValidatorModifier => {
+    return {
+      name,
+      rule,
+      validator: (rule: any, value: any) => validator(rule, value),
+    }
+  }
+}
+
 export const defineArgs = (definition?: ArgsDefinition) => {
-  // console.log(definition)
+  console.log('%o', definition)
+
   if (!definition) {
     return parseArgs
   }
@@ -128,7 +150,7 @@ export const defineArgs = (definition?: ArgsDefinition) => {
 
       const result = flow([
         (ctx: Context) => checkRequired(option, value, ctx),
-        (ctx: Context) => checkValue(option, value, ctx),
+        () => checkValue(option, value),
         () => checkType(option, value),
       ])()
       const optionErrors = result
@@ -137,19 +159,15 @@ export const defineArgs = (definition?: ArgsDefinition) => {
 
       errors = errors.concat(optionErrors)
 
-      // option.modifiers.forEach((modifier: any) => {
-      //   const { name: modifierName, value: modifierValue } = modifier
-      //   // const modifierValue = modifier[name]
-
-      //   // const modifierValidator = constraints[modifierName]
-
-      //   // if (modifierValidator && !modifierValidator(modifierValue, value)) {
-      //   //   console.log(option.name, modifierValidator, modifierValue, value)
-      //   //   errors.push(
-      //   //     `"${option.name}" must satisfy "${modifierName}" contraint. Expected:"${modifierValue}". Received:"${value}".`,
-      //   //   )
-      //   // }
-      // })
+      option.modifiers.forEach((modifier: Modifier) => {
+        if ('validator' in modifier) {
+          if (!modifier.validator(modifier.rule, value)) {
+            errors.push(
+              `"${option.name}" must satisfy "${modifier.name}" contraint. Expected:"${modifier.rule}". Received:"${value}".`,
+            )
+          }
+        }
+      })
     }
 
     argv.errors = errors

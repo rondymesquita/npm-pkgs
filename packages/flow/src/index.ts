@@ -24,8 +24,6 @@ export const flow = (stages: Array<Stage>) => {
           result: stageResult,
         })
         if (contextResults.interrupted) {
-          console.log('interrupted')
-
           break
         }
       } catch (error) {

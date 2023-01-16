@@ -1,26 +1,48 @@
 import {
   boolean,
   defineArgs,
+  defineValidator,
   help,
-  helpOption,
+  // help,
+  // helpOption,
   number,
-  required,
   showHelp,
+  // required,
+  // showHelp,
   string,
+  ValidatorModifier,
 } from './index'
 
 // param('test')
 
+// const max2 = (rule: number) => ({
+//   name: 'max',
+//   rule,
+//   validate: (rule: number, value: number) => {
+//     return value <= rule
+//   },
+// })
+
+// const max = (rule: number) => {
+//   return (value: number) => {
+//     return value >= rule
+//   }
+// }
+
+const max = defineValidator('max', (rule: number, value: number) => {
+  return value <= rule
+})
 const parseArgs = defineArgs({
   // name: "",
   // params: [string('alpha', [required()]), boolean('debug')],
   // options: [number('id', [required(), max(5)])],
   options: [
-    number('alpha', []),
-    number('beta', []),
-    string('gama', [help('A sample help message')]),
-    boolean('delta', []),
+    number('alpha', [help('A random value'), max(6)]),
+    // number('beta', []),
+    // string('gama', [help('A sample help message')]),
+    // boolean('delta', []),
     boolean('ajuda', [help('Show help message'), showHelp()]),
+    // boolean('ajuda', [help('Show help message')]),
     // helpOption(),
   ],
   // commands: [command('hello', {}), command('bye', {})],

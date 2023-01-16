@@ -1,10 +1,9 @@
 import cliui from 'cliui'
-import { ArgsDefinition, Modifier } from '.'
+import { ArgsDefinition, ConfigModifier, Modifier } from '.'
 
 const ui = cliui({} as any)
 
 export const printHelp = (definition: ArgsDefinition) => {
-  // console.log('Options')
   ui.div('Usage: $0 [options]')
   ui.div({
     text: 'Options:',
@@ -27,8 +26,14 @@ export const printHelp = (definition: ArgsDefinition) => {
     }
 
     const modifiersArray = option.modifiers
-      .filter((modifier: Modifier) => modifier.name !== 'help')
-      .map((modifier: Modifier) => `[${modifier.name}:${modifier.value}]`)
+      .filter(
+        (modifier: Modifier) =>
+          modifier.name !== 'help' && modifier.name !== 'showhelp',
+      )
+      .map((modifier: Modifier) => {
+        const description = 'value' in modifier ? modifier.value : modifier.rule
+        return `[${modifier.name}:${description}]`
+      })
     modifiersArray.unshift(`[${option.type}]`)
     const modifiers = {
       text: modifiersArray.join(', '),
