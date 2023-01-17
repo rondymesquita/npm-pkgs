@@ -34,11 +34,7 @@ const createHelpFunction = (namespace: string) => {
 function createTasksFunction(namespace: string = '') {
   const name = namespace
 
-  const createTasks = (
-    taskDef: TaskDef | Task | Task[],
-    tasks: any = {},
-    namespace: string = '',
-  ) => {
+  const createTasks = (taskDef: TaskDef | Task | Task[]) => {
     return deepFlattenTask(taskDef, name)
   }
   return createTasks
@@ -80,12 +76,13 @@ export async function tasks(taskDef: TaskDef) {
 
   const task = name ? tasks[name] : tasks.default
 
+  console.log({ tasks })
+
   const isThereAnyNonDefaultTask =
-    Object.keys(tasks).filter((name: string) => name !== 'default').length > 0
+    Object.keys(tasks).filter((name: string) => name === 'default').length > 0
 
-  console.log({ tasks, task })
-
-  if (!name && isThereAnyNonDefaultTask) {
+  console.log({ tasks, isThereAnyNonDefaultTask })
+  if (!name && !isThereAnyNonDefaultTask) {
     throw new TaskNameNotInformedError()
   }
 
