@@ -25,6 +25,7 @@ export interface Argv {
 }
 
 export interface ArgsDefinition {
+  name?: string
   options: OptionType[]
 }
 

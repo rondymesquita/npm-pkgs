@@ -23,7 +23,6 @@ export const checkValue = (option: OptionType, value: OptionValue) => {
   )
   const isRequired = requiredOption ? requiredOption.value : false
   const isEmpty = value === undefined || value === null
-  console.log({ isRequired, isEmpty })
 
   if (isRequired && isEmpty) {
     throw new Error(`"${option.name}" is required`)

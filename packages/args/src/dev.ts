@@ -12,7 +12,7 @@ const max = defineValidator('max', (rule: number, value: number) => {
   return value <= rule
 })
 const parseArgs = defineArgs({
-  // name: "",
+  name: 'mycli',
   // params: [string('alpha', [required()]), boolean('debug')],
   // options: [number('id', [required(), max(5)])],
   options: [

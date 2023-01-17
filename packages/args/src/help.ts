@@ -11,7 +11,16 @@ import {
 const ui = cliui({} as any)
 
 export const defineHelp = (definition: ArgsDefinition) => {
-  const helpMessage: any = []
+  const body: any = []
+  const header: any = []
+
+  const name = definition.name ? definition.name : '$0'
+
+  header.push(`Usage: ${name} [options]`)
+  header.push({
+    text: 'Options:',
+    padding: [1],
+  })
 
   definition.options.forEach((option) => {
     const name = {
@@ -42,20 +51,19 @@ export const defineHelp = (definition: ArgsDefinition) => {
       padding: [0],
     }
 
-    helpMessage.push({ name, message, modifiers })
+    body.push({ name, message, modifiers })
   })
-  return helpMessage
+  return { header, body }
 }
 
 export const printHelp = (definition: ArgsDefinition) => {
-  const helpMessage = defineHelp(definition)
-  ui.div('Usage: $0 [options]')
-  ui.div({
-    text: 'Options:',
-    padding: [1],
+  const { header, body } = defineHelp(definition)
+
+  header.forEach((row: any) => {
+    ui.div(row)
   })
 
-  helpMessage.forEach(({ name, message, modifiers }: any) => {
+  body.forEach(({ name, message, modifiers }: any) => {
     ui.div(name, message, modifiers)
   })
   console.log(ui.toString())
