@@ -12,16 +12,15 @@ export const string = (
 ): OptionType => {
   return { name, type: 'string', modifiers }
 }
-export const boolean = (name: string, modifiers: any[] = []): OptionType => {
+export const boolean = (
+  name: string,
+  modifiers: Modifier[] = [],
+): OptionType => {
   return { name, type: 'boolean', modifiers }
 }
-// export const number = (
-//   name: string,
-//   modifiers: Modifier[] = [],
-// ): OptionType => {
-//   return { name, type: 'number', modifiers }
-// }
-
-export const number = (name: string, modifiers: any[] = []): OptionType => {
+export const number = (
+  name: string,
+  modifiers: Modifier[] = [],
+): OptionType => {
   return { name, type: 'number', modifiers }
 }

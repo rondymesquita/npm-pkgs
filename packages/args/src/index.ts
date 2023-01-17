@@ -8,6 +8,7 @@ import {
   ConfigModifier,
   help,
   showHelp,
+  ModifierType,
   // showHelp,
 } from './modifiers'
 import { parseValue } from './utils'
@@ -99,19 +100,16 @@ const fillOptionsDefaultValues = (
   return cloneArgOptions
 }
 
-export const defineModifier = (...modifiers: Modifier[]) => {
-  console.log(modifiers)
-}
-
 export function defineValidator(
   name: string,
-  validator: (rule: any, value: any) => any,
+  validator: (value: any, argValue: any) => any,
 ) {
-  return (rule: any): ValidatorModifier => {
+  return (value: any): ValidatorModifier => {
     return {
       name,
-      rule,
-      validator: (rule: any, value: any) => validator(rule, value),
+      value,
+      type: ModifierType.VALIDATOR,
+      validator: (value: any, argValue: any) => validator(value, argValue),
     }
   }
 }
@@ -159,13 +157,14 @@ export const defineArgs = (definition?: ArgsDefinition) => {
 
       errors = errors.concat(optionErrors)
 
-      option.modifiers.forEach((modifier: Modifier) => {
-        if ('validator' in modifier) {
-          if (!modifier.validator(modifier.rule, value)) {
-            errors.push(
-              `"${option.name}" must satisfy "${modifier.name}" contraint. Expected:"${modifier.rule}". Received:"${value}".`,
-            )
-          }
+      const validators = option.modifiers.filter(
+        (mod: Modifier) => mod.type === ModifierType.VALIDATOR,
+      )
+      validators.forEach((modifier: ValidatorModifier) => {
+        if (!modifier.validator(modifier.value, value)) {
+          errors.push(
+            `"${option.name}" must satisfy "${modifier.name}" contraint. Expected:"${modifier.value}". Received:"${value}".`,
+          )
         }
       })
     }

@@ -1,17 +1,20 @@
 import cliui from 'cliui'
-import { ArgsDefinition, ConfigModifier, Modifier } from '.'
+import {
+  ArgsDefinition,
+  ConfigModifier,
+  defineArgs,
+  Modifier,
+  ModifierType,
+  ValidatorModifier,
+} from '.'
 
 const ui = cliui({} as any)
 
-export const printHelp = (definition: ArgsDefinition) => {
-  ui.div('Usage: $0 [options]')
-  ui.div({
-    text: 'Options:',
-    padding: [1],
-  })
+export const defineHelp = (definition: ArgsDefinition) => {
+  const helpMessage: any = []
 
   definition.options.forEach((option) => {
-    const paramName = {
+    const name = {
       text: `--${option.name}`,
       padding: [0],
     }
@@ -20,7 +23,7 @@ export const printHelp = (definition: ArgsDefinition) => {
       (mod: Modifier) => mod.name === 'help',
     )
     const helpText = helpModifier ? helpModifier.value : ''
-    const helpMessage = {
+    const message = {
       text: helpText,
       padding: [0],
     }
@@ -31,17 +34,29 @@ export const printHelp = (definition: ArgsDefinition) => {
           modifier.name !== 'help' && modifier.name !== 'showhelp',
       )
       .map((modifier: Modifier) => {
-        const description = 'value' in modifier ? modifier.value : modifier.rule
-        return `[${modifier.name}:${description}]`
+        return `[${modifier.name}:${modifier.value}]`
       })
     modifiersArray.unshift(`[${option.type}]`)
     const modifiers = {
       text: modifiersArray.join(', '),
       padding: [0],
     }
-    ui.div(paramName, helpMessage, modifiers)
+
+    helpMessage.push({ name, message, modifiers })
+  })
+  return helpMessage
+}
+
+export const printHelp = (definition: ArgsDefinition) => {
+  const helpMessage = defineHelp(definition)
+  ui.div('Usage: $0 [options]')
+  ui.div({
+    text: 'Options:',
+    padding: [1],
   })
 
+  helpMessage.forEach(({ name, message, modifiers }: any) => {
+    ui.div(name, message, modifiers)
+  })
   console.log(ui.toString())
-  return ui.toString()
 }

@@ -1,38 +1,36 @@
 import { string } from './types'
 
-export interface ValidatorModifier {
-  name: string
-  rule: any
-  validator: (rule: any, value: any) => any | Promise<any>
-}
-
-export interface ConfigModifier {
-  name: string
-  value: any
-}
-
 export enum ModifierType {
   CONFIG,
   VALIDATOR,
-  ACTION,
 }
 
-export type Modifier = ValidatorModifier | ConfigModifier
-
-export const constraints: { [key: string]: Function } = {
-  required: (rule: boolean, value: string | number | boolean) =>
-    rule && value !== null && value !== undefined,
+export interface Modifier {
+  name: string
+  type: ModifierType
+  value: any
 }
 
-// export const required = (value: boolean = true): Modifier => {
-//   return { name: 'required', value }
-// }
+export type Validator = (rule: any, value: any) => any | Promise<any>
+
+export interface ValidatorModifier extends Modifier {
+  type: ModifierType.VALIDATOR
+  validator: Validator
+}
+
+export interface ConfigModifier extends Modifier {
+  type: ModifierType.CONFIG
+}
+
+export const required = (value: boolean = true): ConfigModifier => {
+  return { name: 'required', value, type: ModifierType.CONFIG }
+}
 export const help = (value: string): ConfigModifier => {
-  return { name: 'help', value }
+  return { name: 'help', value, type: ModifierType.CONFIG }
 }
 export const defaultValue = (value: any): ConfigModifier => {
-  return { name: 'defaultvalue', value }
+  return { name: 'defaultvalue', value, type: ModifierType.CONFIG }
 }
 export const showHelp = (): ConfigModifier => {
-  return { name: 'showhelp', value: true }
+  return { name: 'showhelp', value: true, type: ModifierType.CONFIG }
 }
