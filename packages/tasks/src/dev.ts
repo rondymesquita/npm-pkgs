@@ -23,11 +23,12 @@ const test = namespace('test', ({ help, tasks }) => {
     await new Promise((res) => setTimeout(res, 2000))
   }
 
-  return tasks({ clean, build: [clean, build] })
+  return tasks({ default: build, clean, build: [clean, build] })
 })
 
 tasks({
   clean,
+  default: build,
   build: [clean, build],
   ...test,
 })

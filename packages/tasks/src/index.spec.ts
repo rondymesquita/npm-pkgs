@@ -70,20 +70,6 @@ describe('tasks', () => {
     expect(tasksMock.fake.default).toBeCalledTimes(1)
   })
 
-  it('calls a default task in namespace', () => {
-    process.argv = ['bin', 'file', 'fake']
-
-    const tasksMock = {
-      fake: {
-        default: jest.fn(),
-      },
-    }
-
-    expect(tasksMock.fake.default).not.toHaveBeenCalled()
-    tasks(tasksMock)
-    expect(tasksMock.fake.default).toBeCalledTimes(1)
-  })
-
   it('throws an error when no task name is informed and no default task exists', () => {
     process.argv = ['bin', 'file']
 
@@ -113,7 +99,11 @@ describe('tasks', () => {
 
     tasks(tasksMock)
     expect(tasksMock.fake).toHaveBeenCalledWith({
-      argv: { options: { alpha: 'value', b: true }, params: ['fake'] },
+      argv: {
+        options: { alpha: 'value', b: true },
+        params: ['fake'],
+        errors: [],
+      },
     })
   })
 })
