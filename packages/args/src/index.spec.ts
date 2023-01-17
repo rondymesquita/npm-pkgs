@@ -91,7 +91,7 @@ describe('test', () => {
       errors: [],
     })
   })
-  it.only('fill default values when option is not passed', () => {
+  it('fill default values when option is not passed', () => {
     const parseArgs = defineArgs({
       options: [
         number('alpha', [defaultValue(5)]),

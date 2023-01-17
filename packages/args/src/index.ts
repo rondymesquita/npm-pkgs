@@ -9,7 +9,7 @@ import { parseValue } from './utils'
 import { boolean, OptionType } from './types'
 import { printHelp } from './help'
 import { Context, flow, Status } from '@rondymesquita/flow'
-import { checkRequired, checkType, checkValue } from './argcheck'
+import { checkType, checkValue } from './argcheck'
 
 export * from './modifiers'
 export * from './types'
@@ -99,7 +99,6 @@ export const defineArgs = (definition?: ArgsDefinition) => {
       const value = argv.options[option.name]
 
       const result = flow([
-        (ctx: Context) => checkRequired(option, value, ctx),
         () => checkValue(option, value),
         () => checkType(option, value),
       ])()
