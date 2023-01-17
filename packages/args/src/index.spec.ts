@@ -6,6 +6,8 @@ import {
   boolean,
   required,
   defaultValue,
+  defineValidator,
+  Validator,
 } from './index'
 
 import { promisify } from 'util'
@@ -89,7 +91,7 @@ describe('test', () => {
       errors: [],
     })
   })
-  it('fill default values when option is not passed', () => {
+  it.only('fill default values when option is not passed', () => {
     const parseArgs = defineArgs({
       options: [
         number('alpha', [defaultValue(5)]),
@@ -109,7 +111,7 @@ describe('test', () => {
       errors: [],
     })
   })
-  it('returns errors when options are not passed', () => {
+  it('returns type errors when values are not passed', () => {
     const parseArgs = defineArgs({
       options: [number('alpha'), string('beta'), boolean('gamma')],
     })
@@ -125,7 +127,7 @@ describe('test', () => {
       ],
     })
   })
-  it('returns errors when type does not match', () => {
+  it('returns type errors when type does not match', () => {
     const parseArgs = defineArgs({
       options: [string('alpha'), boolean('beta'), number('gamma')],
     })
@@ -154,20 +156,66 @@ describe('test', () => {
       ],
     })
 
-    const argv = parseArgs('--alpha=1 --gama=6'.split(' '))
+    const argv = parseArgs('--alpha=alpha --gamma=6'.split(' '))
     expect(argv).toEqual({
       options: {
-        alpha: 1,
-        gama: 6,
+        alpha: 'alpha',
+        gamma: 6,
       },
       params: [],
-      errors: [
-        '"alpha" must be of type "string"',
-        '"beta" is required',
-        '"gamma" must be of type "number"',
-      ],
+      errors: ['"beta" is required'],
     })
   })
+  it('defines a number validator', () => {
+    const max = defineValidator('max', (rule: number, value: number) => {
+      return value <= rule
+    })
 
-  it.only('show help when passing help option', () => {})
+    expect(max(4)).toEqual({
+      name: 'max',
+      type: 'VALIDATOR',
+      validate: expect.any(Function),
+      value: 4,
+    })
+
+    expect(max(4).validate(3)).toBeTruthy()
+    expect(max(4).validate(4)).toBeTruthy()
+    expect(max(4).validate(5)).toBeFalsy()
+  })
+
+  it('defines a string validator', () => {
+    const length = defineValidator('length', (rule: number, value: string) => {
+      return value.length <= rule
+    })
+
+    expect(length(4)).toEqual({
+      name: 'length',
+      type: 'VALIDATOR',
+      validate: expect.any(Function),
+      value: 4,
+    })
+
+    expect(length(6).validate('alpha')).toBeTruthy()
+    expect(length(5).validate('alpha')).toBeTruthy()
+    expect(length(4).validate('alpha')).toBeFalsy()
+  })
+
+  it('defines an array validator', () => {
+    const includes = defineValidator(
+      'includes',
+      (rule: string, value: Array<string>) => {
+        return value.includes(rule)
+      },
+    )
+
+    expect(includes('alpha')).toEqual({
+      name: 'includes',
+      type: 'VALIDATOR',
+      validate: expect.any(Function),
+      value: 'alpha',
+    })
+
+    expect(includes('alpha').validate(['alpha', 'beta'])).toBeTruthy()
+    expect(includes('alpha').validate(['beta'])).toBeFalsy()
+  })
 })

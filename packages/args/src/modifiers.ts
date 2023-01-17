@@ -1,8 +1,8 @@
 import { string } from './types'
 
 export enum ModifierType {
-  CONFIG,
-  VALIDATOR,
+  CONFIG = 'CONFIG',
+  VALIDATOR = 'VALIDATOR',
 }
 
 export interface Modifier {
@@ -11,11 +11,11 @@ export interface Modifier {
   value: any
 }
 
-export type Validator = (rule: any, value: any) => any | Promise<any>
+export type Validator<U> = (argValue: U) => any | Promise<any>
 
-export interface ValidatorModifier extends Modifier {
+export interface ValidatorModifier<U> extends Modifier {
   type: ModifierType.VALIDATOR
-  validator: Validator
+  validate: Validator<U>
 }
 
 export interface ConfigModifier extends Modifier {

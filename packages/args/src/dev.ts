@@ -3,31 +3,10 @@ import {
   defineArgs,
   defineValidator,
   help,
-  // help,
-  // helpOption,
+  helpOption,
   number,
   showHelp,
-  // required,
-  // showHelp,
-  string,
-  ValidatorModifier,
 } from './index'
-
-// param('test')
-
-// const max2 = (rule: number) => ({
-//   name: 'max',
-//   rule,
-//   validate: (rule: number, value: number) => {
-//     return value <= rule
-//   },
-// })
-
-// const max = (rule: number) => {
-//   return (value: number) => {
-//     return value >= rule
-//   }
-// }
 
 const max = defineValidator('max', (rule: number, value: number) => {
   return value <= rule
@@ -41,9 +20,9 @@ const parseArgs = defineArgs({
     // number('beta', []),
     // string('gama', [help('A sample help message')]),
     // boolean('delta', []),
-    boolean('ajuda', [help('Show help message'), showHelp()]),
+    // boolean('ajuda', [help('Show help message'), showHelp()]),
     // boolean('ajuda', [help('Show help message')]),
-    // helpOption(),
+    helpOption(),
   ],
   // commands: [command('hello', {}), command('bye', {})],
   // command: command('hello', {s

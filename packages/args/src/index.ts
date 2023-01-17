@@ -1,24 +1,20 @@
 import { printErrors } from './errors'
 import {
-  // defaultValue,
-  // help,
   Modifier,
-  // required,
   ValidatorModifier,
   ConfigModifier,
-  help,
-  showHelp,
   ModifierType,
-  // showHelp,
 } from './modifiers'
 import { parseValue } from './utils'
 import { boolean, OptionType } from './types'
 import { printHelp } from './help'
 import { Context, flow, Status } from '@rondymesquita/flow'
+import { checkRequired, checkType, checkValue } from './argcheck'
 
 export * from './modifiers'
 export * from './types'
 export * from './command'
+export * from './options'
 
 export type OptionValue = string | number | boolean
 export type Options = Record<string, OptionValue>
@@ -34,48 +30,6 @@ export interface ArgsDefinition {
 
 const SINGLE_DASH_REGEX = /^-(\w*)(=(.*))?$/
 const DOUBLE_DASH_REGEX = /^--(\w*)(=(.*))?$/
-
-const showErrors = (errors: string[]) => {
-  printErrors(errors)
-}
-
-export const helpOption = () => {
-  return boolean('ajuda', [help('Show help message'), showHelp()])
-}
-
-const checkRequired = (
-  option: OptionType,
-  value: OptionValue,
-  ctx: Context,
-) => {
-  const requiredOption = option.modifiers.find(
-    (mod: Modifier) => mod.name === 'required',
-  )
-  const isRequired = requiredOption ? requiredOption.value : false
-
-  if (!isRequired) {
-    ctx.interrupt()
-  }
-}
-const checkValue = (option: OptionType, value: OptionValue) => {
-  const requiredOption = option.modifiers.find(
-    (mod: Modifier) => mod.name === 'required',
-  )
-  const isRequired = requiredOption ? requiredOption.value : false
-  const isEmpty = value === undefined || value === null
-  console.log({ isRequired, isEmpty })
-
-  if (isRequired && isEmpty) {
-    throw new Error(`"${option.name}" is required`)
-  }
-}
-
-const checkType = (option: OptionType, value: OptionValue) => {
-  if (typeof value != option.type) {
-    throw new Error(`"${option.name}" must be of type "${option.type}"`)
-  }
-}
-
 const fillOptionsDefaultValues = (
   option: OptionType,
   argv: Argv,
@@ -89,7 +43,7 @@ const fillOptionsDefaultValues = (
 
   if (!argv.options[option.name]) {
     const defaultModifier: ConfigModifier = option.modifiers.find(
-      (mod: Modifier) => mod.name === 'default',
+      (mod: Modifier) => mod.name === 'defaultvalue',
     )
 
     if (defaultModifier) {
@@ -100,23 +54,20 @@ const fillOptionsDefaultValues = (
   return cloneArgOptions
 }
 
-export function defineValidator(
-  name: string,
-  validator: (value: any, argValue: any) => any,
-) {
-  return (value: any): ValidatorModifier => {
+type Handler<T, U> = (value: T, argValue: U) => boolean
+
+export function defineValidator<T, U>(name: string, handler: Handler<T, U>) {
+  return (value: T): ValidatorModifier<U> => {
     return {
       name,
       value,
       type: ModifierType.VALIDATOR,
-      validator: (value: any, argValue: any) => validator(value, argValue),
+      validate: <V extends U>(argValue: V) => handler(value, argValue),
     }
   }
 }
 
 export const defineArgs = (definition?: ArgsDefinition) => {
-  console.log('%o', definition)
-
   if (!definition) {
     return parseArgs
   }
@@ -160,8 +111,8 @@ export const defineArgs = (definition?: ArgsDefinition) => {
       const validators = option.modifiers.filter(
         (mod: Modifier) => mod.type === ModifierType.VALIDATOR,
       )
-      validators.forEach((modifier: ValidatorModifier) => {
-        if (!modifier.validator(modifier.value, value)) {
+      validators.forEach((modifier: ValidatorModifier<any>) => {
+        if (!modifier.validate(value)) {
           errors.push(
             `"${option.name}" must satisfy "${modifier.name}" contraint. Expected:"${modifier.value}". Received:"${value}".`,
           )
@@ -172,7 +123,7 @@ export const defineArgs = (definition?: ArgsDefinition) => {
     argv.errors = errors
 
     if (errors.length > 0) {
-      showErrors(errors)
+      printErrors(errors)
       printHelp(definition)
     }
 
