@@ -5,66 +5,96 @@ import {
   defineArgs,
   Modifier,
   ModifierType,
+  Option,
   ValidatorModifier,
 } from '.'
 
 const ui = cliui({} as any)
 
-export const defineHelp = (definition: ArgsDefinition) => {
-  const body: any = []
-  const header: any = []
+interface UiElement {
+  text: string
+  padding: Array<number>
+}
+interface OptionHelp {
+  name: UiElement
+  description: UiElement
+  modifiers: UiElement
+}
 
-  const name = definition.name ? definition.name : '$0'
+export const buildOptionHelp = (option: Option): OptionHelp => {
+  const name = {
+    text: `--${option.name}`,
+    padding: [0],
+  }
 
-  header.push(`Usage: ${name} [options]`)
+  const helpModifier = option.modifiers.find(
+    (mod: Modifier) => mod.name === 'help',
+  )
+
+  const description = {
+    text: helpModifier ? helpModifier.value : '',
+    padding: [0],
+  }
+
+  const modifiersArray = option.modifiers
+    .filter(
+      (modifier: Modifier) =>
+        modifier.name !== 'help' && modifier.name !== 'showhelp',
+    )
+    .map((modifier: Modifier) => {
+      return `[${modifier.name}:${modifier.value}]`
+    })
+  modifiersArray.unshift(`[${option.type}]`)
+  const modifiers = {
+    text: modifiersArray.join(', '),
+    padding: [0],
+  }
+
+  return { name, description, modifiers }
+}
+
+export const buildHelp = (
+  definition: ArgsDefinition,
+): {
+  header: Array<UiElement>
+  body: Array<OptionHelp>
+} => {
+  const header: Array<UiElement> = []
+  const body: Array<OptionHelp> = []
+
+  const name = definition.name ? definition.name : ''
+  const usage = definition.usage ? definition.usage(name) : ''
+
+  name &&
+    header.push({
+      text: name,
+      padding: [0],
+    })
+  usage &&
+    header.push({
+      text: usage,
+      padding: [0],
+    })
   header.push({
     text: 'Options:',
     padding: [1],
   })
 
-  definition.options.forEach((option) => {
-    const name = {
-      text: `--${option.name}`,
-      padding: [0],
-    }
-
-    const helpModifier = option.modifiers.find(
-      (mod: Modifier) => mod.name === 'help',
-    )
-    const helpText = helpModifier ? helpModifier.value : ''
-    const message = {
-      text: helpText,
-      padding: [0],
-    }
-
-    const modifiersArray = option.modifiers
-      .filter(
-        (modifier: Modifier) =>
-          modifier.name !== 'help' && modifier.name !== 'showhelp',
-      )
-      .map((modifier: Modifier) => {
-        return `[${modifier.name}:${modifier.value}]`
-      })
-    modifiersArray.unshift(`[${option.type}]`)
-    const modifiers = {
-      text: modifiersArray.join(', '),
-      padding: [0],
-    }
-
-    body.push({ name, message, modifiers })
+  definition.options.forEach((option: Option) => {
+    body.push(buildOptionHelp(option))
   })
   return { header, body }
 }
 
 export const printHelp = (definition: ArgsDefinition) => {
-  const { header, body } = defineHelp(definition)
+  const { header, body } = buildHelp(definition)
 
-  header.forEach((row: any) => {
+  header.forEach((row: UiElement) => {
     ui.div(row)
   })
 
-  body.forEach(({ name, message, modifiers }: any) => {
-    ui.div(name, message, modifiers)
+  body.forEach(({ name, description, modifiers }: OptionHelp) => {
+    ui.div(name, description, modifiers)
   })
   console.log(ui.toString())
 }

@@ -1,9 +1,9 @@
 import { Context } from '@rondymesquita/flow'
 import { OptionValue } from '.'
 import { Modifier } from './modifiers'
-import { OptionType } from './types'
+import { Option } from './types'
 
-export const checkValue = (option: OptionType, value: OptionValue) => {
+export const checkValue = (option: Option, value: OptionValue) => {
   const requiredOption = option.modifiers.find(
     (mod: Modifier) => mod.name === 'required',
   )
@@ -15,7 +15,7 @@ export const checkValue = (option: OptionType, value: OptionValue) => {
   }
 }
 
-export const checkType = (option: OptionType, value: OptionValue) => {
+export const checkType = (option: Option, value: OptionValue) => {
   if (typeof value != option.type) {
     throw new Error(`"${option.name}" must be of type "${option.type}"`)
   }

@@ -90,7 +90,7 @@ describe('tasks', () => {
     expect(tasks(tasksMock)).rejects.toEqual(new TaskNotFoundError('alpha'))
   })
 
-  it('receives context as parameter', () => {
+  it('each task receives context as parameter', () => {
     process.argv = ['bin', 'file', 'fake', '--alpha=value', '-b=true']
 
     const tasksMock = {

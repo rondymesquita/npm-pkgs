@@ -11,7 +11,7 @@ export interface Modifier {
   value: any
 }
 
-export type Validator<U> = (argValue: U) => any | Promise<any>
+export type Validator<U> = (argValue: U) => boolean | Promise<boolean>
 
 export interface ValidatorModifier<U> extends Modifier {
   type: ModifierType.VALIDATOR

@@ -1,26 +1,17 @@
 import { Modifier } from './modifiers'
 
-export interface OptionType {
+export interface Option {
   name: string
   type: string
-  modifiers: any[]
+  modifiers: Modifier[]
 }
 
-export const string = (
-  name: string,
-  modifiers: Modifier[] = [],
-): OptionType => {
+export const string = (name: string, modifiers: Modifier[] = []): Option => {
   return { name, type: 'string', modifiers }
 }
-export const boolean = (
-  name: string,
-  modifiers: Modifier[] = [],
-): OptionType => {
+export const boolean = (name: string, modifiers: Modifier[] = []): Option => {
   return { name, type: 'boolean', modifiers }
 }
-export const number = (
-  name: string,
-  modifiers: Modifier[] = [],
-): OptionType => {
+export const number = (name: string, modifiers: Modifier[] = []): Option => {
   return { name, type: 'number', modifiers }
 }

@@ -6,7 +6,7 @@ import {
   ModifierType,
 } from './modifiers'
 import { parseValue } from './utils'
-import { boolean, OptionType } from './types'
+import { boolean, Option } from './types'
 import { printHelp } from './help'
 import { Context, flow, Status } from '@rondymesquita/flow'
 import { checkType, checkValue } from './argcheck'
@@ -15,6 +15,7 @@ export * from './modifiers'
 export * from './types'
 export * from './command'
 export * from './options'
+export * from './help'
 
 export type OptionValue = string | number | boolean
 export type Options = Record<string, OptionValue>
@@ -26,13 +27,14 @@ export interface Argv {
 
 export interface ArgsDefinition {
   name?: string
-  options: OptionType[]
+  usage?: (name: string) => string
+  options: Option[]
 }
 
 const SINGLE_DASH_REGEX = /^-(\w*)(=(.*))?$/
 const DOUBLE_DASH_REGEX = /^--(\w*)(=(.*))?$/
 const fillOptionsDefaultValues = (
-  option: OptionType,
+  option: Option,
   argv: Argv,
   value: any,
 ): Options => {
@@ -43,9 +45,9 @@ const fillOptionsDefaultValues = (
   }
 
   if (!argv.options[option.name]) {
-    const defaultModifier: ConfigModifier = option.modifiers.find(
+    const defaultModifier: ConfigModifier | undefined = option.modifiers.find(
       (mod: Modifier) => mod.name === 'defaultvalue',
-    )
+    ) as ConfigModifier
 
     if (defaultModifier) {
       cloneArgOptions[option.name] = defaultModifier.value
@@ -111,8 +113,8 @@ export const defineArgs = (definition?: ArgsDefinition) => {
       const validators = option.modifiers.filter(
         (mod: Modifier) => mod.type === ModifierType.VALIDATOR,
       )
-      validators.forEach((modifier: ValidatorModifier<any>) => {
-        if (!modifier.validate(value)) {
+      validators.forEach((modifier: Modifier) => {
+        if (!(modifier as ValidatorModifier<any>).validate(value)) {
           errors.push(
             `"${option.name}" must satisfy "${modifier.name}" contraint. Expected:"${modifier.value}". Received:"${value}".`,
           )

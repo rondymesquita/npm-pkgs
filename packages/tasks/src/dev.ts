@@ -1,18 +1,26 @@
-import { TaskContext, tasks, namespace, help } from './index'
+import { defineValidator, number, string } from '@rondymesquita/args'
+import { TaskContext, tasks, namespace, help, args } from './index'
+
+const max = defineValidator('max', (rule: number, value: number) => {
+  return value <= rule
+})
 
 help(build, 'build app')
+args(build, { options: [number('id', [max(3)])] })
 function build(ctx: TaskContext) {
   console.log('building', ctx)
 }
 
 help(clean, 'clean app')
+args(build, { options: [number('id', [max(3)])] })
 async function clean(ctx: TaskContext) {
   console.log('cleaning', ctx)
   await new Promise((res) => setTimeout(res, 2000))
 }
 
-const test = namespace('test', ({ help, tasks }) => {
+const test = namespace('test', ({ help, tasks, args }) => {
   help(build, 'build app')
+  args(build, { options: [string('quick', [])] })
   function build(ctx: TaskContext) {
     console.log('building', ctx)
   }
@@ -27,8 +35,8 @@ const test = namespace('test', ({ help, tasks }) => {
 })
 
 tasks({
+  build,
   clean,
   default: build,
-  build: [clean, build],
   ...test,
 })
