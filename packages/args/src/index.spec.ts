@@ -157,7 +157,6 @@ describe('test', () => {
     expect(max(4).validate(4)).toBeTruthy()
     expect(max(4).validate(5)).toBeFalsy()
   })
-
   it('defines a string validator', () => {
     const length = defineValidator('length', (rule: number, value: string) => {
       return value.length <= rule
@@ -174,7 +173,6 @@ describe('test', () => {
     expect(length(5).validate('alpha')).toBeTruthy()
     expect(length(4).validate('alpha')).toBeFalsy()
   })
-
   it('defines an array validator', () => {
     const includes = defineValidator(
       'includes',

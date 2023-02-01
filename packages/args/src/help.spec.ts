@@ -1,10 +1,30 @@
 import { defineValidator } from '.'
-import { buildHelp } from './help'
+import { buildHelp, buildOptionHelp } from './help'
 import { defaultValue, help, required } from './modifiers'
 import { boolean, number, string } from './types'
 
 describe('help', () => {
-  it('show help', () => {
+  it('should build a help from option', () => {
+    expect(
+      buildOptionHelp(
+        number('alpha', [defaultValue(5), help('alpha description')]),
+      ),
+    ).toEqual({
+      description: {
+        padding: [0],
+        text: 'alpha description',
+      },
+      modifiers: {
+        padding: [0],
+        text: '[number], [defaultvalue:5]',
+      },
+      name: {
+        padding: [0],
+        text: '--alpha',
+      },
+    })
+  })
+  it('should build help from definition', () => {
     const max = defineValidator('max', (rule: number, value: number) => {
       return value <= rule
     })

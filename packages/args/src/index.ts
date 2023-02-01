@@ -8,7 +8,7 @@ import {
 import { parseValue } from './utils'
 import { boolean, Option } from './types'
 import { printHelp } from './help'
-import { Context, flow, Status } from '@rondymesquita/flow'
+import { flow, Status } from '@rondymesquita/flow'
 import { checkType, checkValue } from './argcheck'
 
 export * from './modifiers'
@@ -17,7 +17,7 @@ export * from './command'
 export * from './options'
 export * from './help'
 
-export type OptionValue = string | number | boolean
+export type OptionValue = string | number | boolean | undefined | null
 export type Options = Record<string, OptionValue>
 export interface Argv {
   options: Options

@@ -1,4 +1,3 @@
-import { Context } from '@rondymesquita/flow'
 import { OptionValue } from '.'
 import { Modifier } from './modifiers'
 import { Option } from './types'
