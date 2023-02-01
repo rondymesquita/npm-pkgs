@@ -1,12 +1,11 @@
 import {
-  parseArgs,
   Argv,
   defineArgs,
   ArgsDefinition,
   helpOption,
 } from '@rondymesquita/args'
 import { TaskNameNotInformedError, TaskNotFoundError } from './errors'
-import { printGlobalHelp, printTaskHelp } from './help'
+import { showTaskHelp, showGlobalHelp } from './help'
 import { buildTaskName, deepFlattenTask } from './util'
 
 export { Options } from '@rondymesquita/args'
@@ -43,7 +42,7 @@ export const help = (task: Task, description: string) => {
 }
 
 export const args = (task: Task, definition: ArgsDefinition) => {
-  definition.options.push(helpOption('help', 'Show task help message'))
+  definition.options.push(helpOption())
   helpMessages[task.name].argsDefinition = definition
   defineArgs(definition)
 }
@@ -51,7 +50,7 @@ export const args = (task: Task, definition: ArgsDefinition) => {
 export const createArgsFunction = (namespace: string = '') => {
   const args = (task: Task, definition: ArgsDefinition) => {
     const name = buildTaskName(namespace, task.name)
-    definition.options.push(helpOption('help', 'Show task help message'))
+    definition.options.push(helpOption())
     helpMessages[name].argsDefinition = definition
     defineArgs(definition)
   }
@@ -68,7 +67,6 @@ const createHelpFunction = (namespace: string) => {
       description,
       argsDefinition: { options: [] },
     }
-    // helpMessages[taskName] = description
   }
 
   return help
@@ -102,9 +100,9 @@ export const namespace = (
 }
 
 export async function tasks(taskDef: TaskDefinition) {
-  const { parseArgs, showHelp } = defineArgs({
+  const { parseArgs, showHelp, showErrors } = defineArgs({
     name: 'tasks',
-    usage: 'tasks [task name] [options]',
+    usage: 'tasks [task name] [task options]\nUsage: tasks [options]',
     options: [helpOption()],
   })
 
@@ -116,17 +114,21 @@ export async function tasks(taskDef: TaskDefinition) {
   }
 
   const createTasks = createTasksFunction()
-  const tasks = createTasks(taskDef)
-  const task = name ? tasks[name] : tasks.default
+  const tasks: PlainTaskDefinition = createTasks(taskDef)
+  const task: Task = name ? tasks[name] : tasks.default
 
-  if (argv.options.test) {
+  if (argv.options.help) {
     if (name) {
-      printTaskHelp(task, name, helpMessages)
+      showTaskHelp(task, name, helpMessages)
     } else {
-      // showHelp()
-      // printGlobalHelp(tasks, helpMessages)
+      showHelp()
+      showGlobalHelp(tasks, helpMessages)
     }
     return
+  }
+
+  if (argv.errors.length > 0) {
+    showErrors()
   }
 
   const isThereAnyNonDefaultTask =

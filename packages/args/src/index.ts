@@ -71,11 +71,16 @@ export function defineValidator<T, U>(name: string, handler: Handler<T, U>) {
 }
 
 export const defineArgs = (definition: ArgsDefinition) => {
+  let errors: string[] = []
+
   const showHelp = () => {
     printHelp(definition)
   }
 
-  let errors: string[] = []
+  const showErrors = () => {
+    printErrors(errors)
+  }
+
   const parseArgsWithDefinition = (args: string[]): Argv => {
     const argv = parseArgs(args)
 
@@ -117,16 +122,10 @@ export const defineArgs = (definition: ArgsDefinition) => {
     /**Actions */
 
     argv.errors = errors
-
-    if (errors.length > 0) {
-      // printErrors(errors)
-      // printHelp(definition)
-    }
-
     return argv
   }
 
-  return { parseArgs: parseArgsWithDefinition, showHelp }
+  return { parseArgs: parseArgsWithDefinition, showHelp, showErrors }
 }
 
 export const parseArgs = (args: string[]): Argv => {

@@ -4,7 +4,7 @@ import { HelpMessage, HelpMessages, PlainTaskDefinition, Task } from '.'
 
 const ui = cliui({} as any)
 
-export const defineGlobalHelp = (
+export const buildGlobalHelp = (
   definition: PlainTaskDefinition,
   messages: HelpMessages,
 ) => {
@@ -12,6 +12,11 @@ export const defineGlobalHelp = (
   const header: any = []
 
   // body.push({ name: 'Task', description: 'Help', options: 'Options' })
+
+  header.push({
+    text: 'Tasks:',
+    padding: [1],
+  })
 
   Object.entries(messages).forEach(
     ([_, helpMessage]: [string, HelpMessage]) => {
@@ -37,13 +42,18 @@ export const defineGlobalHelp = (
   return { header, body }
 }
 
-export const defineTaskHelp = (name: string, messages: HelpMessages) => {
+export const buildTaskHelp = (name: string, messages: HelpMessages) => {
   const body: any = []
   const header: any = []
 
   // body.push({ name: 'Task', description: 'Help', options: 'Options' })
 
   const helpMessage = messages[name]
+
+  header.push({
+    text: 'Task options:',
+    padding: [1],
+  })
 
   helpMessage.argsDefinition.options.forEach((option: Option) => {
     body.push(buildOptionHelp(option))
@@ -52,23 +62,31 @@ export const defineTaskHelp = (name: string, messages: HelpMessages) => {
   return { header, body }
 }
 
-export const printGlobalHelp = (
+export const showGlobalHelp = (
   definition: PlainTaskDefinition,
   messages: HelpMessages,
 ) => {
-  const { header, body } = defineGlobalHelp(definition, messages)
+  const { header, body } = buildGlobalHelp(definition, messages)
+
+  header.forEach((row: any) => {
+    ui.div(row)
+  })
 
   body.forEach(({ name, description, options }: any) => {
     ui.div(name, description, options)
   })
-  // console.log(ui.toString())
+  console.log(ui.toString())
 }
-export const printTaskHelp = (
+export const showTaskHelp = (
   task: Task,
   name: string,
   messages: HelpMessages,
 ) => {
-  const { header, body } = defineTaskHelp(name, messages)
+  const { header, body } = buildTaskHelp(name, messages)
+
+  header.forEach((row: any) => {
+    ui.div(row)
+  })
 
   body.forEach(({ name, description, modifiers }: any) => {
     ui.div(name, description, modifiers)

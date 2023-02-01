@@ -12,7 +12,7 @@ function build(ctx: TaskContext) {
 }
 
 help(clean, 'clean app')
-args(build, { options: [number('id', [max(3)])] })
+args(clean, { options: [string('dir', [])] })
 async function clean(ctx: TaskContext) {
   console.log('cleaning', ctx)
   await new Promise((res) => setTimeout(res, 2000))
