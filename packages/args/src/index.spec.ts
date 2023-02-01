@@ -52,33 +52,8 @@ describe('test', () => {
       errors: [],
     })
   })
-  it('defines args without options', () => {
-    const parseArgs = defineArgs()
-
-    const argv = parseArgs(
-      '--alpha=1 -a=0 --beta=1.0 -b=0.5 --gama=gama -g=gama --delta -d --epsilon=true -e=false'.split(
-        ' ',
-      ),
-    )
-    expect(argv).toEqual({
-      options: {
-        a: 0,
-        alpha: 1,
-        b: 0.5,
-        beta: 1,
-        d: true,
-        delta: true,
-        g: 'gama',
-        gama: 'gama',
-        e: false,
-        epsilon: true,
-      },
-      params: [],
-      errors: [],
-    })
-  })
   it('defines args with options', () => {
-    const parseArgs = defineArgs({
+    const { parseArgs } = defineArgs({
       options: [number('alpha')],
     })
 
@@ -92,7 +67,7 @@ describe('test', () => {
     })
   })
   it('fill default values when option is not passed', () => {
-    const parseArgs = defineArgs({
+    const { parseArgs } = defineArgs({
       options: [
         number('alpha', [defaultValue(5)]),
         string('beta', [defaultValue('beta')]),
@@ -112,7 +87,7 @@ describe('test', () => {
     })
   })
   it('returns type errors when values are not passed', () => {
-    const parseArgs = defineArgs({
+    const { parseArgs } = defineArgs({
       options: [number('alpha'), string('beta'), boolean('gamma')],
     })
 
@@ -128,7 +103,7 @@ describe('test', () => {
     })
   })
   it('returns type errors when type does not match', () => {
-    const parseArgs = defineArgs({
+    const { parseArgs } = defineArgs({
       options: [string('alpha'), boolean('beta'), number('gamma')],
     })
 
@@ -148,7 +123,7 @@ describe('test', () => {
     })
   })
   it('returns errors when constraint does not satisfy', () => {
-    const parseArgs = defineArgs({
+    const { parseArgs } = defineArgs({
       options: [
         string('alpha'),
         boolean('beta', [required(true)]),

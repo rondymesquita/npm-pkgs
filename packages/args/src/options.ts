@@ -1,6 +1,6 @@
-import { help, showHelp } from './modifiers'
+import { help } from './modifiers'
 import { boolean } from './types'
 
-export const helpOption = (name = 'help', message = 'Show help message') => {
-  return boolean(name, [help(message), showHelp()])
+export const helpOption = () => {
+  return boolean('help', [help('Show help message')])
 }

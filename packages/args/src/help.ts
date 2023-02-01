@@ -63,7 +63,7 @@ export const buildHelp = (
   const body: Array<OptionHelp> = []
 
   const name = definition.name ? definition.name : ''
-  const usage = definition.usage ? definition.usage(name) : ''
+  const usage = definition.usage ? definition.usage : ''
 
   name &&
     header.push({
@@ -72,7 +72,7 @@ export const buildHelp = (
     })
   usage &&
     header.push({
-      text: usage,
+      text: `Usage: ${usage}`,
       padding: [0],
     })
   header.push({

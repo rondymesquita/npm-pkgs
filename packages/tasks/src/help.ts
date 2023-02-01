@@ -69,10 +69,9 @@ export const printTaskHelp = (
   messages: HelpMessages,
 ) => {
   const { header, body } = defineTaskHelp(name, messages)
-  // console.log(body)
 
   body.forEach(({ name, description, modifiers }: any) => {
     ui.div(name, description, modifiers)
   })
-  // console.log(ui.toString())
+  console.log(ui.toString())
 }

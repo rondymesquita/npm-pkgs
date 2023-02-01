@@ -1,28 +1,26 @@
 import {
   boolean,
+  defaultValue,
   defineArgs,
   defineValidator,
   help,
   helpOption,
   number,
-  showHelp,
+  required,
+  string,
 } from './index'
 
 const max = defineValidator('max', (rule: number, value: number) => {
   return value <= rule
 })
-const parseArgs = defineArgs({
+const { parseArgs, showHelp } = defineArgs({
   name: 'mycli',
   // params: [string('alpha', [required()]), boolean('debug')],
-  // options: [number('id', [required(), max(5)])],
   options: [
-    number('alpha', [help('A random value'), max(6)]),
-    // number('beta', []),
-    // string('gama', [help('A sample help message')]),
-    // boolean('delta', []),
-    // boolean('ajuda', [help('Show help message'), showHelp()]),
-    // boolean('ajuda', [help('Show help message')]),
-    helpOption(),
+    number('alpha', [help('A random value'), max(6), required(true)]),
+    string('gama', [help('A sample help message')]),
+    boolean('delta', []),
+    boolean('help', [help('Show help message'), defaultValue(true)]),
   ],
   // commands: [command('hello', {}), command('bye', {})],
   // command: command('hello', {s
@@ -31,8 +29,12 @@ const parseArgs = defineArgs({
   // commands: {...command("hello"), ...param()}
 })
 
-// helpArgs()
+// showHelp()
 
 // const argv = args('--debug test:watch --alpha=alphavalue --beta'.split(' '))
 const argv = parseArgs(process.argv.splice(2))
-// console.log(argv)
+console.log(argv)
+
+if (argv.options.help) {
+  showHelp()
+}

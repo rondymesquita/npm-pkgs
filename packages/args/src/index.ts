@@ -27,7 +27,7 @@ export interface Argv {
 
 export interface ArgsDefinition {
   name?: string
-  usage?: (name: string) => string
+  usage?: string
   options: Option[]
 }
 
@@ -70,32 +70,24 @@ export function defineValidator<T, U>(name: string, handler: Handler<T, U>) {
   }
 }
 
-export const defineArgs = (definition?: ArgsDefinition) => {
-  if (!definition) {
-    return parseArgs
+export const defineArgs = (definition: ArgsDefinition) => {
+  const showHelp = () => {
+    printHelp(definition)
   }
 
   let errors: string[] = []
-  const args = (args: string[]): Argv => {
+  const parseArgsWithDefinition = (args: string[]): Argv => {
     const argv = parseArgs(args)
 
-    const isHelp = definition.options.find((option) => {
-      return option.modifiers.find((mod) => {
-        return mod.name === 'showhelp'
-      })
-    })
+    // console.log(argv)
 
-    if (argv.options[isHelp?.name!]) {
-      printHelp(definition)
-      return argv
-    }
-
+    /**Fill default values */
     for (let index = 0; index < definition.options.length; index++) {
       const option = definition.options[index]
       const value = argv.options[option.name]
       argv.options = fillOptionsDefaultValues(option, argv, value)
     }
-
+    /**Validate */
     for (let index = 0; index < definition.options.length; index++) {
       const option = definition.options[index]
       const value = argv.options[option.name]
@@ -122,17 +114,19 @@ export const defineArgs = (definition?: ArgsDefinition) => {
       })
     }
 
+    /**Actions */
+
     argv.errors = errors
 
     if (errors.length > 0) {
-      printErrors(errors)
-      printHelp(definition)
+      // printErrors(errors)
+      // printHelp(definition)
     }
 
     return argv
   }
 
-  return args
+  return { parseArgs: parseArgsWithDefinition, showHelp }
 }
 
 export const parseArgs = (args: string[]): Argv => {

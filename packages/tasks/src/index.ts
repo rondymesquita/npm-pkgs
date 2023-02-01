@@ -102,9 +102,9 @@ export const namespace = (
 }
 
 export async function tasks(taskDef: TaskDefinition) {
-  const parseArgs = defineArgs({
+  const { parseArgs, showHelp } = defineArgs({
     name: 'tasks',
-    usage: (name) => `${name} [task name] [options]`,
+    usage: 'tasks [task name] [options]',
     options: [helpOption()],
   })
 
@@ -123,9 +123,9 @@ export async function tasks(taskDef: TaskDefinition) {
     if (name) {
       printTaskHelp(task, name, helpMessages)
     } else {
+      // showHelp()
       // printGlobalHelp(tasks, helpMessages)
     }
-    // console.log(helpMessages)
     return
   }
 
