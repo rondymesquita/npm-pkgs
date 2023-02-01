@@ -6,12 +6,12 @@ export interface Option {
   modifiers: Modifier[]
 }
 
-const createTypeOption = (type: string) => {
+const createTypeOptionFn = (type: string) => {
   return (name: string, modifiers: Modifier[] = []) => {
     return { name, type, modifiers }
   }
 }
 
-export const string = createTypeOption('string')
-export const boolean = createTypeOption('boolean')
-export const number = createTypeOption('number')
+export const string = createTypeOptionFn('string')
+export const boolean = createTypeOptionFn('boolean')
+export const number = createTypeOptionFn('number')
