@@ -97,13 +97,13 @@ export const defineArgs = (definition: ArgsDefinition) => {
       const option = definition.options[index]
       const value = argv.options[option.name]
 
-      const result = flow([
+      const results = flow([
         () => checkValue(option, value),
         () => checkType(option, value),
       ])()
-      const optionErrors = result
-        .filter((data) => data.status === Status.FAIL)
-        .map((data) => data.result)
+      const optionErrors = results
+        .filter((result) => result.status === Status.FAIL)
+        .map((result) => result.data)
 
       errors = errors.concat(optionErrors)
 

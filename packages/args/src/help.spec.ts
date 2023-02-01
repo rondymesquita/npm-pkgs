@@ -1,6 +1,6 @@
 import { defineValidator } from '.'
 import { buildHelp } from './help'
-import { defaultValue, help, required, showHelp } from './modifiers'
+import { defaultValue, help, required } from './modifiers'
 import { boolean, number, string } from './types'
 
 describe('help', () => {

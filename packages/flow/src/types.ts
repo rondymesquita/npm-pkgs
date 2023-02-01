@@ -5,11 +5,7 @@ export enum Status {
 
 export interface Result {
   status: Status
-  result: any
+  data: any
 }
 
-export type Stage = (ctx: Context) => any
-
-export interface Context {
-  interrupt: () => void
-}
+export type Stage = () => any

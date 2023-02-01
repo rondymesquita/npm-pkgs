@@ -59,7 +59,6 @@ export const createArgsFunction = (namespace: string = '') => {
 }
 
 const createHelpFunction = (namespace: string) => {
-  // const name = namespace
   const help = (task: Task, description: string) => {
     const name = buildTaskName(namespace, task.name)
     helpMessages[name] = {

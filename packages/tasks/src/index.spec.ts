@@ -100,7 +100,7 @@ describe('tasks', () => {
     tasks(tasksMock)
     expect(tasksMock.fake).toHaveBeenCalledWith({
       argv: {
-        options: { alpha: 'value', b: true },
+        options: { alpha: 'value', b: true, help: false },
         params: ['fake'],
         errors: [],
       },

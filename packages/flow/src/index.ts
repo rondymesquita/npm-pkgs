@@ -1,39 +1,26 @@
-import { Context, Result, Stage, Status } from './types'
+import { Result, Stage, Status } from './types'
 export * from './types'
 
 export const flow = (stages: Array<Stage>) => {
-  const result: Array<Result> = []
+  const results: Array<Result> = []
   return () => {
     for (let index = 0; index < stages.length; index++) {
       const stage = stages[index]
 
-      const contextResults = {
-        interrupted: false,
-      }
-
-      const ctx: Context = {
-        interrupt: function (): void {
-          contextResults.interrupted = true
-        },
-      }
-
       try {
-        const stageResult = stage(ctx)
-        result.push({
+        const stageResult = stage()
+        results.push({
           status: Status.OK,
-          result: stageResult,
+          data: stageResult,
         })
-        if (contextResults.interrupted) {
-          break
-        }
       } catch (error) {
-        result.push({
+        results.push({
           status: Status.FAIL,
-          result: (error as Error).message,
+          data: (error as Error).message,
         })
         break
       }
     }
-    return result
+    return results
   }
 }
