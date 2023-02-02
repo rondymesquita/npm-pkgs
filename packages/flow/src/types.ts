@@ -8,4 +8,9 @@ export interface Result {
   data: any
 }
 
+export interface Option {
+  stopOnError?: boolean
+  fulano?: boolean
+}
+
 export type Stage = () => any

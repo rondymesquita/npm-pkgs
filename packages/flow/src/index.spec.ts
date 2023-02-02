@@ -1,100 +1,116 @@
-import { parseArgs, defineArgs, number } from './index'
+import { flow, stopOnError } from './index'
 
-describe('test', () => {
-  it('parses integers', () => {
-    const options = parseArgs('--alpha=1 -b=0'.split(' '))
-    expect(options).toEqual({
-      options: {
-        alpha: 1,
-        b: 0,
+describe('flow', () => {
+  it('should run a flow in sequence', () => {
+    const order: Array<number> = []
+    const run = flow([
+      () => {
+        order.push(1)
       },
-      params: [],
-    })
-  })
-  it('parses double', () => {
-    const options = parseArgs('--alpha=1.0 -b=0.5'.split(' '))
-    expect(options).toEqual({
-      options: {
-        alpha: 1.0,
-        b: 0.5,
+      () => {
+        order.push(2)
       },
-      params: [],
-    })
-  })
-  it('parses string', () => {
-    const options = parseArgs('--alpha=alphavalue -b=bvalue'.split(' '))
-    expect(options).toEqual({
-      options: {
-        alpha: 'alphavalue',
-        b: 'bvalue',
-      },
-      params: [],
-    })
-  })
-  it('parses boolean', () => {
-    const options = parseArgs('--alpha -b'.split(' '))
-    expect(options).toEqual({
-      options: {
-        alpha: true,
-        b: true,
-      },
-      params: [],
-    })
-  })
-  it('parses boolean values', () => {
-    const options = parseArgs('--alpha=true -b=false'.split(' '))
-    expect(options).toEqual({
-      options: {
-        alpha: true,
-        b: false,
-      },
-      params: [],
-    })
-  })
-  it('parses parameters', () => {
-    const options = parseArgs(
-      '--alpha=alphavalue -b=false fulano sicrano'.split(' '),
-    )
-    expect(options).toEqual({
-      options: {
-        alpha: 'alphavalue',
-        b: false,
-      },
-      params: ['fulano', 'sicrano'],
-    })
-  })
-  it('defines args parsing options', () => {
-    const parseArgs = defineArgs({})
+    ])
 
-    const argv = parseArgs(
-      '--alpha=1 -a=0 --beta=1.0 -b=0.5 --gama=gama -g=gama --delta -d --epsilon=true -e=false'.split(
-        ' ',
-      ),
-    )
-    expect(argv).toEqual({
-      options: {
-        a: 0,
-        alpha: 1,
-        b: 0.5,
-        beta: 1,
-        d: true,
-        delta: true,
-        g: 'gama',
-        gama: 'gama',
-        e: false,
-        epsilon: true,
-      },
-      params: [],
-    })
+    expect(order).toEqual([])
+    run()
+    expect(order).toEqual([1, 2])
   })
 
-  it('throws an error when type', () => {
-    const parseArgs = defineArgs({
-      options: [number('alpha')],
-    })
+  it('should get results when all stages are ok', () => {
+    const run = flow([() => 1, () => 2])
 
-    const assert = () => parseArgs('--gama=gama'.split(' '))
+    const results = run()
+    expect(results).toEqual([
+      {
+        data: 1,
+        status: 'OK',
+      },
+      {
+        data: 2,
+        status: 'OK',
+      },
+    ])
+  })
 
-    expect(assert()).rejects.toEqual(new Error('alpha'))
+  it('should get results when laste stage throws error', () => {
+    const run = flow([
+      () => 1,
+      () => {
+        throw new Error('error')
+      },
+    ])
+
+    const results = run()
+    expect(results).toEqual([
+      {
+        data: 1,
+        status: 'OK',
+      },
+      {
+        data: 'error',
+        status: 'FAIL',
+      },
+    ])
+  })
+
+  it('should stop flow when stage throws error', () => {
+    const run = flow([
+      () => {
+        throw new Error('error')
+      },
+      () => 'this will not be executed',
+    ])
+
+    const results = run()
+    expect(results).toEqual([
+      {
+        data: 'error',
+        status: 'FAIL',
+      },
+    ])
+  })
+
+  it('should not stop flow when stopOnError is false', () => {
+    const run = flow([
+      () => {
+        throw new Error('error')
+      },
+      () => 'this will be executed normally',
+    ])
+
+    const results = run([stopOnError(false)])
+    expect(results).toEqual([
+      {
+        data: 'error',
+        status: 'FAIL',
+      },
+      {
+        data: 'this will be executed normally',
+        status: 'OK',
+      },
+    ])
+  })
+
+  it('should run a flow in sequence when stages are promises', () => {
+    const longRunning = () => new Promise((resolve) => setTimeout(resolve, 100))
+
+    const order: Array<number> = []
+    const run = flow([
+      async () => {
+        order.push(1)
+        await longRunning()
+        return 1
+      },
+      async () => {
+        order.push(2)
+        await longRunning()
+        return 2
+      },
+    ])
+
+    expect(order).toEqual([])
+    run()
+    expect(order).toEqual([1, 2])
   })
 })

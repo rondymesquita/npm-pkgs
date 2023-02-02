@@ -1,9 +1,14 @@
-import { Result, Stage, Status } from './types'
+import { stopOnError } from './options'
+import { Option, Result, Stage, Status } from './types'
+import { createObjectFromArray } from './utils'
 export * from './types'
+export * from './options'
 
 export const flow = (stages: Array<Stage>) => {
   const results: Array<Result> = []
-  return () => {
+  return (options: Option[] = [stopOnError()]) => {
+    const optionsObject = createObjectFromArray(options)
+
     for (let index = 0; index < stages.length; index++) {
       const stage = stages[index]
 
@@ -18,7 +23,10 @@ export const flow = (stages: Array<Stage>) => {
           status: Status.FAIL,
           data: (error as Error).message,
         })
-        break
+
+        if (optionsObject.stopOnError) {
+          break
+        }
       }
     }
     return results
