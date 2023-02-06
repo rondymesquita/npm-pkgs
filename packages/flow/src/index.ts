@@ -6,14 +6,14 @@ export * from './options'
 
 export const flow = (stages: Array<Stage>) => {
   const results: Array<Result> = []
-  return (options: Option[] = [stopOnError()]) => {
+  return async (options: Option[] = [stopOnError()]) => {
     const optionsObject = createObjectFromArray(options)
 
     for (let index = 0; index < stages.length; index++) {
       const stage = stages[index]
 
       try {
-        const stageResult = stage()
+        const stageResult = await stage()
         results.push({
           status: Status.OK,
           data: stageResult,

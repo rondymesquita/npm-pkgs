@@ -4,10 +4,11 @@ import {
   number,
   string,
   boolean,
-  required,
-  defaultValue,
+  modifiers,
+  // required,
+  // defaultValue,
   defineValidator,
-  Validator,
+  // Validator,
 } from './index'
 
 import { promisify } from 'util'
@@ -69,7 +70,7 @@ describe('test', () => {
   it('fill default values when option is not passed', () => {
     const { parseArgs } = defineArgs({
       options: [
-        number('alpha', [defaultValue(5)]),
+        number('alpha', [modifiers.defaultValue(5)]),
         string('beta', [defaultValue('beta')]),
         boolean('gama', [defaultValue(true)]),
       ],

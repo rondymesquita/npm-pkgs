@@ -32,7 +32,7 @@
   },
   "scripts": {
     "test": "jest --coverage",
-    "test:watch": "jest --watchAll",
+    "test:watch": "jest --watchAll --detectOpenHandles --detectLeaks",
     "dev": "nodemon -w ./src ./src/dev.ts --alpha=1 -a=0 --beta=1.0 -b=0.5 --gama=gama -g=gama --delta -d --epsilon=true -e=false",
     "dev:bin": "nodemon -w './src' --ext 'ts,js,json' --exec ts-node ./src/bin.ts ./src/example.js",
     "build": "rimraf ./dist && tsc && copyfiles ./example ./dist",
@@ -55,7 +55,8 @@
     "ts-jest": "^27.1.5",
     "ts-node": "^10.9.1",
     "typedoc": "^0.23.24",
-    "typescript": "^4.9.4"
+    "typescript": "^4.9.4",
+    "weak-napi": "^2.0.2"
   },
   "dependencies": {
     "cliui": "^8.0.1"

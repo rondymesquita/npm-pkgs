@@ -10,8 +10,12 @@ import { boolean, Option } from './types'
 import { printHelp } from './help'
 import { flow, Status } from '@rondymesquita/flow'
 import { checkType, checkValue } from './argcheck'
+import * as modifiers from './modifiers'
 
-export * from './modifiers'
+// export *  modifiers
+// export const modifiers
+// export let modifier
+export { modifiers }
 export * from './types'
 export * from './command'
 export * from './options'

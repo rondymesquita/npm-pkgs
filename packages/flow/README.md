@@ -35,7 +35,7 @@ const run = flow([
   },
 ])
 
-const results = run()
+const results = await run()
 // [
 //   {
 //     data: 'sample error',
@@ -46,7 +46,7 @@ const results = run()
 
 ### Keep executing even with exception
 
-Pass options to `run` function.
+Pass `stopOnError` option to `run` function.
 
 ```js
 const run = flow([
@@ -56,7 +56,7 @@ const run = flow([
   () => 'this will be executed normally',
 ])
 
-const results = run([stopOnError(false)])
+const results = await run([stopOnError(false)])
 // {
 //   data: 'error',
 //   status: 'FAIL',
@@ -77,7 +77,7 @@ const run = flow([
   () => 'this will be executed normally',
 ])
 
-const results = run([stopOnError(false)])
+const results = await run([stopOnError(false)])
 
 const successes = results.filter((result) => result.status === Status.OK)
 const errors = results.filter((result) => result.status === Status.FAIL)
