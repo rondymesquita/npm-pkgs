@@ -32,7 +32,7 @@
   },
   "scripts": {
     "test": "jest",
-    "test:watch": "npm run test -- --watchAll",
+    "test:watch": "jest --watchAll --detectOpenHandles --detectLeaks",
     "dev": "nodemon -w ./src ./src/dev.ts --alpha=5 -a=0 --beta=1.0 -b=0.5 --gama=gama -g=gama --delta -d --epsilon=true -e=false",
     "dev:bin": "nodemon -w './src' --ext 'ts,js,json' --exec ts-node ./src/bin.ts ./src/example.js",
     "build": "rimraf ./dist && tsc && copyfiles ./example ./dist",

@@ -1,12 +1,12 @@
 import { defineValidator } from '.'
-import { buildHelp, buildOptionHelp } from './help'
+import { buildHelp, buildHelpForOption } from './help'
 import { defaultValue, help, required } from './modifiers'
 import { boolean, number, string } from './types'
 
 describe('help', () => {
   it('should build a help from option', () => {
     expect(
-      buildOptionHelp(
+      buildHelpForOption(
         number('alpha', [defaultValue(5), help('alpha description')]),
       ),
     ).toEqual({

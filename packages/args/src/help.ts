@@ -21,7 +21,7 @@ interface OptionHelp {
   modifiers: UiElement
 }
 
-export const buildOptionToHelp = (option: Option): OptionHelp => {
+export const buildHelpForOption = (option: Option): OptionHelp => {
   const name = {
     text: `--${option.name}`,
     padding: [0],
@@ -81,7 +81,7 @@ export const buildHelp = (
   })
 
   definition.options.forEach((option: Option) => {
-    body.push(buildOptionToHelp(option))
+    body.push(buildHelpForOption(option))
   })
   return { header, body }
 }

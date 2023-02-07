@@ -1,6 +1,5 @@
 import { defineValidator } from '.'
 import { checkType, checkValue } from './argcheck'
-import { buildHelp, buildOptionHelp } from './help'
 import { defaultValue, help, required } from './modifiers'
 import { boolean, number, string } from './types'
 

@@ -8,14 +8,9 @@ import {
 import { parseValue } from './utils'
 import { boolean, Option } from './types'
 import { printHelp } from './help'
-import { flow, Status } from '@rondymesquita/flow'
+import { flow, Result, Status } from '@rondymesquita/flow'
 import { checkType, checkValue } from './argcheck'
-import * as modifiers from './modifiers'
-
-// export *  modifiers
-// export const modifiers
-// export let modifier
-export { modifiers }
+export * from './modifiers'
 export * from './types'
 export * from './command'
 export * from './options'
@@ -104,10 +99,11 @@ export const defineArgs = (definition: ArgsDefinition) => {
       const results = flow([
         () => checkValue(option, value),
         () => checkType(option, value),
-      ])()
+      ]).run()
+
       const optionErrors = results
-        .filter((result) => result.status === Status.FAIL)
-        .map((result) => result.data)
+        .filter((result: Result) => result.status === Status.FAIL)
+        .map((result: Result) => result.data)
 
       errors = errors.concat(optionErrors)
 
