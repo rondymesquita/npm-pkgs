@@ -8,9 +8,13 @@ export interface Result {
   data: any
 }
 
+export type Results = Array<Result>
+
 export interface Option {
   stopOnError?: boolean
   fulano?: boolean
 }
 
-export type Stage = () => any
+type SyncStage = () => any
+type AsyncStage = () => Promise<any>
+export type Stage = AsyncStage | SyncStage
