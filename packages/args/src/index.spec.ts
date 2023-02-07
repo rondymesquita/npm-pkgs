@@ -39,10 +39,10 @@ describe('test', () => {
     })
   })
   it('parses parameters', () => {
-    const options = parseArgs(
+    const argv = parseArgs(
       '--alpha=alphavalue -b=false fulano sicrano'.split(' '),
     )
-    expect(options).toEqual({
+    expect(argv).toEqual({
       options: {
         alpha: 'alphavalue',
         b: false,
@@ -90,7 +90,7 @@ describe('test', () => {
       options: [number('alpha'), string('beta'), boolean('gamma')],
     })
 
-    const argv = parseArgs(''.split(''))
+    const argv = parseArgs([])
     expect(argv).toEqual({
       options: {},
       params: [],
@@ -189,5 +189,26 @@ describe('test', () => {
 
     expect(includes('alpha').validate(['alpha', 'beta'])).toBeTruthy()
     expect(includes('alpha').validate(['beta'])).toBeFalsy()
+  })
+
+  it('should return error on invalid custom user constraint', () => {
+    const max = defineValidator('max', (rule: number, value: number) => {
+      return value <= rule
+    })
+
+    const { parseArgs } = defineArgs({
+      options: [number('gamma', [max(3)])],
+    })
+
+    const argv = parseArgs('--gamma=6'.split(' '))
+    expect(argv).toEqual({
+      options: {
+        gamma: 6,
+      },
+      params: [],
+      errors: [
+        '"gamma" must satisfy "max" contraint. Expected:"3". Received:"6".',
+      ],
+    })
   })
 })
