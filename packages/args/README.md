@@ -75,7 +75,7 @@ const argv = parseArgs('--alpha=alphavalue -b=false gamma delta'.split(' '))
 // }
 ```
 
-### Contraints
+### Constraints
 
 ```js
 
