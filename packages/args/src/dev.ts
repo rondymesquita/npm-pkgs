@@ -4,7 +4,6 @@ import {
   defineArgs,
   defineValidator,
   help,
-  helpOption,
   number,
   required,
   string,

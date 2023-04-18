@@ -1,7 +1,7 @@
 import { defineValidator } from '.'
 import { buildHelp, buildHelpForOption } from './help'
 import { defaultValue, help, required } from './modifiers'
-import { boolean, number, string } from './types'
+import { boolean, number, string } from './options'
 
 describe('help', () => {
   it('should build a help from option', () => {

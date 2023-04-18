@@ -1,7 +1,7 @@
 import { defineValidator } from '.'
 import { checkType, checkValue } from './argcheck'
 import { defaultValue, help, required } from './modifiers'
-import { boolean, number, string } from './types'
+import { boolean, number, string } from './options'
 
 describe('argcheck', () => {
   it('should be okay if value have the correct type', () => {

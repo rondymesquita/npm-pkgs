@@ -6,20 +6,22 @@ import {
   ModifierType,
 } from './modifiers'
 import { parseValue } from './utils'
-import { boolean, Option } from './types'
 import { printHelp } from './help'
 import { flow, Result, Status } from '@rondymesquita/flow'
 import { checkType, checkValue } from './argcheck'
-export * from './modifiers'
-export * from './types'
-export * from './command'
-export * from './options'
-export * from './help'
+import { Option } from './options'
 
-export type OptionValue = string | number | boolean | undefined | null
-export type Options = Record<string, OptionValue>
+export * from './modifiers'
+export * as modifiers from './modifiers'
+export * from './options'
+export * as options from './options'
+export * from './validator'
+export * as validator from './validator'
+
+export type ArgvOptionValue = string | number | boolean | undefined | null
+export type ArgvOptions = Record<string, ArgvOptionValue>
 export interface Argv {
-  options: Options
+  options: ArgvOptions
   params: Array<string>
   errors: Array<string>
 }
@@ -28,45 +30,6 @@ export interface ArgsDefinition {
   name?: string
   usage?: string
   options: Option[]
-}
-
-const SINGLE_DASH_REGEX = /^-(\w*)(=(.*))?$/
-const DOUBLE_DASH_REGEX = /^--(\w*)(=(.*))?$/
-const fillOptionsDefaultValues = (
-  option: Option,
-  argv: Argv,
-  value: any,
-): Options => {
-  const cloneArgOptions: Options = { ...argv.options }
-
-  if (value) {
-    return cloneArgOptions
-  }
-
-  if (!argv.options[option.name]) {
-    const defaultModifier: ConfigModifier | undefined = option.modifiers.find(
-      (mod: Modifier) => mod.name === 'defaultvalue',
-    ) as ConfigModifier
-
-    if (defaultModifier) {
-      cloneArgOptions[option.name] = defaultModifier.value
-    }
-  }
-
-  return cloneArgOptions
-}
-
-type Handler<T, U> = (value: T, argValue: U) => boolean
-
-export function defineValidator<T, U>(name: string, handler: Handler<T, U>) {
-  return (value: T): ValidatorModifier<U> => {
-    return {
-      name,
-      value,
-      type: ModifierType.VALIDATOR,
-      validate: <V extends U>(argValue: V) => handler(value, argValue),
-    }
-  }
 }
 
 export const defineArgs = (definition: ArgsDefinition) => {
@@ -119,8 +82,6 @@ export const defineArgs = (definition: ArgsDefinition) => {
       })
     }
 
-    /**Actions */
-
     argv.errors = errors
     return argv
   }
@@ -129,8 +90,10 @@ export const defineArgs = (definition: ArgsDefinition) => {
 }
 
 export const parseArgs = (args: string[]): Argv => {
-  const options: Options = {}
+  const options: ArgvOptions = {}
   const params: Array<string> = []
+  const SINGLE_DASH_REGEX = /^-(\w*)(=(.*))?$/
+  const DOUBLE_DASH_REGEX = /^--(\w*)(=(.*))?$/
 
   args.map((arg: string) => {
     const regex = [SINGLE_DASH_REGEX, DOUBLE_DASH_REGEX].find((regex) => {
@@ -150,4 +113,28 @@ export const parseArgs = (args: string[]): Argv => {
   })
 
   return { options, params, errors: [] }
+}
+
+const fillOptionsDefaultValues = (
+  option: Option,
+  argv: Argv,
+  value: any,
+): ArgvOptions => {
+  const cloneArgOptions: ArgvOptions = { ...argv.options }
+
+  if (value) {
+    return cloneArgOptions
+  }
+
+  if (!argv.options[option.name]) {
+    const defaultModifier: ConfigModifier | undefined = option.modifiers.find(
+      (mod: Modifier) => mod.name === 'defaultvalue',
+    ) as ConfigModifier
+
+    if (defaultModifier) {
+      cloneArgOptions[option.name] = defaultModifier.value
+    }
+  }
+
+  return cloneArgOptions
 }

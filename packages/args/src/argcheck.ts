@@ -1,8 +1,7 @@
-import { OptionValue } from '.'
+import { Option, ArgvOptionValue } from './'
 import { Modifier } from './modifiers'
-import { Option } from './types'
 
-export const checkValue = (option: Option, value: OptionValue) => {
+export const checkValue = (option: Option, value: ArgvOptionValue) => {
   const requiredOption = option.modifiers.find(
     (mod: Modifier) => mod.name === 'required',
   )
@@ -14,7 +13,7 @@ export const checkValue = (option: Option, value: OptionValue) => {
   }
 }
 
-export const checkType = (option: Option, value: OptionValue) => {
+export const checkType = (option: Option, value: ArgvOptionValue) => {
   if (typeof value != option.type) {
     throw new Error(`"${option.name}" must be of type "${option.type}"`)
   }

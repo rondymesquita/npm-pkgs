@@ -1,4 +1,5 @@
-import { helpOption } from './options'
+import { required } from './modifiers'
+import { helpOption, string, boolean, number } from './options'
 
 describe('options', () => {
   it('should create help option', () => {
@@ -36,6 +37,30 @@ describe('options', () => {
       ],
       name: 'alpha',
       type: 'boolean',
+    })
+  })
+
+  it('should get an option type', () => {
+    expect(string('alpha', [required()])).toEqual({
+      name: 'alpha',
+      type: 'string',
+      modifiers: [
+        {
+          name: 'required',
+          type: 'CONFIG',
+          value: true,
+        },
+      ],
+    })
+    expect(number('alpha')).toEqual({
+      name: 'alpha',
+      type: 'number',
+      modifiers: [],
+    })
+    expect(boolean('alpha')).toEqual({
+      name: 'alpha',
+      type: 'boolean',
+      modifiers: [],
     })
   })
 })

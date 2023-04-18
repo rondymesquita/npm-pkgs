@@ -1,5 +1,3 @@
-import { string } from './types'
-
 export enum ModifierType {
   CONFIG = 'CONFIG',
   VALIDATOR = 'VALIDATOR',
