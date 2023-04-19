@@ -30,20 +30,26 @@ describe('flow', () => {
         return 1
       },
       () => {
+        order.push(2)
+        return 2
+      },
+      () => {
         return new Promise((resolve) =>
           setTimeout(() => {
-            order.push(2)
-            resolve(2)
+            order.push(3)
+            resolve(3)
           }, 100),
         )
       },
-      () => Promise.resolve(3),
-      () => 4,
+      () => {
+        Promise.resolve(4)
+        order.push(4)
+      },
     ])
 
     expect(order).toEqual([])
     await runAsync()
-    expect(order).toEqual([1, 2])
+    expect(order).toEqual([1, 2, 3, 4])
   })
 
   it('should stop flow when a stage rejects an error', async () => {
