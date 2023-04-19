@@ -1,4 +1,5 @@
 import { flow, stopOnError } from './index'
+import { describe, it, expect } from 'vitest'
 
 describe('flow', () => {
   it('should run a flow in sequence', () => {
@@ -24,7 +25,7 @@ describe('flow', () => {
     const order: Array<number> = []
     const { runAsync } = flow([
       async () => {
-        await longRunning(1000)
+        await longRunning(100)
         order.push(1)
         return 1
       },
@@ -43,6 +44,30 @@ describe('flow', () => {
     expect(order).toEqual([])
     await runAsync()
     expect(order).toEqual([1, 2])
+  })
+
+  it('should stop flow when a stage rejects an error', async () => {
+    const longRunning = (duration: number = 100) =>
+      new Promise((resolve) => setTimeout(resolve, duration))
+
+    const order: Array<number> = []
+    const { runAsync } = flow([
+      async () => {
+        await longRunning()
+        order.push(1)
+        return 1
+      },
+      async () => {
+        await longRunning()
+        throw new Error('Fake error')
+      },
+      () => Promise.resolve(3),
+      () => 4,
+    ])
+
+    expect(order).toEqual([])
+    await runAsync()
+    expect(order).toEqual([1])
   })
 
   it('should get results when all stages are ok', async () => {
