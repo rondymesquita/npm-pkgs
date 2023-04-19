@@ -1,4 +1,5 @@
 import { defaultValue, help, required } from './modifiers'
+import { describe, it, expect } from 'vitest'
 
 describe('modifiers', () => {
   it('should create required modifier', () => {

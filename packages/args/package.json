@@ -31,7 +31,7 @@
     }
   },
   "scripts": {
-    "test": "vitest --watch=false",
+    "test": "vitest --watch=false --coverage",
     "test:watch": "vitest",
     "dev": "tsx --watch ./src/dev.ts --alpha=5 -a=0 --beta=1.0 -b=0.5 --gama=gama -g=gama --delta -d --epsilon=true -e=false",
     "build": "rimraf ./dist && tsc",
@@ -43,16 +43,12 @@
   "license": "MIT",
   "devDependencies": {
     "@release-it/conventional-changelog": "^5.1.1",
-    "@types/jest": "^27.5.2",
     "@types/node": "^18.11.18",
     "copyfiles": "^2.4.1",
-    "jest": "^27.5.1",
     "nodemon": "^2.0.20",
     "prettier": "^2.8.2",
     "release-it": "^15.6.0",
     "rimraf": "^3.0.2",
-    "ts-jest": "^27.1.5",
-    "ts-node": "^10.9.1",
     "tsx": "^3.12.6",
     "typedoc": "^0.23.24",
     "typescript": "^4.9.4",

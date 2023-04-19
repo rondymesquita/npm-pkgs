@@ -12,18 +12,16 @@ import { checkType, checkValue } from './argcheck'
 import { Option } from './options'
 
 export * from './modifiers'
-export * as modifiers from './modifiers'
 export * from './options'
-export * as options from './options'
 export * from './validator'
-export * as validator from './validator'
+export * from './help'
 
 export type ArgvOptionValue = string | number | boolean | undefined | null
 export type ArgvOptions = Record<string, ArgvOptionValue>
 export interface Argv {
   options: ArgvOptions
   params: Array<string>
-  errors: Array<string>
+  errors: string[]
 }
 
 export interface ArgsDefinition {
@@ -32,7 +30,13 @@ export interface ArgsDefinition {
   options: Option[]
 }
 
-export const defineArgs = (definition: ArgsDefinition) => {
+export interface DefineArgs {
+  parseArgs: (args: string[]) => Argv
+  showHelp: () => any
+  showErrors: () => any
+}
+
+export const defineArgs = (definition: ArgsDefinition): DefineArgs => {
   let errors: string[] = []
 
   const showHelp = () => {
@@ -46,14 +50,13 @@ export const defineArgs = (definition: ArgsDefinition) => {
   const parseArgsWithDefinition = (args: string[]): Argv => {
     const argv = parseArgs(args)
 
-    // console.log(argv)
-
     /**Fill default values */
     for (let index = 0; index < definition.options.length; index++) {
       const option = definition.options[index]
       const value = argv.options[option.name]
       argv.options = fillOptionsDefaultValues(option, argv, value)
     }
+
     /**Validate */
     for (let index = 0; index < definition.options.length; index++) {
       const option = definition.options[index]
@@ -76,12 +79,11 @@ export const defineArgs = (definition: ArgsDefinition) => {
       validators.forEach((modifier: Modifier) => {
         if (!(modifier as ValidatorModifier<any>).validate(value)) {
           errors.push(
-            `"${option.name}" must satisfy "${modifier.name}" contraint. Expected:"${modifier.value}". Received:"${value}".`,
+            `"${option.name}" must satisfy "${modifier.name}" constraint. Expected:"${modifier.value}". Received:"${value}".`,
           )
         }
       })
     }
-
     argv.errors = errors
     return argv
   }

@@ -9,10 +9,7 @@ import {
   defineValidator,
 } from './index'
 
-import { promisify } from 'util'
-import { exec as nodeExec, spawn } from 'child_process'
-const exec = promisify(nodeExec)
-// const spawn = promisify(nodeSpawn)
+import { describe, it, expect } from 'vitest'
 
 describe('test', () => {
   it('parses options', () => {
@@ -157,7 +154,7 @@ describe('test', () => {
       },
       params: [],
       errors: [
-        '"gamma" must satisfy "max" contraint. Expected:"3". Received:"6".',
+        '"gamma" must satisfy "max" constraint. Expected:"3". Received:"6".',
       ],
     })
   })

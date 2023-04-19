@@ -17,8 +17,7 @@ const argv = parseArgs(process.argv.splice(2))
 // 		e: false,
 // 		epsilon: true,
 // 	},
-// 	params: [],
-// 	errors: [],
+// 	params: []
 // }
 ```
 
@@ -32,23 +31,17 @@ const { parseArgs, showHelp } = defineArgs({
     boolean('gamma', [help('Custom help message')]),
   ],
 })
-
-const argv = parseArgs(process.argv.splice(2))
-
-if (argv.errors.length > 0) {
-  showHelp()
-}
 ```
 
 ### Help
 
 ```js
-// Define help option
-const { parseArgs, showHelp } = defineArgs({
+// define help option
+const { parseArgs, showHelp, errors } = defineArgs({
   options: [boolean('help', [help('Show help message'), defaultValue(false)])],
 })
 
-// or user pre defined helpOption()
+// or use a pre defined helpOption()
 const { parseArgs, showHelp } = defineArgs({
   options: [helpOption()],
 })
@@ -70,8 +63,7 @@ const argv = parseArgs('--alpha=alphavalue -b=false gamma delta'.split(' '))
 //     alpha: 'alphavalue',
 //     b: false,
 //   },
-//   params: ['gamma', 'delta'],
-//   errors: [],
+//   params: ['gamma', 'delta']
 // }
 ```
 
@@ -84,7 +76,7 @@ number('alpha')
 // errors: ['"alpha" must be of type "number"'],
 
 // Required
-boolean('beta', [required(true)]),
+boolean('beta', [required()]),
 // errors: ['"beta" is required'],
 
 ```

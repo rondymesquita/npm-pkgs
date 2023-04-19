@@ -22,11 +22,6 @@ export interface ConfigModifier extends Modifier {
   type: ModifierType.CONFIG
 }
 
-export interface ActionModifier extends Modifier {
-  type: ModifierType.ACTION
-  action: Action
-}
-
 export const required = (value: boolean = true): ConfigModifier => {
   return { name: 'required', value, type: ModifierType.CONFIG }
 }

@@ -1,4 +1,8 @@
 {
-	"editor.formatOnSave": true,
-	"editor.defaultFormatter": "SimonSiefke.prettier-vscode"
+  "prettier.tabWidth": 2,
+  "prettier.useTabs": false,
+  "prettier.singleQuote": true,
+  "prettier.endOfLine": "lf",
+  "prettier.semi": false,
+  "prettier.trailingComma": "all"
 }

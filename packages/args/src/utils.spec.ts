@@ -1,4 +1,5 @@
 import { isBoolean, parseValue } from './utils'
+import { describe, it, expect } from 'vitest'
 
 describe('utils', () => {
   it('should check if string is boolean', () => {

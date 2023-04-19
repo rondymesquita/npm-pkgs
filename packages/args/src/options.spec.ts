@@ -1,5 +1,6 @@
 import { required } from './modifiers'
 import { helpOption, string, boolean, number } from './options'
+import { describe, it, expect } from 'vitest'
 
 describe('options', () => {
   it('should create help option', () => {

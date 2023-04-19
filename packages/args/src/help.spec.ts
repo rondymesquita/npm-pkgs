@@ -2,6 +2,7 @@ import { defineValidator } from '.'
 import { buildHelp, buildHelpForOption } from './help'
 import { defaultValue, help, required } from './modifiers'
 import { boolean, number, string } from './options'
+import { describe, it, expect } from 'vitest'
 
 describe('help', () => {
   it('should build a help from option', () => {

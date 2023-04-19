@@ -1,14 +1,3 @@
-export const parseModifiers = (modifiers: any[]) => {
-  const options: any = {}
-  Object.entries(modifiers).forEach(([_, modifier]) => {
-    const key = Object.entries(modifier)[0][0]
-    const value = Object.entries(modifier)[0][1]
-    options[key] = value
-  })
-
-  return options
-}
-
 export const isBoolean = (value: string) => {
   return ['true', 'false'].includes(value)
 }

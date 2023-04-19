@@ -1,4 +1,5 @@
 import { defineValidator } from './validator'
+import { describe, it, expect } from 'vitest'
 
 describe('validator', () => {
   it('defines a number validator', () => {
