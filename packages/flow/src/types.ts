@@ -15,7 +15,7 @@ export interface Option {
   fulano?: boolean
 }
 
-export type Context = Map<any, any>
+export type Context<K = any, V = any> = Map<K, V>
 type SyncStage = (context: Context) => any
 type AsyncStage = (context: Context) => Promise<any>
 export type Stage = AsyncStage | SyncStage

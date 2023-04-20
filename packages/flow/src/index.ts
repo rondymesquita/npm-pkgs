@@ -5,10 +5,10 @@ export * from './types'
 export * from './options'
 
 export const flow = (stages: Array<Stage>) => {
-  const results: Array<Result> = []
   const context: Context = new Map()
 
   const run = (options: Option[] = [stopOnError()]) => {
+    const results: Array<Result> = []
     const optionsObject = createObjectFromArray(options)
 
     for (let index = 0; index < stages.length; index++) {
@@ -35,8 +35,8 @@ export const flow = (stages: Array<Stage>) => {
   }
 
   const runAsync = async (options: Option[] = [stopOnError()]) => {
+    const results: Array<Result> = []
     const optionsObject = createObjectFromArray(options)
-    const context: Context = new Map()
 
     for (let index = 0; index < stages.length; index++) {
       const stage = stages[index]
@@ -61,5 +61,5 @@ export const flow = (stages: Array<Stage>) => {
     return results
   }
 
-  return { run, runAsync }
+  return { run, runAsync, context }
 }

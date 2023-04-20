@@ -6,7 +6,7 @@ Simple execute functions in sequence.
 - Improve code readability
 
 ```js
-const run = flow([() => 1, () => 2])
+const { run } = flow([() => 1, () => 2])
 
 const results = run()
 // [
@@ -26,7 +26,7 @@ const results = run()
 Simply make stage thrown an exception.
 
 ```js
-const run = flow([
+const { run } = flow([
   () => {
     throw new Error('sample error')
   },
@@ -35,7 +35,7 @@ const run = flow([
   },
 ])
 
-const results = await run()
+const results = run()
 // [
 //   {
 //     data: 'sample error',
@@ -49,14 +49,14 @@ const results = await run()
 Pass `stopOnError` option to `run` function.
 
 ```js
-const run = flow([
+const { run } = flow([
   () => {
     throw new Error('error')
   },
   () => 'this will be executed normally',
 ])
 
-const results = await run([stopOnError(false)])
+const results = run([stopOnError(false)])
 // {
 //   data: 'error',
 //   status: 'FAIL',
@@ -67,18 +67,71 @@ const results = await run([stopOnError(false)])
 // },
 ```
 
-### Get all sucesses or errors
+### Get all results or errors
 
 ```js
-const run = flow([
+const { run } = flow([
   () => {
     throw new Error('error')
   },
   () => 'this will be executed normally',
 ])
 
-const results = await run([stopOnError(false)])
+const results = run([stopOnError(false)])
 
 const successes = results.filter((result) => result.status === Status.OK)
 const errors = results.filter((result) => result.status === Status.FAIL)
+```
+
+### Context - share data between stages
+
+```js
+const { run } = flow([
+  (ctx) => {
+    ctx.set('color', 'red')
+  },
+  (ctx) => {
+    ctx.get('color') // red
+    ctx.set('mode', 'dark')
+  },
+  (ctx) => {
+    ctx.get('color') // red
+    ctx.get('mode') // dark
+  },
+])
+
+const results = run()
+```
+
+Inject data in context before running.
+
+```js
+const { run, context } = flow([
+  (ctx) => {
+    ctx.get('mode') // light
+  },
+])
+
+context.set('mode', 'light')
+const results = run()
+```
+
+### Promises
+
+If any stage resolves to a promise, use `runAsync`.
+
+```js
+const { runAsync } = flow([
+  async () => {
+    await fetch()
+  },
+  () => {
+    return Promise.resolve()
+  },
+  () => {
+    return new Promise(...)
+  },
+])
+
+const results = await runAsync()
 ```
