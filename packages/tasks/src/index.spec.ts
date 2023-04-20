@@ -1,26 +1,28 @@
+import { log } from 'console'
 import { TaskNameNotInformedError, TaskNotFoundError } from './errors'
-import { tasks } from './index'
+import { PlainTaskDefinition, TaskDefinition, tasks, Context } from './index'
+import { vi, describe, it, expect } from 'vitest'
 
 describe('tasks', () => {
   it('calls a task', () => {
-    process.argv = ['bin', 'file', 'alpha']
+    process.argv = ['bin', 'file', 'fake', '--alpha=value', '-b=true']
 
     const tasksMock = {
-      alpha: jest.fn(),
+      fake: vi.fn(),
     }
 
-    expect(tasksMock.alpha).not.toHaveBeenCalled()
+    expect(tasksMock.fake).not.toHaveBeenCalled()
     tasks(tasksMock)
-    expect(tasksMock.alpha).toBeCalledTimes(1)
+    expect(tasksMock.fake).toBeCalledTimes(1)
   })
 
   it('calls tasks in sequence when task is an array of tasks', async () => {
     process.argv = ['bin', 'file', 'alpha']
 
     const order: string[] = []
-    const beta = jest.fn(() => order.push('beta'))
-    const gamma = jest.fn(() => order.push('gamma'))
-    const delta = jest.fn(() => order.push('delta'))
+    const beta = vi.fn(() => order.push('beta'))
+    const gamma = vi.fn(() => order.push('gamma'))
+    const delta = vi.fn(() => order.push('delta'))
     const tasksMock = {
       alpha: [beta, gamma, delta],
     }
@@ -34,7 +36,7 @@ describe('tasks', () => {
     process.argv = ['bin', 'file']
 
     const tasksMock = {
-      default: jest.fn(),
+      default: vi.fn(),
     }
 
     expect(tasksMock.default).not.toHaveBeenCalled()
@@ -47,7 +49,7 @@ describe('tasks', () => {
 
     const tasksMock = {
       fake: {
-        alpha: jest.fn(),
+        alpha: vi.fn(),
       },
     }
 
@@ -61,7 +63,7 @@ describe('tasks', () => {
 
     const tasksMock = {
       fake: {
-        default: jest.fn(),
+        default: vi.fn(),
       },
     }
 
@@ -70,40 +72,69 @@ describe('tasks', () => {
     expect(tasksMock.fake.default).toBeCalledTimes(1)
   })
 
-  it('throws an error when no task name is informed and no default task exists', () => {
+  it('throws an error when no task name is informed and no default task exists', async () => {
     process.argv = ['bin', 'file']
 
     const tasksMock = {
-      fake: jest.fn(),
+      fake: vi.fn(),
     }
 
-    expect(tasks(tasksMock)).rejects.toEqual(new TaskNameNotInformedError())
+    await expect(() => tasks(tasksMock)).rejects.toThrowError(
+      new TaskNameNotInformedError(),
+    )
   })
 
-  it('throws an error when task name is informed but task does not exist', () => {
+  it('throws an error when task name is informed but task does not exist', async () => {
     process.argv = ['bin', 'file', 'alpha']
 
     const tasksMock = {
-      beta: jest.fn(),
+      beta: vi.fn(),
     }
 
-    expect(tasks(tasksMock)).rejects.toEqual(new TaskNotFoundError('alpha'))
+    await expect(() => tasks(tasksMock)).rejects.toThrowError(
+      new TaskNotFoundError('alpha'),
+    )
   })
 
   it('each task receives context as parameter', () => {
-    process.argv = ['bin', 'file', 'fake', '--alpha=value', '-b=true']
+    process.argv = ['bin', 'file', 'fake']
 
     const tasksMock = {
-      fake: jest.fn(),
+      fake: vi.fn(),
     }
 
     tasks(tasksMock)
     expect(tasksMock.fake).toHaveBeenCalledWith({
-      argv: {
-        options: { alpha: 'value', b: true, help: false },
-        params: ['fake'],
-        errors: [],
+      values: new Map(),
+      _: {
+        argv: {
+          errors: [],
+          options: {
+            help: false,
+          },
+          params: ['fake'],
+        },
       },
     })
   })
+
+  it('should underscore be readonly', () =>
+    new Promise((done) => {
+      process.argv = ['bin', 'file', 'alpha']
+
+      const tasksMock: TaskDefinition = {
+        alpha: vi.fn().mockImplementationOnce((ctx: Context) => {
+          expect(
+            () =>
+              // @ts-ignore
+              (ctx._.test = 'fake'),
+          ).toThrowError(
+            new Error('Cannot add property test, object is not extensible'),
+          )
+          done({})
+        }),
+      }
+
+      tasks(tasksMock)
+    }))
 })

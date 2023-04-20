@@ -1,17 +1,12 @@
-import { Option, buildOptionHelp } from '@rondymesquita/args'
+import { Option, buildHelpForOption } from '@rondymesquita/args'
 import cliui from 'cliui'
 import { HelpMessage, HelpMessages, PlainTaskDefinition, Task } from '.'
 
 const ui = cliui({} as any)
 
-export const buildGlobalHelp = (
-  definition: PlainTaskDefinition,
-  messages: HelpMessages,
-) => {
+export const buildGlobalHelp = (messages: HelpMessages) => {
   const body: any = []
   const header: any = []
-
-  // body.push({ name: 'Task', description: 'Help', options: 'Options' })
 
   header.push({
     text: 'Tasks:',
@@ -19,13 +14,14 @@ export const buildGlobalHelp = (
   })
 
   Object.entries(messages).forEach(
-    ([_, helpMessage]: [string, HelpMessage]) => {
+    ([helpMessageName, helpMessage]: [string, HelpMessage]) => {
       const name = {
-        text: `${helpMessage.name}`,
+        // text: `${helpMessage.name}`,
+        text: helpMessageName,
         padding: [0],
       }
       const description = {
-        text: `${helpMessage.description}`,
+        text: helpMessage.description,
         padding: [0],
       }
 
@@ -56,17 +52,14 @@ export const buildTaskHelp = (name: string, messages: HelpMessages) => {
   })
 
   helpMessage.argsDefinition.options.forEach((option: Option) => {
-    body.push(buildOptionHelp(option))
+    body.push(buildHelpForOption(option))
   })
 
   return { header, body }
 }
 
-export const showGlobalHelp = (
-  definition: PlainTaskDefinition,
-  messages: HelpMessages,
-) => {
-  const { header, body } = buildGlobalHelp(definition, messages)
+export const showTasksHelp = (messages: HelpMessages) => {
+  const { header, body } = buildGlobalHelp(messages)
 
   header.forEach((row: any) => {
     ui.div(row)

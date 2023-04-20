@@ -1,37 +1,49 @@
-import { defineValidator, number, string } from '@rondymesquita/args'
-import { TaskContext, tasks, namespace, help, args } from './index'
+import { help, helpOption, required } from '@rondymesquita/args'
+import {
+  Context,
+  tasks,
+  namespace,
+  args,
+  defineValidator,
+  number,
+  string,
+} from './index'
 
 const max = defineValidator('max', (rule: number, value: number) => {
   return value <= rule
 })
 
-help(build, 'build app')
+// help(build, 'build app')
 args(build, { options: [number('id', [max(3)])] })
-function build(ctx: TaskContext) {
+function build(ctx: Context) {
   console.log('building', ctx)
 }
 
-help(clean, 'clean app')
-args(clean, { options: [string('dir', [])] })
-async function clean(ctx: TaskContext) {
+// help(clean, 'clean app')
+args(clean, { options: [string('dir', []), number('id', [max(3)])] })
+async function clean(ctx: Context) {
   console.log('cleaning', ctx)
   await new Promise((res) => setTimeout(res, 2000))
 }
 
-const test = namespace('test', ({ help, tasks, args }) => {
-  help(build, 'build app')
-  args(build, { options: [string('quick', [])] })
-  function build(ctx: TaskContext) {
-    console.log('building', ctx)
+const test = namespace('test', ({ tasks, args }) => {
+  // help(unit, 'run unit tets')
+  args(unit, {
+    options: [
+      string('reporter', [help('Reporter format'), required()]),
+      helpOption('help', 'run unit tests'),
+    ],
+  })
+  function unit(ctx: Context) {
+    console.log('running unit tests', ctx)
   }
 
-  help(clean, 'clean app')
-  async function clean(ctx: TaskContext) {
-    console.log('cleaning', ctx)
+  async function e2e(ctx: Context) {
+    console.log('runnint e2e tests', ctx)
     await new Promise((res) => setTimeout(res, 2000))
   }
 
-  return tasks({ default: build, clean, build: [clean, build] })
+  return tasks({ default: unit, e2e, unit })
 })
 
 tasks({
