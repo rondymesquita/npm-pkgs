@@ -1,11 +1,12 @@
 import { stopOnError } from './options'
-import { Option, Result, Stage, Status } from './types'
+import { Context, Option, Result, Stage, Status } from './types'
 import { createObjectFromArray } from './utils'
 export * from './types'
 export * from './options'
 
 export const flow = (stages: Array<Stage>) => {
   const results: Array<Result> = []
+  const context: Context = new Map()
 
   const run = (options: Option[] = [stopOnError()]) => {
     const optionsObject = createObjectFromArray(options)
@@ -14,7 +15,7 @@ export const flow = (stages: Array<Stage>) => {
       const stage = stages[index]
 
       try {
-        const stageResult = stage()
+        const stageResult = stage(context)
         results.push({
           status: Status.OK,
           data: stageResult,
@@ -35,12 +36,13 @@ export const flow = (stages: Array<Stage>) => {
 
   const runAsync = async (options: Option[] = [stopOnError()]) => {
     const optionsObject = createObjectFromArray(options)
+    const context: Context = new Map()
 
     for (let index = 0; index < stages.length; index++) {
       const stage = stages[index]
 
       try {
-        const stageResult = await stage()
+        const stageResult = await stage(context)
         results.push({
           status: Status.OK,
           data: stageResult,

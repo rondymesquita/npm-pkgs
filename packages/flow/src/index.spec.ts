@@ -1,4 +1,4 @@
-import { flow, stopOnError } from './index'
+import { Context, flow, stopOnError } from './index'
 import { describe, it, expect } from 'vitest'
 
 describe('flow', () => {
@@ -149,5 +149,30 @@ describe('flow', () => {
         status: 'OK',
       },
     ])
+  })
+
+  it('should pass context along the stages', async () => {
+    const expectedContext = {}
+    const { run } = flow([
+      (ctx: Context) => {
+        ctx.set('alpha', 'alpha-value')
+      },
+      (ctx: Context) => {
+        const alpha = ctx.get('alpha')
+        expectedContext['alpha'] = alpha
+        ctx.set('beta', 'beta-value')
+      },
+      (ctx: Context) => {
+        const beta = ctx.get('beta')
+        expectedContext['beta'] = beta
+      },
+    ])
+
+    expect(expectedContext).toEqual({})
+    run()
+    expect(expectedContext).toEqual({
+      alpha: 'alpha-value',
+      beta: 'beta-value',
+    })
   })
 })
