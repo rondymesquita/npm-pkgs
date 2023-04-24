@@ -21,6 +21,7 @@ export const flow = (stages: Array<Stage>) => {
           data: stageResult,
         })
       } catch (error) {
+        console.error(error)
         results.push({
           status: Status.FAIL,
           data: (error as Error).message,
@@ -48,11 +49,11 @@ export const flow = (stages: Array<Stage>) => {
           data: stageResult,
         })
       } catch (error) {
+        console.error(error)
         results.push({
           status: Status.FAIL,
           data: (error as Error).message,
         })
-
         if (optionsObject.stopOnError) {
           break
         }
