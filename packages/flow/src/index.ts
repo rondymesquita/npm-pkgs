@@ -1,13 +1,20 @@
 import { stopOnError } from './options'
 import { Context, Option, Result, Stage, Status } from './types'
 import { createObjectFromArray } from './utils'
+
 export * from './types'
 export * from './options'
 
-export const flow = (stages: Array<Stage>) => {
+export interface Flow {
+  run: (options?: Option[]) => Array<Result>
+  runAsync: (options?: Option[]) => Promise<Array<Result>>
+  context: Map<any, any>
+}
+
+export const flow = (stages: Array<Stage>): Flow => {
   const context: Context = new Map()
 
-  const run = (options: Option[] = [stopOnError()]) => {
+  const run = (options: Option[] = [stopOnError()]): Array<Result> => {
     const results: Array<Result> = []
     const optionsObject = createObjectFromArray(options)
 
@@ -21,10 +28,9 @@ export const flow = (stages: Array<Stage>) => {
           data: stageResult,
         })
       } catch (error) {
-        console.error(error)
         results.push({
           status: Status.FAIL,
-          data: (error as Error).message,
+          data: error,
         })
 
         if (optionsObject.stopOnError) {
@@ -35,7 +41,9 @@ export const flow = (stages: Array<Stage>) => {
     return results
   }
 
-  const runAsync = async (options: Option[] = [stopOnError()]) => {
+  const runAsync = async (
+    options: Option[] = [stopOnError()],
+  ): Promise<Array<Result>> => {
     const results: Array<Result> = []
     const optionsObject = createObjectFromArray(options)
 
@@ -49,10 +57,9 @@ export const flow = (stages: Array<Stage>) => {
           data: stageResult,
         })
       } catch (error) {
-        console.error(error)
         results.push({
           status: Status.FAIL,
-          data: (error as Error).message,
+          data: error,
         })
         if (optionsObject.stopOnError) {
           break
