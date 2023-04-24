@@ -21,7 +21,7 @@ export type ArgvOptions = Record<string, ArgvOptionValue>
 export interface Argv {
   options: ArgvOptions
   params: Array<string>
-  errors: string[]
+  errors: Error[]
 }
 
 export interface ArgsDefinition {
@@ -37,7 +37,7 @@ export interface DefineArgs {
 }
 
 export const defineArgs = (definition: ArgsDefinition): DefineArgs => {
-  let errors: string[] = []
+  let errors: Error[] = []
 
   const showHelp = () => {
     printHelp(definition)
@@ -79,11 +79,14 @@ export const defineArgs = (definition: ArgsDefinition): DefineArgs => {
       validators.forEach((modifier: Modifier) => {
         if (!(modifier as ValidatorModifier<any>).validate(value)) {
           errors.push(
-            `"${option.name}" must satisfy "${modifier.name}" constraint. Expected:"${modifier.value}". Received:"${value}".`,
+            new Error(
+              `"${option.name}" must satisfy "${modifier.name}" constraint. Expected:"${modifier.value}". Received:"${value}".`,
+            ),
           )
         }
       })
     }
+
     argv.errors = errors
     return argv
   }
