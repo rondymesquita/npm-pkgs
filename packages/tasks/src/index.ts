@@ -8,16 +8,17 @@ import {
 import { TaskNameNotInformedError, TaskNotFoundError } from './errors'
 import { showTasksHelp } from './help'
 import { buildTaskName, deepFlattenTask } from './util'
+import { flow, Context } from '@rondymesquita/flow'
+
 export * from '@rondymesquita/args'
 
-export interface Context {
-  _: Readonly<{
-    argv: Argv
-  }>
-  values?: Map<any, any>
-}
+// export interface Context {
+//   argv: Argv
+//   values: Map<any, any>
+// }
 
-export type Task = (ctx: Context) => Promise<any> | any | void
+export { Context } from '@rondymesquita/flow'
+export type Task = (ctx: Context) => Promise<any> | any
 export interface TaskDefinition {
   [key: string]: Task | TaskDefinition | Task[]
 }
@@ -147,6 +148,8 @@ export async function tasks(taskDef: TaskDefinition) {
   const tasks: PlainTaskDefinition = createTasks(taskDef)
   const task: Task = name ? tasks[name] : tasks.default
 
+  // console.log({ task })
+
   // console.log(JSON.stringify(helpMessages, null, 1))
   if (argv.options.help && !task) {
     showHelp()
@@ -191,17 +194,21 @@ export async function tasks(taskDef: TaskDefinition) {
     }
   }
 
-  const ctx: Context = {
-    _: Object.freeze({ argv }),
-    values: new Map<any, any>(),
-  }
+  // console.log('Aqui', typeof task, Array.isArray(task))
 
+  // const ctx: any = {
+  //   argv,
+  //   values: new Map(),
+  // }
+  let { runAsync, context }: any = {}
   if (Array.isArray(task)) {
-    for (const step of task) {
-      await step(ctx)
-    }
+    ;({ runAsync, context } = flow(task))
+    context.set('argv', argv)
+    await runAsync()
+
     return
   }
-
-  await task(ctx)
+  ;({ runAsync, context } = flow([task]))
+  context.set('argv', argv)
+  await runAsync()
 }

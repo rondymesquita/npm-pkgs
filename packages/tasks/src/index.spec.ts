@@ -104,37 +104,89 @@ describe('tasks', () => {
     }
 
     tasks(tasksMock)
-    expect(tasksMock.fake).toHaveBeenCalledWith({
-      values: new Map(),
-      _: {
-        argv: {
-          errors: [],
-          options: {
-            help: false,
+    expect(tasksMock.fake).toHaveBeenCalledWith(
+      new Map([
+        [
+          'argv',
+          {
+            errors: [],
+            options: {
+              help: false,
+            },
+            params: ['fake'],
           },
-          params: ['fake'],
-        },
-      },
-    })
+        ],
+      ]),
+    )
   })
 
-  it('should underscore be readonly', () =>
-    new Promise((done) => {
-      process.argv = ['bin', 'file', 'alpha']
+  it('should share values between tasks calls tasks in sequence', async () => {
+    process.argv = ['bin', 'file', 'alpha', '--fake=1']
 
-      const tasksMock: TaskDefinition = {
-        alpha: vi.fn().mockImplementationOnce((ctx: Context) => {
-          expect(
-            () =>
-              // @ts-ignore
-              (ctx._.test = 'fake'),
-          ).toThrowError(
-            new Error('Cannot add property test, object is not extensible'),
-          )
-          done({})
-        }),
+    function mapToObj(map: any) {
+      const obj = {}
+      for (let [k, v] of map) {
+        if (v instanceof Map) {
+          obj[k] = mapToObj(v)
+        } else {
+          obj[k] = v
+        }
       }
+      return obj
+    }
 
-      tasks(tasksMock)
-    }))
+    let betaContext
+    const beta = vi.fn((ctx: Context) => {
+      betaContext = mapToObj(ctx)
+      ctx.set('red', 'red-value')
+    })
+    let gammaContext
+    const gamma = vi.fn((ctx: Context) => {
+      gammaContext = mapToObj(ctx)
+      ctx.set('green', 'green-value')
+    })
+    let deltaContext
+    const delta = vi.fn((ctx: Context) => {
+      deltaContext = mapToObj(ctx)
+    })
+
+    const tasksMock = {
+      alpha: [beta, gamma, delta],
+    }
+
+    await tasks(tasksMock)
+    expect(betaContext).toEqual({
+      argv: {
+        errors: [],
+        options: {
+          fake: 1,
+          help: false,
+        },
+        params: ['alpha'],
+      },
+    })
+    expect(gammaContext).toEqual({
+      argv: {
+        errors: [],
+        options: {
+          fake: 1,
+          help: false,
+        },
+        params: ['alpha'],
+      },
+      red: 'red-value',
+    })
+    expect(deltaContext).toEqual({
+      argv: {
+        errors: [],
+        options: {
+          fake: 1,
+          help: false,
+        },
+        params: ['alpha'],
+      },
+      red: 'red-value',
+      green: 'green-value',
+    })
+  })
 })

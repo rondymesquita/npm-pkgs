@@ -13,13 +13,11 @@ const max = defineValidator('max', (rule: number, value: number) => {
   return value <= rule
 })
 
-// help(build, 'build app')
 args(build, { options: [number('id', [max(3)])] })
 function build(ctx: Context) {
   console.log('building', ctx)
 }
 
-// help(clean, 'clean app')
 args(clean, { options: [string('dir', []), number('id', [max(3)])] })
 async function clean(ctx: Context) {
   console.log('cleaning', ctx)
@@ -49,6 +47,7 @@ const test = namespace('test', ({ tasks, args }) => {
 tasks({
   build,
   clean,
-  default: build,
+  // prepare: [clean, build],
+  // default: [clean, build],
   ...test,
 })
