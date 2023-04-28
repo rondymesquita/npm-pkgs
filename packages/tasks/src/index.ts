@@ -1,23 +1,17 @@
 import {
-  Argv,
   defineArgs,
   ArgsDefinition,
   helpOption,
   Option,
 } from '@rondymesquita/args'
 import { TaskNameNotInformedError, TaskNotFoundError } from './errors'
-import { showTasksHelp } from './help'
+import { showGlobalHelp } from './help'
 import { buildTaskName, deepFlattenTask } from './util'
-import { flow, Context } from '@rondymesquita/flow'
+import { flow, Context, Flow, Status } from '@rondymesquita/flow'
 
 export * from '@rondymesquita/args'
-
-// export interface Context {
-//   argv: Argv
-//   values: Map<any, any>
-// }
-
 export { Context } from '@rondymesquita/flow'
+
 export type Task = (ctx: Context) => Promise<any> | any
 export interface TaskDefinition {
   [key: string]: Task | TaskDefinition | Task[]
@@ -27,76 +21,37 @@ export interface PlainTaskDefinition {
   [key: string]: Task
 }
 
-export interface HelpMessage {
-  name: string
-  description: string
-  argsDefinition: ArgsDefinition
-}
-
-export type HelpMessages = {
-  [key: string]: HelpMessage
-}
-export type TaskErrorMessages = {
-  [key: string]: string[]
-}
-
 export interface TaskArgDefinition {
   options: Option[]
 }
 
-const helpMessages: HelpMessages = {}
+// export interface Definition {
+//   name: string
+//   description: string
+//   argsDefinition: ArgsDefinition
+// }
 
-export const help = (task: Task, description: string) => {
-  helpMessages[task.name] = {
-    name: task.name,
-    description,
-    argsDefinition: { options: [] },
+export type Definition = {
+  [key: string]: {
+    name: string
+    description: string
+    argsDefinition: ArgsDefinition
   }
 }
 
-export const args = (task: Task, definition: TaskArgDefinition) => {
-  definition.options.push(helpOption())
-  if (helpMessages[task.name]) {
-    helpMessages[task.name].argsDefinition = definition
-  } else {
-    helpMessages[task.name] = {
-      name: task.name,
-      description: '',
-      argsDefinition: definition,
-    }
-  }
-}
+// const createHelpFunction = (namespace: string) => {
+//   const help = (task: Task, description: string) => {
+//     const name = buildTaskName(namespace, task.name)
 
-export const createArgsFunction = (namespace: string = '') => {
-  const args = (task: Task, definition: TaskArgDefinition) => {
-    const name = buildTaskName(namespace, task.name)
-    if (helpMessages[name]) {
-      helpMessages[name].argsDefinition = definition
-    } else {
-      helpMessages[name] = {
-        name: task.name,
-        description: '',
-        argsDefinition: definition,
-      }
-    }
-  }
+//     definition[name] = {
+//       name,
+//       description,
+//       argsDefinition: { options: [] },
+//     }
+//   }
 
-  return args
-}
-
-const createHelpFunction = (namespace: string) => {
-  const help = (task: Task, description: string) => {
-    const name = buildTaskName(namespace, task.name)
-
-    helpMessages[name] = {
-      name,
-      description,
-      argsDefinition: { options: [] },
-    }
-  }
-
-  return help
-}
+//   return help
+// }
 
 function createTasksFunction(namespace: string = '') {
   const name = namespace
@@ -109,106 +64,163 @@ function createTasksFunction(namespace: string = '') {
   return createTasks
 }
 
-export interface CreateNamespace {
+interface CreateNamespace {
   tasks: ReturnType<typeof createTasksFunction>
-  help: ReturnType<typeof createHelpFunction>
-  args: ReturnType<typeof createArgsFunction>
+  // help: ReturnType<typeof createHelpFunction>
+  args: (task: Task, taskArgDefinition: TaskArgDefinition) => void
 }
 
-export const namespace = (
-  name: string,
-  createNamespaceFn: (params: CreateNamespace) => PlainTaskDefinition,
-): TaskDefinition => {
-  const namespacedTasks = createTasksFunction(name)
-  const namespacedHelp = createHelpFunction(name)
-  const namespacesArgs = createArgsFunction(name)
-
-  const fn = createNamespaceFn({
-    tasks: namespacedTasks,
-    help: namespacedHelp,
-    args: namespacesArgs,
-  })
-
-  return fn
+export interface DefineTasks {
+  definition: Definition
+  args: (task: Task, definition: TaskArgDefinition) => void
+  tasks: (taskDef: TaskDefinition) => Promise<void>
+  namespace: (
+    name: string,
+    defineNamespaceTasks: (params: CreateNamespace) => PlainTaskDefinition,
+  ) => TaskDefinition
 }
 
-export async function tasks(taskDef: TaskDefinition) {
-  // console.log(taskDef)
+export const defineTasks = (): DefineTasks => {
+  const definition: Definition = {}
 
-  const { parseArgs, showHelp, showErrors } = defineArgs({
-    name: 'tasks',
-    usage: 'tasks [task name] [task options]\nUsage: tasks [options]',
-    options: [helpOption()],
-  })
-
-  const argv = parseArgs(process.argv.slice(2))
-  const name = argv.params[0]
-
-  const createTasks = createTasksFunction()
-  const tasks: PlainTaskDefinition = createTasks(taskDef)
-  const task: Task = name ? tasks[name] : tasks.default
-
-  // console.log({ task })
-
-  // console.log(JSON.stringify(helpMessages, null, 1))
-  if (argv.options.help && !task) {
-    showHelp()
-    showTasksHelp(helpMessages)
-    return
+  const fillEmptyDefinition = (tasks: PlainTaskDefinition) => {
+    Object.entries(tasks).forEach(([name, task]) => {
+      if (!definition[name]) {
+        definition[name] = {
+          name,
+          description: '',
+          argsDefinition: {
+            options: [helpOption()],
+          },
+        }
+      }
+    })
   }
 
-  if (argv.errors.length > 0) {
-    console.log(`Errors`)
-    showErrors()
-    return
+  const createArgsFunction = (namespace: string = '') => {
+    const args = (task: Task, taskArgDefinition: TaskArgDefinition) => {
+      taskArgDefinition.options.push(helpOption())
+      const name = buildTaskName(namespace, task.name)
+      if (definition[name]) {
+        definition[name].argsDefinition = taskArgDefinition
+      } else {
+        definition[name] = {
+          name: task.name,
+          description: '',
+          argsDefinition: taskArgDefinition,
+        }
+      }
+    }
+
+    return args
   }
 
-  if (!name && !task) {
-    throw new TaskNameNotInformedError()
+  const args = createArgsFunction()
+
+  const namespace = (
+    name: string,
+    defineNamespaceTasks: (params: CreateNamespace) => PlainTaskDefinition,
+  ): TaskDefinition => {
+    const namespacedTasks = createTasksFunction(name)
+    // const namespacedHelp = createHelpFunction(name)
+    const namespacedArgs = createArgsFunction(name)
+
+    const fn = defineNamespaceTasks({
+      tasks: namespacedTasks,
+      // help: namespacedHelp,
+      args: namespacedArgs,
+    })
+
+    return fn
   }
 
-  if (name && !task) {
-    throw new TaskNotFoundError(name)
-  }
+  async function tasks(taskDef: TaskDefinition) {
+    const { parseArgs, showHelp, showErrors } = defineArgs({
+      name: 'tasks',
+      usage: 'tasks [task name] [task options]\nUsage: tasks [options]',
+      options: [helpOption()],
+    })
 
-  if (name && helpMessages[name]) {
-    const taskArgDefinition = helpMessages[name].argsDefinition
+    const argv = parseArgs(process.argv.slice(2))
 
-    const {
-      parseArgs: parseTaskArgs,
-      showHelp: showTaskHelp,
-      showErrors: showTaskErrors,
-    } = defineArgs(taskArgDefinition)
+    const name = argv.params[0]
 
-    parseTaskArgs(process.argv.slice(2))
+    const createTasks = createTasksFunction()
+    const tasks: PlainTaskDefinition = createTasks(taskDef)
+    const task: Task = name ? tasks[name] : tasks.default
+    fillEmptyDefinition(tasks)
 
-    if (argv.options.help) {
-      showTaskHelp()
+    if (argv.options.help && !name) {
+      showHelp()
+      showGlobalHelp(definition)
       return
     }
 
     if (argv.errors.length > 0) {
-      console.log(`Task errors: ${name}`)
-      showTaskErrors()
+      console.log(`Errors`)
+      showErrors()
       return
+    }
+
+    if (!name && !task) {
+      throw new TaskNameNotInformedError()
+    }
+
+    if (name && !task) {
+      throw new TaskNotFoundError(name)
+    }
+
+    if (name && definition[name]) {
+      const taskArgDefinition = definition[name].argsDefinition
+
+      const {
+        parseArgs: parseTaskArgs,
+        showHelp: showTaskHelp,
+        showErrors: showTaskErrors,
+      } = defineArgs(taskArgDefinition)
+
+      parseTaskArgs(process.argv.slice(2))
+
+      if (argv.options.help) {
+        showTaskHelp()
+        return
+      }
+
+      if (argv.errors.length > 0) {
+        console.log(`Task errors: ${name}`)
+        showTaskErrors()
+        return
+      }
+    }
+
+    let { runAsync, context }: Partial<Flow> = {}
+    let results
+    let errors
+    if (Array.isArray(task)) {
+      ;({ runAsync, context } = flow(task))
+      context.set('argv', argv)
+      results = await runAsync()
+    } else {
+      ;({ runAsync, context } = flow([task]))
+      context.set('argv', argv)
+      results = await runAsync()
+    }
+
+    errors = results.filter((result) => result.status === Status.FAIL)
+    if (errors.length > 0) {
+      errors.forEach((error) => {
+        console.error(error.data)
+      })
     }
   }
 
-  // console.log('Aqui', typeof task, Array.isArray(task))
-
-  // const ctx: any = {
-  //   argv,
-  //   values: new Map(),
-  // }
-  let { runAsync, context }: any = {}
-  if (Array.isArray(task)) {
-    ;({ runAsync, context } = flow(task))
-    context.set('argv', argv)
-    await runAsync()
-
-    return
+  return {
+    tasks,
+    args,
+    namespace,
+    definition,
   }
-  ;({ runAsync, context } = flow([task]))
-  context.set('argv', argv)
-  await runAsync()
 }
+
+const { namespace, definition, tasks, args } = defineTasks()
+export { namespace, definition, tasks, args }

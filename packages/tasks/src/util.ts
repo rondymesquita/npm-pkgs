@@ -1,6 +1,4 @@
 export const buildTaskName = (namespace: string, fnName: string) => {
-  // console.log({ fnName })
-
   let name: string = namespace ? `${namespace}:${fnName}` : fnName
 
   if (name !== 'default' && name.includes('default')) {

@@ -1,11 +1,42 @@
+// vi.doMock('@ondymesquita/')
+
 import { log } from 'console'
 import { TaskNameNotInformedError, TaskNotFoundError } from './errors'
-import { PlainTaskDefinition, TaskDefinition, tasks, Context } from './index'
-import { vi, describe, it, expect } from 'vitest'
+import {
+  PlainTaskDefinition,
+  TaskDefinition,
+  defineTasks,
+  Context,
+  string,
+  boolean,
+  number,
+  required,
+  args,
+  // defineArgs,
+} from './index'
+
+import { showGlobalHelp } from './help'
+import { Argv, Option, defineArgs, helpOption } from '@rondymesquita/args'
+import {
+  vi,
+  describe,
+  it,
+  expect,
+  Mock,
+  Mocked,
+  MockedFunction,
+  SpyInstance,
+} from 'vitest'
+// import { Mock } from 'vitest'
+
+vi.mock('@rondymesquita/args')
+vi.mock('./help')
 
 describe('tasks', () => {
   it('calls a task', () => {
     process.argv = ['bin', 'file', 'fake', '--alpha=value', '-b=true']
+
+    const { tasks } = defineTasks()
 
     const tasksMock = {
       fake: vi.fn(),
@@ -18,6 +49,8 @@ describe('tasks', () => {
 
   it('calls tasks in sequence when task is an array of tasks', async () => {
     process.argv = ['bin', 'file', 'alpha']
+
+    const { tasks } = defineTasks()
 
     const order: string[] = []
     const beta = vi.fn(() => order.push('beta'))
@@ -35,6 +68,8 @@ describe('tasks', () => {
   it('calls a default task when passing no param', () => {
     process.argv = ['bin', 'file']
 
+    const { tasks } = defineTasks()
+
     const tasksMock = {
       default: vi.fn(),
     }
@@ -44,8 +79,26 @@ describe('tasks', () => {
     expect(tasksMock.default).toBeCalledTimes(1)
   })
 
-  it('calls a task in namespace', () => {
+  it('calls a task in namespace using namespace function', () => {
     process.argv = ['bin', 'file', 'fake:alpha']
+
+    const { tasks, namespace } = defineTasks()
+
+    const namespacedTasks = { alpha: vi.fn() }
+
+    const tasksMock = namespace('fake', ({ tasks }) => {
+      return tasks(namespacedTasks)
+    })
+
+    expect(namespacedTasks.alpha).not.toHaveBeenCalled()
+    tasks({ ...tasksMock })
+    expect(namespacedTasks.alpha).toBeCalledTimes(1)
+  })
+
+  it('calls a task in namespace without namespace function', () => {
+    process.argv = ['bin', 'file', 'fake:alpha']
+
+    const { tasks } = defineTasks()
 
     const tasksMock = {
       fake: {
@@ -60,6 +113,7 @@ describe('tasks', () => {
 
   it('calls a default task in namespace', () => {
     process.argv = ['bin', 'file', 'fake']
+    const { tasks } = defineTasks()
 
     const tasksMock = {
       fake: {
@@ -75,6 +129,8 @@ describe('tasks', () => {
   it('throws an error when no task name is informed and no default task exists', async () => {
     process.argv = ['bin', 'file']
 
+    const { tasks } = defineTasks()
+
     const tasksMock = {
       fake: vi.fn(),
     }
@@ -87,6 +143,8 @@ describe('tasks', () => {
   it('throws an error when task name is informed but task does not exist', async () => {
     process.argv = ['bin', 'file', 'alpha']
 
+    const { tasks } = defineTasks()
+
     const tasksMock = {
       beta: vi.fn(),
     }
@@ -98,6 +156,8 @@ describe('tasks', () => {
 
   it('each task receives context as parameter', () => {
     process.argv = ['bin', 'file', 'fake']
+
+    const { tasks } = defineTasks()
 
     const tasksMock = {
       fake: vi.fn(),
@@ -120,7 +180,7 @@ describe('tasks', () => {
     )
   })
 
-  it('should share values between tasks calls tasks in sequence', async () => {
+  it('should share context between tasks calls tasks in sequence', async () => {
     process.argv = ['bin', 'file', 'alpha', '--fake=1']
 
     function mapToObj(map: any) {
@@ -134,6 +194,8 @@ describe('tasks', () => {
       }
       return obj
     }
+
+    const { tasks } = defineTasks()
 
     let betaContext
     const beta = vi.fn((ctx: Context) => {
@@ -187,6 +249,261 @@ describe('tasks', () => {
       },
       red: 'red-value',
       green: 'green-value',
+    })
+  })
+
+  it('should add args to task', async () => {
+    const { args, definition } = defineTasks()
+
+    const alpha = () => {}
+
+    expect(definition).toEqual({})
+    args(alpha, {
+      options: [string('color'), boolean('watch'), number('id')],
+    })
+    expect(definition).toEqual({
+      alpha: {
+        argsDefinition: {
+          options: [
+            {
+              modifiers: [],
+              name: 'color',
+              type: 'string',
+            },
+            {
+              modifiers: [],
+              name: 'watch',
+              type: 'boolean',
+            },
+            {
+              modifiers: [],
+              name: 'id',
+              type: 'number',
+            },
+            {
+              modifiers: [
+                {
+                  name: 'help',
+                  type: 'CONFIG',
+                  value: 'Show help message',
+                },
+                {
+                  name: 'defaultvalue',
+                  type: 'CONFIG',
+                  value: false,
+                },
+              ],
+              name: 'help',
+              type: 'boolean',
+            },
+          ],
+        },
+        description: '',
+        name: 'alpha',
+      },
+    })
+  })
+
+  it('should fill minimum args for each task when args in not defined', async () => {
+    process.argv = ['bin', 'file', 'fake:alpha']
+    const { tasks, definition } = defineTasks()
+
+    const tasksMock = {
+      fake: {
+        alpha: vi.fn(),
+      },
+    }
+
+    expect(definition).toEqual({})
+    await tasks(tasksMock)
+    expect(definition).toEqual({
+      'fake:alpha': {
+        argsDefinition: {
+          options: [
+            {
+              modifiers: [
+                {
+                  name: 'help',
+                  type: 'CONFIG',
+                  value: 'Show help message',
+                },
+                {
+                  name: 'defaultvalue',
+                  type: 'CONFIG',
+                  value: false,
+                },
+              ],
+              name: 'help',
+              type: 'boolean',
+            },
+          ],
+        },
+        description: '',
+        name: 'fake:alpha',
+      },
+    })
+  })
+
+  it('should add args to task in namespace', async () => {
+    const { namespace, definition } = defineTasks()
+
+    namespace('fake', ({ tasks, args }) => {
+      const alpha = () => {}
+      args(alpha, {
+        options: [string('color'), boolean('watch'), number('id')],
+      })
+      return tasks({ alpha })
+    })
+
+    expect(definition).toEqual({
+      'fake:alpha': {
+        argsDefinition: {
+          options: [
+            {
+              modifiers: [],
+              name: 'color',
+              type: 'string',
+            },
+            {
+              modifiers: [],
+              name: 'watch',
+              type: 'boolean',
+            },
+            {
+              modifiers: [],
+              name: 'id',
+              type: 'number',
+            },
+            {
+              modifiers: [
+                {
+                  name: 'help',
+                  type: 'CONFIG',
+                  value: 'Show help message',
+                },
+                {
+                  name: 'defaultvalue',
+                  type: 'CONFIG',
+                  value: false,
+                },
+              ],
+              name: 'help',
+              type: 'boolean',
+            },
+          ],
+        },
+        description: '',
+        name: 'alpha',
+      },
+    })
+  })
+
+  it('should show help with help flag and without task name', async () => {
+    const showHelp = vi.fn()
+    const argv: Argv = {
+      errors: [],
+      params: [],
+      options: { help: true },
+    }
+    process.argv = ['bin', 'file', '--help']
+    ;(defineArgs as Mock).mockImplementation(() => ({
+      parseArgs: vi.fn(() => argv),
+      showHelp,
+      showErrors: vi.fn(),
+    }))
+    ;(helpOption as Mock<any, Option>).mockImplementation(() => ({
+      name: 'help',
+      type: 'boolean',
+      modifiers: [],
+    }))
+
+    const { tasks } = defineTasks()
+    const alpha = () => {}
+    expect(showHelp).not.toBeCalled()
+    expect(showGlobalHelp).not.toBeCalled()
+    await tasks({ alpha })
+    expect(showHelp).toHaveBeenCalledOnce()
+    expect(showGlobalHelp).toHaveBeenNthCalledWith(1, {
+      alpha: {
+        argsDefinition: {
+          options: [
+            {
+              modifiers: [],
+              name: 'help',
+              type: 'boolean',
+            },
+          ],
+        },
+        description: '',
+        name: 'alpha',
+      },
+    })
+  })
+
+  it.skip('should show errors when parseArgs returns errors with wrong type option', async () => {
+    process.argv = ['bin', 'file', '--help=wrong-type']
+
+    const defineArgsSpy = vi.spyOn(argsPkg, 'defineArgs')
+
+    const showErrorsMock = vi.fn()
+
+    defineArgsSpy.mockImplementationOnce((argsDefinition) => {
+      const { parseArgs, showHelp } = argsPkg.defineArgs(argsDefinition)
+
+      return {
+        parseArgs,
+        showHelp,
+        showErrors: showErrorsMock,
+      }
+    })
+
+    const { tasks } = defineTasks()
+    expect(showErrorsMock).not.toBeCalled()
+    const alpha = () => {}
+    args(alpha, {
+      options: [number('id')],
+    })
+    await tasks({ alpha })
+    // expect(showErrorsMock).toHaveBeenCalledWith()
+  })
+
+  it.only('should show help of task with help flag and with task name', async () => {
+    const showHelp = vi.fn()
+    const argv: Argv = {
+      errors: [],
+      params: ['alpha'],
+      options: { help: true },
+    }
+    ;(defineArgs as Mock).mockImplementation(() => ({
+      parseArgs: vi.fn(() => argv),
+      showHelp,
+      showErrors: vi.fn(),
+    }))
+    ;(helpOption as Mock<any, Option>).mockImplementation(() => ({
+      name: 'help',
+      type: 'boolean',
+      modifiers: [],
+    }))
+
+    const { tasks, definition } = defineTasks()
+    const alpha = () => {}
+    expect(showHelp).not.toBeCalled()
+    await tasks({ alpha })
+    expect(showHelp).toHaveBeenCalledOnce()
+    expect(definition).toEqual({
+      alpha: {
+        argsDefinition: {
+          options: [
+            {
+              modifiers: [],
+              name: 'help',
+              type: 'boolean',
+            },
+          ],
+        },
+        description: '',
+        name: 'alpha',
+      },
     })
   })
 })

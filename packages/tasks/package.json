@@ -31,9 +31,9 @@
     }
   },
   "scripts": {
-    "test": "vitest --watch=false",
+    "test": "vitest --watch=false  --coverage",
     "test:watch": "vitest --watch=true",
-    "dev": "tsx --watch ./src/dev.ts build --test",
+    "dev": "tsx --watch ./src/dev.ts prepare --help",
     "dev:bin": "tsx --watch './src' --ext 'ts,js,json' --exec ts-node ./src/bin.ts ./src/example.js",
     "build": "rimraf ./dist && tsc && copyfiles ./example ./dist",
     "release": "release-it --ci",

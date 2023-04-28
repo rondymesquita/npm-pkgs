@@ -1,13 +1,7 @@
 import { help, helpOption, required } from '@rondymesquita/args'
-import {
-  Context,
-  tasks,
-  namespace,
-  args,
-  defineValidator,
-  number,
-  string,
-} from './index'
+import { Context, defineTasks, defineValidator, number, string } from './index'
+
+const { tasks, args, namespace } = defineTasks()
 
 const max = defineValidator('max', (rule: number, value: number) => {
   return value <= rule
@@ -18,14 +12,16 @@ function build(ctx: Context) {
   console.log('building', ctx)
 }
 
-args(clean, { options: [string('dir', []), number('id', [max(3)])] })
+args(clean, {
+  options: [string('dir', []), number('id', [max(3)])],
+})
 async function clean(ctx: Context) {
   console.log('cleaning', ctx)
+  // throw new Error('deu um erro aqui')
   await new Promise((res) => setTimeout(res, 2000))
 }
 
 const test = namespace('test', ({ tasks, args }) => {
-  // help(unit, 'run unit tets')
   args(unit, {
     options: [
       string('reporter', [help('Reporter format'), required()]),
@@ -48,6 +44,6 @@ tasks({
   build,
   clean,
   // prepare: [clean, build],
-  // default: [clean, build],
+  default: [clean, build],
   ...test,
 })
