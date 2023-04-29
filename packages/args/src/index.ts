@@ -60,8 +60,7 @@ export const defineArgs = (definition: ArgsDefinition): DefineArgs => {
     Object.entries(definition.options).forEach(([name, modifiers]) => {
       const value = argv.options[name]
 
-      // const flowModifiers = []
-      const flowModifiers = modifiers
+      const modifierFunctions = modifiers
         .filter((modifier: Modifier) => {
           return modifier.type === ModifierType.VALIDATOR
         })
@@ -72,17 +71,20 @@ export const defineArgs = (definition: ArgsDefinition): DefineArgs => {
       const results = flow([
         () => checkValue(name, modifiers, value),
         () => checkType(name, modifiers, value),
-        ...flowModifiers,
+        ...modifierFunctions,
       ]).run()
 
-      const errors = results
+      const resultErrors = results
         .filter((result: Result) => result.status === Status.FAIL)
         .map((result: Result) => result.data)
 
-      if (errors.length > 0) {
-        console.log(errors)
-        return
-      }
+      errors = errors.concat(resultErrors)
+
+      // TODO, if verbose enabled
+      // if (errors.length > 0) {
+      //   console.log(errors)
+      //   return
+      // }
     })
 
     argv.errors = errors

@@ -13,46 +13,6 @@ import {
 import { describe, it, expect } from 'vitest'
 
 describe('test', () => {
-  it.only('should parse options as object', () => {
-    const max = defineValidator('max', (rule: number, value: number) => {
-      return value <= rule
-    })
-    const { parseArgs } = defineArgs({
-      options: {
-        alpha: [type('number'), required(true), defaultValue(1), max(3)],
-      },
-    })
-
-    const argv = parseArgs(
-      // '--alpha=fake-alpha --beta=fake-beta --gama=true'.split(' '),
-      '--beta=fake-beta --gama=true --alpha=4'.split(' '),
-    )
-    // expect(argv).toEqual({
-    //   options: {
-    //     alpha: 'fake-alpha',
-    //     beta: 'fake-beta',
-    //     gama: true,
-    //   },
-    //   params: [],
-    //   errors: [],
-    // })
-  })
-  it.skip('should parse options as array', () => {
-    const { parseArgs } = defineArgs({
-      // options: ['alpha', 'beta', 'gama'],
-    })
-
-    const argv = parseArgs('--alpha=1 --beta=fake-beta --gama=true'.split(' '))
-    expect(argv).toEqual({
-      options: {
-        alpha: 1,
-        beta: 'fake-beta',
-        gama: true,
-      },
-      params: [],
-      errors: [],
-    })
-  })
   it('parses options', () => {
     const options = parseArgs(
       '--alpha=1 -a=0 --beta=1.0 -b=0.5 --gama=gama -g=gama --delta -d --epsilon=true -e=false'.split(
@@ -91,7 +51,9 @@ describe('test', () => {
   })
   it('defines args with options', () => {
     const { parseArgs } = defineArgs({
-      options: [number('alpha')],
+      options: {
+        alpha: [type('number')],
+      },
     })
 
     const argv = parseArgs('--alpha=1'.split(' '))
@@ -105,11 +67,11 @@ describe('test', () => {
   })
   it('fill default values when option is not passed', () => {
     const { parseArgs } = defineArgs({
-      options: [
-        number('alpha', [defaultValue(5)]),
-        string('beta', [defaultValue('beta')]),
-        boolean('gama', [defaultValue(true)]),
-      ],
+      options: {
+        alpha: [type('number'), defaultValue(5)],
+        beta: [type('string'), defaultValue('beta')],
+        gamma: [type('boolean'), defaultValue(true)],
+      },
     })
 
     const argv = parseArgs([])
@@ -117,7 +79,7 @@ describe('test', () => {
       options: {
         alpha: 5,
         beta: 'beta',
-        gama: true,
+        gamma: true,
       },
       params: [],
       errors: [],
@@ -125,7 +87,11 @@ describe('test', () => {
   })
   it('returns type errors when values are not passed', () => {
     const { parseArgs } = defineArgs({
-      options: [number('alpha'), string('beta'), boolean('gamma')],
+      options: {
+        alpha: [type('number')],
+        beta: [type('string')],
+        gamma: [type('boolean')],
+      },
     })
 
     const argv = parseArgs([])
@@ -141,7 +107,11 @@ describe('test', () => {
   })
   it('returns type errors when type does not match', () => {
     const { parseArgs } = defineArgs({
-      options: [string('alpha'), boolean('beta'), number('gamma')],
+      options: {
+        alpha: [type('string')],
+        beta: [type('boolean')],
+        gamma: [type('number')],
+      },
     })
 
     const argv = parseArgs('--alpha=1 --beta=1.0 --gama=gama'.split(' '))
@@ -161,11 +131,10 @@ describe('test', () => {
   })
   it('returns errors when constraint does not satisfy', () => {
     const { parseArgs } = defineArgs({
-      options: [
-        string('alpha'),
-        boolean('beta', [required(true)]),
-        number('gamma', []),
-      ],
+      options: {
+        alpha: [type('string')],
+        beta: [type('boolean'), required(true)],
+      },
     })
 
     const argv = parseArgs('--alpha=alpha --gamma=6'.split(' '))
@@ -185,7 +154,9 @@ describe('test', () => {
     })
 
     const { parseArgs } = defineArgs({
-      options: [number('gamma', [max(3)])],
+      options: {
+        gamma: [type('number'), max(3)],
+      },
     })
 
     const argv = parseArgs('--gamma=6'.split(' '))
