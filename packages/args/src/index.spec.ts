@@ -1,17 +1,58 @@
 import {
   parseArgs,
   defineArgs,
-  number,
-  string,
-  boolean,
+  // number,
+  // string,
+  // boolean,
   required,
   defaultValue,
   defineValidator,
+  type,
 } from './index'
 
 import { describe, it, expect } from 'vitest'
 
 describe('test', () => {
+  it.only('should parse options as object', () => {
+    const max = defineValidator('max', (rule: number, value: number) => {
+      return value <= rule
+    })
+    const { parseArgs } = defineArgs({
+      options: {
+        alpha: [type('number'), required(true), defaultValue(1), max(3)],
+      },
+    })
+
+    const argv = parseArgs(
+      // '--alpha=fake-alpha --beta=fake-beta --gama=true'.split(' '),
+      '--beta=fake-beta --gama=true --alpha=4'.split(' '),
+    )
+    // expect(argv).toEqual({
+    //   options: {
+    //     alpha: 'fake-alpha',
+    //     beta: 'fake-beta',
+    //     gama: true,
+    //   },
+    //   params: [],
+    //   errors: [],
+    // })
+  })
+  it.skip('should parse options as array', () => {
+    const { parseArgs } = defineArgs({
+      // options: ['alpha', 'beta', 'gama'],
+    })
+
+    const argv = parseArgs('--alpha=1 --beta=fake-beta --gama=true'.split(' '))
+    expect(argv).toEqual({
+      options: {
+        alpha: 1,
+        beta: 'fake-beta',
+        gama: true,
+      },
+      params: [],
+      errors: [],
+    })
+  })
   it('parses options', () => {
     const options = parseArgs(
       '--alpha=1 -a=0 --beta=1.0 -b=0.5 --gama=gama -g=gama --delta -d --epsilon=true -e=false'.split(

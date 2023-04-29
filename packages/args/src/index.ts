@@ -8,7 +8,7 @@ import {
 import { parseValue } from './utils'
 import { printHelp } from './help'
 import { flow, Result, Status } from '@rondymesquita/flow'
-import { checkType, checkValue } from './argcheck'
+import { checkType, checkValidator, checkValue } from './argcheck'
 import { Option } from './options'
 
 export * from './modifiers'
@@ -27,7 +27,8 @@ export interface Argv {
 export interface ArgsDefinition {
   name?: string
   usage?: string
-  options: Option[]
+  // options: Option[]
+  options: Record<string, Modifier[]>
 }
 
 export interface DefineArgs {
@@ -51,41 +52,38 @@ export const defineArgs = (definition: ArgsDefinition): DefineArgs => {
     const argv = parseArgs(args)
 
     /**Fill default values */
-    for (let index = 0; index < definition.options.length; index++) {
-      const option = definition.options[index]
-      const value = argv.options[option.name]
-      argv.options = fillOptionsDefaultValues(option, argv, value)
-    }
+    Object.entries(definition.options).forEach(([name, modifiers]) => {
+      const value = argv.options[name]
+      argv.options = fillOptionsDefaultValues(name, modifiers, value, argv)
+    })
 
-    /**Validate */
-    for (let index = 0; index < definition.options.length; index++) {
-      const option = definition.options[index]
-      const value = argv.options[option.name]
+    Object.entries(definition.options).forEach(([name, modifiers]) => {
+      const value = argv.options[name]
+
+      // const flowModifiers = []
+      const flowModifiers = modifiers
+        .filter((modifier: Modifier) => {
+          return modifier.type === ModifierType.VALIDATOR
+        })
+        .map((modifier: Modifier) => {
+          return () => checkValidator(name, modifier, value)
+        })
 
       const results = flow([
-        () => checkValue(option, value),
-        () => checkType(option, value),
+        () => checkValue(name, modifiers, value),
+        () => checkType(name, modifiers, value),
+        ...flowModifiers,
       ]).run()
 
-      const optionErrors = results
+      const errors = results
         .filter((result: Result) => result.status === Status.FAIL)
         .map((result: Result) => result.data)
 
-      errors = errors.concat(optionErrors)
-
-      const validators = option.modifiers.filter(
-        (mod: Modifier) => mod.type === ModifierType.VALIDATOR,
-      )
-      validators.forEach((modifier: Modifier) => {
-        if (!(modifier as ValidatorModifier<any>).validate(value)) {
-          errors.push(
-            new Error(
-              `"${option.name}" must satisfy "${modifier.name}" constraint. Expected:"${modifier.value}". Received:"${value}".`,
-            ),
-          )
-        }
-      })
-    }
+      if (errors.length > 0) {
+        console.log(errors)
+        return
+      }
+    })
 
     argv.errors = errors
     return argv
@@ -121,9 +119,12 @@ export const parseArgs = (args: string[]): Argv => {
 }
 
 const fillOptionsDefaultValues = (
-  option: Option,
+  // option: Option,
+  // value: any,
+  name: string,
+  modifiers: Modifier[],
+  value: ArgvOptionValue,
   argv: Argv,
-  value: any,
 ): ArgvOptions => {
   const cloneArgOptions: ArgvOptions = { ...argv.options }
 
@@ -131,13 +132,13 @@ const fillOptionsDefaultValues = (
     return cloneArgOptions
   }
 
-  if (!argv.options[option.name]) {
-    const defaultModifier: ConfigModifier | undefined = option.modifiers.find(
+  if (!argv.options[name]) {
+    const defaultModifier: ConfigModifier | undefined = modifiers.find(
       (mod: Modifier) => mod.name === 'defaultvalue',
     ) as ConfigModifier
 
     if (defaultModifier) {
-      cloneArgOptions[option.name] = defaultModifier.value
+      cloneArgOptions[name] = defaultModifier.value
     }
   }
 
