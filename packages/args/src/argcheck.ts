@@ -1,17 +1,15 @@
-import { Option, ArgvOptionValue } from './'
-import { Modifier, ModifierType, ValidatorModifier } from './modifiers'
+import { ArgvOptionValue } from './'
+import { Modifier, ValidatorModifier } from './modifiers'
 
 export const checkValue = (
   name: string,
   modifiers: Modifier[],
   value: ArgvOptionValue,
 ) => {
-  // console.log(modifiers)
-
-  const requiredOption = modifiers.find(
+  const requiredModifier = modifiers.find(
     (mod: Modifier) => mod.name === 'required',
   )
-  const isRequired = requiredOption ? requiredOption.value : false
+  const isRequired = requiredModifier ? requiredModifier.value : false
   const isEmpty = value === undefined || value === null
   if (isRequired && isEmpty) {
     throw new Error(`"${name}" is required`)

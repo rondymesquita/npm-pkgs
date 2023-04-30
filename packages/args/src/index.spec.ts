@@ -1,9 +1,6 @@
 import {
   parseArgs,
   defineArgs,
-  // number,
-  // string,
-  // boolean,
   required,
   defaultValue,
   defineValidator,
@@ -99,9 +96,9 @@ describe('test', () => {
       options: {},
       params: [],
       errors: [
-        new Error('"alpha" must be of type "number"'),
-        new Error('"beta" must be of type "string"'),
-        new Error('"gamma" must be of type "boolean"'),
+        '"alpha" must be of type "number"',
+        '"beta" must be of type "string"',
+        '"gamma" must be of type "boolean"',
       ],
     })
   })
@@ -123,9 +120,9 @@ describe('test', () => {
       },
       params: [],
       errors: [
-        new Error('"alpha" must be of type "string"'),
-        new Error('"beta" must be of type "boolean"'),
-        new Error('"gamma" must be of type "number"'),
+        '"alpha" must be of type "string"',
+        '"beta" must be of type "boolean"',
+        '"gamma" must be of type "number"',
       ],
     })
   })
@@ -144,7 +141,7 @@ describe('test', () => {
         gamma: 6,
       },
       params: [],
-      errors: [new Error('"beta" is required')],
+      errors: ['"beta" is required'],
     })
   })
 
@@ -166,9 +163,7 @@ describe('test', () => {
       },
       params: [],
       errors: [
-        new Error(
-          '"gamma" must satisfy "max" constraint. Expected:"3". Received:"6".',
-        ),
+        '"gamma" must satisfy "max" constraint. Expected:"3". Received:"6".',
       ],
     })
   })

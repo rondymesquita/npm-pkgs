@@ -33,7 +33,7 @@
   "scripts": {
     "test": "vitest --watch=false --coverage",
     "test:watch": "vitest",
-    "dev": "tsx --watch ./src/dev.ts --alpha=5 -a=0 --beta=1.0 -b=0.5 --gama=gama -g=gama --delta -d --epsilon=true -e=false",
+    "dev": "tsx --watch ./src/dev.ts --help",
     "build": "rimraf ./dist && tsc",
     "release": "release-it --ci",
     "docs": "typedoc"

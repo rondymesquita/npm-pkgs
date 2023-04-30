@@ -1,15 +1,16 @@
 import { defineValidator } from '.'
 import { buildHelp, buildHelpForOption } from './help'
-import { defaultValue, help, required } from './modifiers'
-import { boolean, number, string } from './options'
+import { defaultValue, help, required, type } from './modifiers'
 import { describe, it, expect } from 'vitest'
 
 describe('help', () => {
   it('should build a help from option', () => {
     expect(
-      buildHelpForOption(
-        number('alpha', [defaultValue(5), help('alpha description')]),
-      ),
+      buildHelpForOption('alpha', [
+        required(true),
+        defaultValue(5),
+        help('alpha description'),
+      ]),
     ).toEqual({
       description: {
         padding: [0],
@@ -17,7 +18,7 @@ describe('help', () => {
       },
       modifiers: {
         padding: [0],
-        text: '[number], [defaultvalue:5]',
+        text: '[required:true], [defaultvalue:5]',
       },
       name: {
         padding: [0],
@@ -33,12 +34,12 @@ describe('help', () => {
     const definition = {
       name: 'mycli',
       usage: 'mycli [options]',
-      options: [
-        number('alpha', [defaultValue(5), max(6)]),
-        string('beta', [defaultValue('beta'), help('beta description')]),
-        boolean('gama', [defaultValue(true), required()]),
-        boolean('ajuda', [help('Show help message')]),
-      ],
+      options: {
+        alpha: [defaultValue(5), max(6), type('number')],
+        beta: [defaultValue('beta'), help('beta description'), type('string')],
+        gama: [defaultValue(true), required(), type('boolean')],
+        ajuda: [help('Show help message'), type('boolean')],
+      },
     }
     expect(buildHelp(definition)).toEqual({
       header: [
@@ -63,7 +64,7 @@ describe('help', () => {
           },
           modifiers: {
             padding: [0],
-            text: '[number], [defaultvalue:5], [max:6]',
+            text: '[type:number], [defaultvalue:5], [max:6]',
           },
           name: {
             padding: [0],
@@ -77,7 +78,7 @@ describe('help', () => {
           },
           modifiers: {
             padding: [0],
-            text: '[string], [defaultvalue:beta]',
+            text: '[type:string], [defaultvalue:beta]',
           },
           name: {
             padding: [0],
@@ -91,7 +92,7 @@ describe('help', () => {
           },
           modifiers: {
             padding: [0],
-            text: '[boolean], [defaultvalue:true], [required:true]',
+            text: '[type:boolean], [defaultvalue:true], [required:true]',
           },
           name: {
             padding: [0],
@@ -105,7 +106,7 @@ describe('help', () => {
           },
           modifiers: {
             padding: [0],
-            text: '[boolean]',
+            text: '[type:boolean]',
           },
           name: {
             padding: [0],

@@ -41,8 +41,3 @@ export const required = (value: boolean = true): ConfigModifier => {
 export const defaultValue = (value: any): ConfigModifier => {
   return { name: 'defaultvalue', value, type: ModifierType.CONFIG }
 }
-
-// export const type = createConfigModifier('type')
-// export const defaultValue = createConfigModifier('defaultValue')
-// export const help = createConfigModifier('help')
-// export const required = createConfigModifier('required')

@@ -5,9 +5,9 @@ import {
   defineArgs,
   Modifier,
   ModifierType,
-  Option,
   ValidatorModifier,
 } from '.'
+import { Options } from './options'
 
 const ui = cliui({} as any)
 
@@ -21,30 +21,38 @@ interface OptionHelp {
   modifiers: UiElement
 }
 
-export const buildHelpForOption = (option: Option): OptionHelp => {
-  const name = {
-    text: `--${option.name}`,
-    padding: [0],
-  }
-
-  const helpModifier = option.modifiers.find(
+export const buildHelpForOption = (
+  optionName: string,
+  optionModifiers: Modifier[],
+): OptionHelp => {
+  const helpModifier = optionModifiers.find(
     (mod: Modifier) => mod.name === 'help',
   )
+  const typeModifier = optionModifiers.find(
+    (mod: Modifier) => mod.name === 'type',
+  )
 
+  const name = {
+    text: `--${optionName}`,
+    padding: [0],
+  }
   const description = {
     text: helpModifier ? helpModifier.value : '',
     padding: [0],
   }
-
-  const modifiersArray = option.modifiers
+  const modifiersArray = optionModifiers
     .filter(
       (modifier: Modifier) =>
-        modifier.name !== 'help' && modifier.name !== 'showhelp',
+        modifier.name !== 'help' && modifier.name !== 'type',
     )
     .map((modifier: Modifier) => {
       return `[${modifier.name}:${modifier.value}]`
     })
-  modifiersArray.unshift(`[${option.type}]`)
+
+  if (typeModifier) {
+    modifiersArray.unshift(`[${typeModifier.name}:${typeModifier.value}]`)
+  }
+
   const modifiers = {
     text: modifiersArray.join(', '),
     padding: [0],
@@ -80,9 +88,10 @@ export const buildHelp = (
     padding: [1],
   })
 
-  definition.options.forEach((option: Option) => {
-    body.push(buildHelpForOption(option))
+  Object.entries(definition.options).forEach(([name, modifiers]) => {
+    body.push(buildHelpForOption(name, modifiers))
   })
+
   return { header, body }
 }
 

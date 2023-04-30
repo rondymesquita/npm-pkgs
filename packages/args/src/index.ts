@@ -9,7 +9,7 @@ import { parseValue } from './utils'
 import { printHelp } from './help'
 import { flow, Result, Status } from '@rondymesquita/flow'
 import { checkType, checkValidator, checkValue } from './argcheck'
-import { Option } from './options'
+import { Options } from './options'
 
 export * from './modifiers'
 export * from './options'
@@ -21,14 +21,13 @@ export type ArgvOptions = Record<string, ArgvOptionValue>
 export interface Argv {
   options: ArgvOptions
   params: Array<string>
-  errors: Error[]
+  errors: string[]
 }
 
 export interface ArgsDefinition {
   name?: string
   usage?: string
-  // options: Option[]
-  options: Record<string, Modifier[]>
+  options: Options
 }
 
 export interface DefineArgs {
@@ -38,7 +37,7 @@ export interface DefineArgs {
 }
 
 export const defineArgs = (definition: ArgsDefinition): DefineArgs => {
-  let errors: Error[] = []
+  let errors: string[] = []
 
   const showHelp = () => {
     printHelp(definition)
@@ -76,7 +75,7 @@ export const defineArgs = (definition: ArgsDefinition): DefineArgs => {
 
       const resultErrors = results
         .filter((result: Result) => result.status === Status.FAIL)
-        .map((result: Result) => result.data)
+        .map((result: Result) => (result.data as Error).message)
 
       errors = errors.concat(resultErrors)
 
