@@ -1,64 +1,45 @@
 import {
   defineArgs,
   ArgsDefinition,
-  helpOption,
-  Option,
+  type,
+  defaultValue,
+  help as helpArgs,
+  Options,
 } from '@rondymesquita/args'
 import { TaskNameNotInformedError, TaskNotFoundError } from './errors'
 import { showGlobalHelp } from './help'
 import { buildTaskName, deepFlattenTask } from './util'
 import { flow, Context, Flow, Status } from '@rondymesquita/flow'
 
-export * from '@rondymesquita/args'
+// export * from '@rondymesquita/args'
 export { Context } from '@rondymesquita/flow'
 
 export type Task = (ctx: Context) => Promise<any> | any
-export interface TaskDefinition {
-  [key: string]: Task | TaskDefinition | Task[]
+export interface TasksDefinition {
+  [key: string]: Task | TasksDefinition | Task[]
 }
 
-export interface PlainTaskDefinition {
+export interface PlainTasksDefinition {
   [key: string]: Task
 }
 
 export interface TaskArgDefinition {
-  options: Option[]
+  options: Options
 }
 
-// export interface Definition {
-//   name: string
-//   description: string
-//   argsDefinition: ArgsDefinition
-// }
-
-export type Definition = {
-  [key: string]: {
-    name: string
-    description: string
-    argsDefinition: ArgsDefinition
-  }
+export interface TaskMeta {
+  name: string
+  description: string
+  argsDefinition: ArgsDefinition
 }
-
-// const createHelpFunction = (namespace: string) => {
-//   const help = (task: Task, description: string) => {
-//     const name = buildTaskName(namespace, task.name)
-
-//     definition[name] = {
-//       name,
-//       description,
-//       argsDefinition: { options: [] },
-//     }
-//   }
-
-//   return help
-// }
+export type TaskDefinition = Record<string, TaskMeta>
 
 function createTasksFunction(namespace: string = '') {
   const name = namespace
 
   const createTasks = (
-    taskDef: TaskDefinition | Task | Task[],
-  ): PlainTaskDefinition => {
+    taskDef: TasksDefinition | Task | Task[],
+  ): PlainTasksDefinition => {
     return deepFlattenTask(taskDef, name)
   }
   return createTasks
@@ -71,26 +52,33 @@ interface CreateNamespace {
 }
 
 export interface DefineTasks {
-  definition: Definition
+  // definition: TaskDefinition
   args: (task: Task, definition: TaskArgDefinition) => void
-  tasks: (taskDef: TaskDefinition) => Promise<void>
+  tasks: (taskDef: TasksDefinition) => Promise<void>
+  help: (task: Task, description: string) => void
   namespace: (
     name: string,
-    defineNamespaceTasks: (params: CreateNamespace) => PlainTaskDefinition,
-  ) => TaskDefinition
+    defineNamespaceTasks: (params: CreateNamespace) => PlainTasksDefinition,
+  ) => TasksDefinition
 }
 
 export const defineTasks = (): DefineTasks => {
-  const definition: Definition = {}
+  const definition: TaskDefinition = {}
 
-  const fillEmptyDefinition = (tasks: PlainTaskDefinition) => {
-    Object.entries(tasks).forEach(([name, task]) => {
-      if (!definition[name]) {
-        definition[name] = {
-          name,
+  const fillEmptyDefinition = (tasks: PlainTasksDefinition) => {
+    Object.entries(tasks).forEach(([taskName, task]) => {
+      if (!definition[taskName]) {
+        definition[taskName] = {
+          name: taskName,
           description: '',
           argsDefinition: {
-            options: [helpOption()],
+            options: {
+              help: [
+                helpArgs('Show help message'),
+                type('boolean'),
+                defaultValue(false),
+              ],
+            },
           },
         }
       }
@@ -99,7 +87,11 @@ export const defineTasks = (): DefineTasks => {
 
   const createArgsFunction = (namespace: string = '') => {
     const args = (task: Task, taskArgDefinition: TaskArgDefinition) => {
-      taskArgDefinition.options.push(helpOption())
+      taskArgDefinition.options['help'] = [
+        helpArgs('Show help message'),
+        type('boolean'),
+        defaultValue(false),
+      ]
       const name = buildTaskName(namespace, task.name)
       if (definition[name]) {
         definition[name].argsDefinition = taskArgDefinition
@@ -117,10 +109,41 @@ export const defineTasks = (): DefineTasks => {
 
   const args = createArgsFunction()
 
+  const createHelpFunction = (namespace: string = '') => {
+    const help = (task: Task, description: string) => {
+      const name = buildTaskName(namespace, task.name)
+
+      if (definition[name]) {
+        // definition[name].argsDefinition = {
+        //   options: [...definition[name].argsDefinition.options, helpOption()],
+        // }
+      } else {
+        // definition[name] = {
+        //   name: task.name,
+        //   description: '',
+        //   argsDefinition: {
+        //     // options: [helpOption('help', description)],
+        //     name: '',
+        //     usage: '',
+        //   },
+        // }
+      }
+      // definition[name] = {
+      //   name,
+      //   description,
+      //   argsDefinition: { options: [] },
+      // }
+    }
+
+    return help
+  }
+
+  const help = createHelpFunction()
+
   const namespace = (
     name: string,
-    defineNamespaceTasks: (params: CreateNamespace) => PlainTaskDefinition,
-  ): TaskDefinition => {
+    defineNamespaceTasks: (params: CreateNamespace) => PlainTasksDefinition,
+  ): TasksDefinition => {
     const namespacedTasks = createTasksFunction(name)
     // const namespacedHelp = createHelpFunction(name)
     const namespacedArgs = createArgsFunction(name)
@@ -134,11 +157,17 @@ export const defineTasks = (): DefineTasks => {
     return fn
   }
 
-  async function tasks(taskDef: TaskDefinition) {
+  const tasks = async (taskDef: TasksDefinition) => {
     const { parseArgs, showHelp, showErrors } = defineArgs({
       name: 'tasks',
       usage: 'tasks [task name] [task options]\nUsage: tasks [options]',
-      options: [helpOption()],
+      options: {
+        help: [
+          helpArgs('Show help message'),
+          type('boolean'),
+          defaultValue(false),
+        ],
+      },
     })
 
     const argv = parseArgs(process.argv.slice(2))
@@ -146,7 +175,7 @@ export const defineTasks = (): DefineTasks => {
     const name = argv.params[0]
 
     const createTasks = createTasksFunction()
-    const tasks: PlainTaskDefinition = createTasks(taskDef)
+    const tasks: PlainTasksDefinition = createTasks(taskDef)
     const task: Task = name ? tasks[name] : tasks.default
     fillEmptyDefinition(tasks)
 
@@ -217,10 +246,10 @@ export const defineTasks = (): DefineTasks => {
   return {
     tasks,
     args,
+    help,
     namespace,
-    definition,
   }
 }
 
-const { namespace, definition, tasks, args } = defineTasks()
-export { namespace, definition, tasks, args }
+const { namespace, tasks, args, help } = defineTasks()
+export { namespace, tasks, args, help }

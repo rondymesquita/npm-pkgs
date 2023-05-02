@@ -1,5 +1,6 @@
-import { ArgsDefinition, Option, buildHelpForOption } from '@rondymesquita/args'
+import { ArgsDefinition, Modifier } from '@rondymesquita/args'
 import cliui from 'cliui'
+import { TaskDefinition } from '.'
 
 const ui = cliui({} as any)
 
@@ -13,84 +14,39 @@ export type HelpMessages = {
   [key: string]: HelpMessage
 }
 
-export const buildGlobalHelp = (messages: HelpMessages) => {
-  const body: any = []
+export const buildGlobalHelp = (definition: TaskDefinition) => {
   const header: any = []
+  const body: any = []
 
   header.push({
     text: 'Tasks:',
     padding: [1],
   })
 
-  Object.entries(messages).forEach(
-    ([helpMessageName, helpMessage]: [string, HelpMessage]) => {
-      const name = {
-        // text: `${helpMessage.name}`,
-        text: helpMessageName,
-        padding: [0],
-      }
-      const description = {
-        text: helpMessage.description,
-        padding: [0],
-      }
-      const options = helpMessage.argsDefinition.options
-        .map((option: Option) => {
-          return `[--${option.name}:${option.type}]`
-        })
-        .join(', ')
-
-      body.push({ name, description, options })
-    },
-  )
+  Object.entries(definition).forEach(([taskName, taskMeta]) => {
+    const name = {
+      text: taskName,
+      padding: [0],
+    }
+    const description = {
+      text: taskMeta.description,
+      padding: [0],
+    }
+    body.push({ name, description })
+  })
 
   return { header, body }
 }
 
-// export const buildTaskHelp = (name: string, messages: HelpMessages) => {
-//   const body: any = []
-//   const header: any = []
-
-//   // body.push({ name: 'Task', description: 'Help', options: 'Options' })
-
-//   const helpMessage = messages[name]
-
-//   header.push({
-//     text: 'Task options:',
-//     padding: [1],
-//   })
-
-//   helpMessage.argsDefinition.options.forEach((option: Option) => {
-//     body.push(buildHelpForOption(option))
-//   })
-
-//   return { header, body }
-// }
-
-export const showGlobalHelp = (messages: HelpMessages) => {
-  const { header, body } = buildGlobalHelp(messages)
+export const showGlobalHelp = (definition: TaskDefinition) => {
+  const { header, body } = buildGlobalHelp(definition)
 
   header.forEach((row: any) => {
     ui.div(row)
   })
 
-  body.forEach(({ name, description, options }: any) => {
-    ui.div(name, description, options)
+  body.forEach(({ name, description }: any) => {
+    ui.div(name, description)
   })
   console.log(ui.toString())
 }
-// export const showTaskHelp = (
-//   task: Task,
-//   name: string,
-//   messages: HelpMessages,
-// ) => {
-//   const { header, body } = buildTaskHelp(name, messages)
-
-//   header.forEach((row: any) => {
-//     ui.div(row)
-//   })
-
-//   body.forEach(({ name, description, modifiers }: any) => {
-//     ui.div(name, description, modifiers)
-//   })
-//   console.log(ui.toString())
-// }

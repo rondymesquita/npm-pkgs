@@ -1,21 +1,22 @@
 import { vi, describe, it, expect } from 'vitest'
 import { HelpMessages, buildGlobalHelp } from './help'
-import { string } from '@rondymesquita/args'
+import { type } from '@rondymesquita/args'
+import { TaskDefinition } from '.'
 
 describe('help', () => {
-  it('asdsa', () => {
-    const helpMessages: HelpMessages = {
+  it('should build global help for tasks', () => {
+    const definition: TaskDefinition = {
       'fake:task': {
         name: 'fake:task',
         description: 'fake task help message',
         argsDefinition: {
           name: 'color',
           usage: 'fake:task --color=red',
-          options: [string('color')],
+          options: { color: [type('string')] },
         },
       },
     }
-    const globalHelp = buildGlobalHelp(helpMessages)
+    const globalHelp = buildGlobalHelp(definition)
     expect(globalHelp).toEqual({
       body: [
         {
@@ -27,7 +28,6 @@ describe('help', () => {
             padding: [0],
             text: 'fake:task',
           },
-          options: '[--color:string]',
         },
       ],
       header: [
