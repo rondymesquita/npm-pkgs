@@ -1,3 +1,6 @@
+import { defaultValue, help, type } from '@rondymesquita/args'
+import { PlainTasksDefinition, TaskDefinition } from '.'
+
 export const buildTaskName = (namespace: string, fnName: string) => {
   let name: string = namespace ? `${namespace}:${fnName}` : fnName
 
@@ -19,4 +22,50 @@ export function deepFlattenTask(obj: any, namespace = '', result: any = {}) {
     }
   }
   return result
+}
+
+export const generateBasicDefinition = (
+  tasks: PlainTasksDefinition,
+  definition: TaskDefinition,
+) => {
+  const clonedDefinition = JSON.parse(
+    JSON.stringify(definition),
+  ) as TaskDefinition
+
+  Object.entries(tasks).forEach(([taskName, task]) => {
+    if (!clonedDefinition[taskName]) {
+      clonedDefinition[taskName] = {
+        name: taskName,
+        description: '',
+        argsDefinition: {
+          options: {
+            help: [
+              help('Show help message'),
+              type('boolean'),
+              defaultValue(false),
+            ],
+          },
+        },
+      }
+    }
+  })
+
+  return clonedDefinition
+}
+
+export const defineCallback = <T extends any>(): [
+  (...data: T[]) => void,
+  (c: Function) => void,
+] => {
+  let callback: Function = () => {}
+
+  const setCallback = (_callback: Function) => {
+    callback = _callback
+  }
+
+  const invokeCallback = (...data: T[]) => {
+    callback(...data)
+  }
+
+  return [invokeCallback, setCallback]
 }

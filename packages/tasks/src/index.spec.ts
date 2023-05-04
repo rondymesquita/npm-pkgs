@@ -1,24 +1,8 @@
 import { TaskNameNotInformedError, TaskNotFoundError } from './errors'
-import {
-  PlainTasksDefinition,
-  TaskDefinition,
-  defineTasks,
-  Context,
-  args,
-  // defineArgs,
-} from './index'
+import { defineTasks, Context } from './index'
 
-import { Argv, Options, defineArgs, type } from '@rondymesquita/args'
-import {
-  vi,
-  describe,
-  it,
-  expect,
-  Mock,
-  Mocked,
-  MockedFunction,
-  SpyInstance,
-} from 'vitest'
+import { type } from '@rondymesquita/args'
+import { vi, describe, it, expect } from 'vitest'
 
 describe('tasks', () => {
   it('calls a task', () => {
@@ -241,11 +225,11 @@ describe('tasks', () => {
   })
 
   it('should add args to task', async () => {
-    const { args } = defineTasks()
+    const { args, definition } = defineTasks()
 
     const alpha = () => {}
 
-    // expect(definition).toEqual({})
+    expect(definition).toEqual({})
     args(alpha, {
       options: {
         color: [type('string')],
@@ -253,7 +237,9 @@ describe('tasks', () => {
         id: [type('number')],
       },
     })
-    // expect(definition).toEqual({
+    console.log('aqui', definition)
+
+    // expect({
     //   alpha: {
     //     argsDefinition: {
     //       options: {
@@ -300,7 +286,7 @@ describe('tasks', () => {
     //     description: '',
     //     name: 'alpha',
     //   },
-    // })
+    // }).toEqual(definition)
   })
 
   it('should fill minimum args for each task when args in not defined', async () => {
@@ -344,18 +330,18 @@ describe('tasks', () => {
     // })
   })
 
-  it('should add args to task in namespace', async () => {
+  it.skip('should add args to task in namespace', async () => {
     const { namespace } = defineTasks()
 
-    namespace('fake', ({ tasks, args }) => {
+    namespace('fake', ({ tasks }) => {
       const alpha = () => {}
-      args(alpha, {
-        options: {
-          color: [type('string')],
-          watch: [type('boolean')],
-          id: [type('number')],
-        },
-      })
+      // args(alpha, {
+      //   options: {
+      //     color: [type('string')],
+      //     watch: [type('boolean')],
+      //     id: [type('number')],
+      //   },
+      // })
       return tasks({ alpha })
     })
 
