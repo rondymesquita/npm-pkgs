@@ -25,11 +25,13 @@ const argv = parseArgs(process.argv.splice(2))
 
 ```js
 const { parseArgs, showHelp } = defineArgs({
-  options: [
-    number('alpha', [required()]),
-    string('beta', [defaultValue('beta')]),
-    boolean('gamma', [help('Custom help message')]),
-  ],
+  name: 'mycli',
+  usage: 'mycli [options]',
+  options: {
+    alpha: [type('number'), required()],
+    beta: [type('string'), defaultValue('value')],
+    gamma: [type('boolean'), help('Custom help message')],
+  },
 })
 ```
 
@@ -38,12 +40,9 @@ const { parseArgs, showHelp } = defineArgs({
 ```js
 // define help option
 const { parseArgs, showHelp, errors } = defineArgs({
-  options: [boolean('help', [help('Show help message'), defaultValue(false)])],
-})
-
-// or use a pre defined helpOption()
-const { parseArgs, showHelp } = defineArgs({
-  options: [helpOption()],
+  options: {
+    help: [help('Show help message'), type('boolean'), defaultValue(false)],
+  },
 })
 
 const argv = parseArgs(process.argv.splice(2))
@@ -67,21 +66,21 @@ const argv = parseArgs('--alpha=alphavalue -b=false gamma delta'.split(' '))
 // }
 ```
 
-### Constraints
+### Modifiers
 
 ```js
 
 // By type
-number('alpha')
+alpha: [type('string')]
 // errors: ['"alpha" must be of type "number"'],
 
 // Required
-boolean('beta', [required()]),
+beta: [required()],
 // errors: ['"beta" is required'],
 
 ```
 
-#### User defined constrains
+#### User defined modifier
 
 ```js
 const max = defineValidator('max', (rule: number, value: number) => {
@@ -89,7 +88,9 @@ const max = defineValidator('max', (rule: number, value: number) => {
 })
 
 const { parseArgs } = defineArgs({
-  options: [number('gamma', [max(3)])],
+  options: {
+    gamma: [max(3)],
+  },
 })
 
 const argv = parseArgs('--gamma=6'.split(' '))
