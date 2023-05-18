@@ -1,6 +1,6 @@
 import { ArgsDefinition, Modifier } from '@rondymesquita/args'
 import cliui from 'cliui'
-import { TaskDefinition } from '.'
+import { TasksDefinition } from '.'
 
 const ui = cliui({} as any)
 
@@ -14,7 +14,7 @@ export type HelpMessages = {
   [key: string]: HelpMessage
 }
 
-export const buildGlobalHelp = (definition: TaskDefinition) => {
+export const buildGlobalHelp = (definition: TasksDefinition) => {
   const header: any = []
   const body: any = []
 
@@ -38,7 +38,7 @@ export const buildGlobalHelp = (definition: TaskDefinition) => {
   return { header, body }
 }
 
-export const showGlobalHelp = (definition: TaskDefinition) => {
+export const showGlobalHelp = (definition: TasksDefinition) => {
   const { header, body } = buildGlobalHelp(definition)
 
   header.forEach((row: any) => {

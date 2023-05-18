@@ -7,7 +7,7 @@ import {
   type,
 } from './index'
 
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, expectTypeOf } from 'vitest'
 
 describe('test', () => {
   it('parses options', () => {
@@ -166,5 +166,23 @@ describe('test', () => {
         '"gamma" must satisfy "max" constraint. Expected:"3". Received:"6".',
       ],
     })
+  })
+
+  it.only('should return typed options with custom type', () => {
+    interface CustomOptions {
+      alpha: string
+      gamma: number
+    }
+
+    const argv = parseArgs('--alpha=alpha --gamma=6'.split(' '))
+    const options = argv.options as CustomOptions
+    expect(options.alpha).toEqual('alpha')
+    expect(options.gamma).toEqual(6)
+  })
+
+  it.only('should return typed options with any type', () => {
+    const argv = parseArgs('--alpha=alpha --gamma=6'.split(' '))
+    expect(argv.options.alpha).toEqual('alpha')
+    expect(argv.options.gamma).toEqual(6)
   })
 })

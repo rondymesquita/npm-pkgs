@@ -1,14 +1,18 @@
 import { TaskNameNotInformedError, TaskNotFoundError } from './errors'
 import { defineTasks, Context } from './index'
 
-import { type } from '@rondymesquita/args'
+import { defineArgs, type } from '@rondymesquita/args'
 import { vi, describe, it, expect } from 'vitest'
+
+const createSut = () => {
+  return defineTasks(defineArgs)
+}
 
 describe('tasks', () => {
   it('calls a task', () => {
     process.argv = ['bin', 'file', 'fake', '--alpha=value', '-b=true']
 
-    const { tasks } = defineTasks()
+    const { tasks } = createSut()
 
     const tasksMock = {
       fake: vi.fn(),
@@ -22,7 +26,7 @@ describe('tasks', () => {
   it('calls tasks in sequence when task is an array of tasks', async () => {
     process.argv = ['bin', 'file', 'alpha']
 
-    const { tasks } = defineTasks()
+    const { tasks } = createSut()
 
     const order: string[] = []
     const beta = vi.fn(() => order.push('beta'))
@@ -40,7 +44,7 @@ describe('tasks', () => {
   it('calls a default task when passing no param', () => {
     process.argv = ['bin', 'file']
 
-    const { tasks } = defineTasks()
+    const { tasks } = createSut()
 
     const tasksMock = {
       default: vi.fn(),
@@ -54,7 +58,7 @@ describe('tasks', () => {
   it('calls a task in namespace using namespace function', () => {
     process.argv = ['bin', 'file', 'fake:alpha']
 
-    const { tasks, namespace } = defineTasks()
+    const { tasks, namespace } = createSut()
 
     const namespacedTasks = { alpha: vi.fn() }
 
@@ -70,7 +74,7 @@ describe('tasks', () => {
   it('calls a task in namespace without namespace function', () => {
     process.argv = ['bin', 'file', 'fake:alpha']
 
-    const { tasks } = defineTasks()
+    const { tasks } = createSut()
 
     const tasksMock = {
       fake: {
@@ -85,7 +89,7 @@ describe('tasks', () => {
 
   it('calls a default task in namespace', () => {
     process.argv = ['bin', 'file', 'fake']
-    const { tasks } = defineTasks()
+    const { tasks } = createSut()
 
     const tasksMock = {
       fake: {
@@ -101,7 +105,7 @@ describe('tasks', () => {
   it('throws an error when no task name is informed and no default task exists', async () => {
     process.argv = ['bin', 'file']
 
-    const { tasks } = defineTasks()
+    const { tasks } = createSut()
 
     const tasksMock = {
       fake: vi.fn(),
@@ -115,7 +119,7 @@ describe('tasks', () => {
   it('throws an error when task name is informed but task does not exist', async () => {
     process.argv = ['bin', 'file', 'alpha']
 
-    const { tasks } = defineTasks()
+    const { tasks } = createSut()
 
     const tasksMock = {
       beta: vi.fn(),
@@ -129,7 +133,7 @@ describe('tasks', () => {
   it('each task receives context as parameter', () => {
     process.argv = ['bin', 'file', 'fake']
 
-    const { tasks } = defineTasks()
+    const { tasks } = createSut()
 
     const tasksMock = {
       fake: vi.fn(),
@@ -167,7 +171,7 @@ describe('tasks', () => {
       return obj
     }
 
-    const { tasks } = defineTasks()
+    const { tasks } = createSut()
 
     let betaContext
     const beta = vi.fn((ctx: Context) => {
@@ -225,7 +229,7 @@ describe('tasks', () => {
   })
 
   it('should add args to task', async () => {
-    const { args, definition } = defineTasks()
+    const { args, definition } = createSut()
 
     const alpha = () => {}
 
@@ -237,61 +241,60 @@ describe('tasks', () => {
         id: [type('number')],
       },
     })
-    console.log('aqui', definition)
 
-    // expect({
-    //   alpha: {
-    //     argsDefinition: {
-    //       options: {
-    //         color: [
-    //           {
-    //             name: 'type',
-    //             type: 'CONFIG',
-    //             value: 'string',
-    //           },
-    //         ],
-    //         help: [
-    //           {
-    //             name: 'help',
-    //             type: 'CONFIG',
-    //             value: 'Show help message',
-    //           },
-    //           {
-    //             name: 'type',
-    //             type: 'CONFIG',
-    //             value: 'boolean',
-    //           },
-    //           {
-    //             name: 'defaultvalue',
-    //             type: 'CONFIG',
-    //             value: false,
-    //           },
-    //         ],
-    //         id: [
-    //           {
-    //             name: 'type',
-    //             type: 'CONFIG',
-    //             value: 'number',
-    //           },
-    //         ],
-    //         watch: [
-    //           {
-    //             name: 'type',
-    //             type: 'CONFIG',
-    //             value: 'boolean',
-    //           },
-    //         ],
-    //       },
-    //     },
-    //     description: '',
-    //     name: 'alpha',
-    //   },
-    // }).toEqual(definition)
+    expect({
+      alpha: {
+        argsDefinition: {
+          options: {
+            color: [
+              {
+                name: 'type',
+                type: 'CONFIG',
+                value: 'string',
+              },
+            ],
+            help: [
+              {
+                name: 'help',
+                type: 'CONFIG',
+                value: 'Show help message',
+              },
+              {
+                name: 'type',
+                type: 'CONFIG',
+                value: 'boolean',
+              },
+              {
+                name: 'defaultvalue',
+                type: 'CONFIG',
+                value: false,
+              },
+            ],
+            id: [
+              {
+                name: 'type',
+                type: 'CONFIG',
+                value: 'number',
+              },
+            ],
+            watch: [
+              {
+                name: 'type',
+                type: 'CONFIG',
+                value: 'boolean',
+              },
+            ],
+          },
+        },
+        description: '',
+        name: 'alpha',
+      },
+    }).toEqual(definition)
   })
 
   it('should fill minimum args for each task when args in not defined', async () => {
     process.argv = ['bin', 'file', 'fake:alpha']
-    const { tasks } = defineTasks()
+    const { tasks } = createSut()
 
     const tasksMock = {
       fake: {
@@ -330,68 +333,68 @@ describe('tasks', () => {
     // })
   })
 
-  it.skip('should add args to task in namespace', async () => {
-    const { namespace } = defineTasks()
+  it('should add args to task in namespace', async () => {
+    const { namespace, definition } = createSut()
 
-    namespace('fake', ({ tasks }) => {
+    namespace('fake', ({ tasks, args }) => {
       const alpha = () => {}
-      // args(alpha, {
-      //   options: {
-      //     color: [type('string')],
-      //     watch: [type('boolean')],
-      //     id: [type('number')],
-      //   },
-      // })
+      args(alpha, {
+        options: {
+          color: [type('string')],
+          watch: [type('boolean')],
+          id: [type('number')],
+        },
+      })
       return tasks({ alpha })
     })
 
-    // expect(definition).toEqual({
-    //   'fake:alpha': {
-    //     argsDefinition: {
-    //       options: {
-    //         color: [
-    //           {
-    //             name: 'type',
-    //             type: 'CONFIG',
-    //             value: 'string',
-    //           },
-    //         ],
-    //         help: [
-    //           {
-    //             name: 'help',
-    //             type: 'CONFIG',
-    //             value: 'Show help message',
-    //           },
-    //           {
-    //             name: 'type',
-    //             type: 'CONFIG',
-    //             value: 'boolean',
-    //           },
-    //           {
-    //             name: 'defaultvalue',
-    //             type: 'CONFIG',
-    //             value: false,
-    //           },
-    //         ],
-    //         id: [
-    //           {
-    //             name: 'type',
-    //             type: 'CONFIG',
-    //             value: 'number',
-    //           },
-    //         ],
-    //         watch: [
-    //           {
-    //             name: 'type',
-    //             type: 'CONFIG',
-    //             value: 'boolean',
-    //           },
-    //         ],
-    //       },
-    //     },
-    //     description: '',
-    //     name: 'alpha',
-    //   },
-    // })
+    expect(definition).toEqual({
+      'fake:alpha': {
+        argsDefinition: {
+          options: {
+            color: [
+              {
+                name: 'type',
+                type: 'CONFIG',
+                value: 'string',
+              },
+            ],
+            help: [
+              {
+                name: 'help',
+                type: 'CONFIG',
+                value: 'Show help message',
+              },
+              {
+                name: 'type',
+                type: 'CONFIG',
+                value: 'boolean',
+              },
+              {
+                name: 'defaultvalue',
+                type: 'CONFIG',
+                value: false,
+              },
+            ],
+            id: [
+              {
+                name: 'type',
+                type: 'CONFIG',
+                value: 'number',
+              },
+            ],
+            watch: [
+              {
+                name: 'type',
+                type: 'CONFIG',
+                value: 'boolean',
+              },
+            ],
+          },
+        },
+        description: '',
+        name: 'fake:alpha',
+      },
+    })
   })
 })

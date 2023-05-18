@@ -3,47 +3,26 @@ import {
   required,
   defineValidator,
   type,
+  ArgsDefinition,
 } from '@rondymesquita/args'
-import { Context, defineTasks, tasks, namespace } from './index'
+import { Context, defineTasks, tasks, namespace, Task } from './index'
 
-// const { tasks, args, namespace } = defineTasks()
-
-const max = defineValidator('max', (rule: number, value: number) => {
-  return value <= rule
-})
-
-// args(build, { options: { id: [type('number'), max(3)] } })
-function build(ctx: Context) {
-  console.log('building')
+interface UnitArgs {
+  name: string
+  id: number
+}
+const unit = (ctx: Context) => {
+  ctx
+  ctx.getParams()
+  ctx.getErrors()
+  console.log('unit')
 }
 
-async function clean(ctx: Context) {
-  console.log('cleaning', ctx)
-  await new Promise((res) => setTimeout(res, 2000))
+function e2e() {
+  console.log('e2e')
 }
-
-const test = namespace('test', ({ tasks }) => {
-  // args(unit, {
-  //   options: [
-  //     // string('reporter', [help('Reporter format'), required()]),
-  //     // helpOption('help', 'run unit tests'),
-  //   ],
-  // })
-  function unit(ctx: Context) {
-    console.log('running unit tests', ctx)
-  }
-
-  async function e2e(ctx: Context) {
-    console.log('runnint e2e tests', ctx)
-    await new Promise((res) => setTimeout(res, 2000))
-  }
-
-  return tasks({ default: unit, e2e, unit })
-})
 
 tasks({
-  build,
-  clean,
-  default: [clean, build],
-  ...test,
+  unit,
+  e2e,
 })

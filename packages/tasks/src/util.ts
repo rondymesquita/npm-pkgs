@@ -1,5 +1,5 @@
 import { defaultValue, help, type } from '@rondymesquita/args'
-import { PlainTasksDefinition, TaskDefinition } from '.'
+import { PlainDefinition, TasksDefinition } from '.'
 
 export const buildTaskName = (namespace: string, fnName: string) => {
   let name: string = namespace ? `${namespace}:${fnName}` : fnName
@@ -25,12 +25,12 @@ export function deepFlattenTask(obj: any, namespace = '', result: any = {}) {
 }
 
 export const generateBasicDefinition = (
-  tasks: PlainTasksDefinition,
-  definition: TaskDefinition,
+  tasks: PlainDefinition,
+  definition: TasksDefinition,
 ) => {
   const clonedDefinition = JSON.parse(
     JSON.stringify(definition),
-  ) as TaskDefinition
+  ) as TasksDefinition
 
   Object.entries(tasks).forEach(([taskName, task]) => {
     if (!clonedDefinition[taskName]) {

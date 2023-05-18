@@ -5,7 +5,7 @@ import {
   ConfigModifier,
   ModifierType,
 } from './modifiers'
-import { parseValue } from './utils'
+import { fillOptionsDefaultValues, parseValue } from './utils'
 import { printHelp } from './help'
 import { flow, Result, Status } from '@rondymesquita/flow'
 import { checkType, checkValidator, checkValue } from './argcheck'
@@ -16,8 +16,13 @@ export * from './options'
 export * from './validator'
 export * from './help'
 
-export type ArgvOptionValue = string | number | boolean | undefined | null
-export type ArgvOptions = Record<string, ArgvOptionValue>
+// export type ArgvOptionValue = any
+// export type ArgvOptions<T extends Record<string, ArgvOptionValue> = Record<string, ArgvOptionValue>> = T
+// ArgvOptions
+
+export interface ArgvOptions {
+  [k: string]: any
+}
 export interface Argv {
   options: ArgvOptions
   params: Array<string>
@@ -117,31 +122,4 @@ export const parseArgs = (args: string[]): Argv => {
   })
 
   return { options, params, errors: [] }
-}
-
-const fillOptionsDefaultValues = (
-  // option: Option,
-  // value: any,
-  name: string,
-  modifiers: Modifier[],
-  value: ArgvOptionValue,
-  argv: Argv,
-): ArgvOptions => {
-  const cloneArgOptions: ArgvOptions = { ...argv.options }
-
-  if (value) {
-    return cloneArgOptions
-  }
-
-  if (!argv.options[name]) {
-    const defaultModifier: ConfigModifier | undefined = modifiers.find(
-      (mod: Modifier) => mod.name === 'defaultvalue',
-    ) as ConfigModifier
-
-    if (defaultModifier) {
-      cloneArgOptions[name] = defaultModifier.value
-    }
-  }
-
-  return cloneArgOptions
 }
