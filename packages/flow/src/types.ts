@@ -14,7 +14,9 @@ export interface Option {
   stopOnError: boolean
 }
 
+export type ProvideArgsFn = (context: Context) => any[]
+
 export type Context<K = any, V = any> = Map<K, V>
-type SyncStage = (context: Context) => any
-type AsyncStage = (context: Context) => Promise<any>
+type SyncStage = (...params: any[]) => any
+type AsyncStage = (...params: any[]) => Promise<any>
 export type Stage = AsyncStage | SyncStage

@@ -1,7 +1,7 @@
 import { TaskNameNotInformedError, TaskNotFoundError } from './errors'
 import { defineTasks, Context } from './index'
 
-import { defineArgs, type } from '@rondymesquita/args'
+import { ArgsDefinition, defineArgs, type } from '@rondymesquita/args'
 import { vi, describe, it, expect } from 'vitest'
 
 const createSut = () => {
@@ -333,10 +333,10 @@ describe('tasks', () => {
     // })
   })
 
-  it('should add args to task in namespace', async () => {
-    const { namespace, definition } = createSut()
+  it.only('should add args to task in namespace', async () => {
+    const { namespace, getDefinition } = createSut()
 
-    namespace('fake', ({ tasks, args }) => {
+    const fakeNamespace = namespace('fake', ({ tasks, args }) => {
       const alpha = () => {}
       args(alpha, {
         options: {
@@ -345,10 +345,14 @@ describe('tasks', () => {
           id: [type('number')],
         },
       })
+      console.log(tasks)
+
       return tasks({ alpha })
     })
 
-    expect(definition).toEqual({
+    console.log({ d: getDefinition() })
+
+    expect({
       'fake:alpha': {
         argsDefinition: {
           options: {
@@ -395,6 +399,78 @@ describe('tasks', () => {
         description: '',
         name: 'fake:alpha',
       },
+    }).toEqual(getDefinition())
+
+    // expect(getDefinition()).toEqual({
+    //   'fake:alpha': {
+    //     argsDefinition: {
+    //       options: {
+    //         color: [
+    //           {
+    //             name: 'type',
+    //             type: 'CONFIG',
+    //             value: 'string',
+    //           },
+    //         ],
+    //         help: [
+    //           {
+    //             name: 'help',
+    //             type: 'CONFIG',
+    //             value: 'Show help message',
+    //           },
+    //           {
+    //             name: 'type',
+    //             type: 'CONFIG',
+    //             value: 'boolean',
+    //           },
+    //           {
+    //             name: 'defaultvalue',
+    //             type: 'CONFIG',
+    //             value: false,
+    //           },
+    //         ],
+    //         id: [
+    //           {
+    //             name: 'type',
+    //             type: 'CONFIG',
+    //             value: 'number',
+    //           },
+    //         ],
+    //         watch: [
+    //           {
+    //             name: 'type',
+    //             type: 'CONFIG',
+    //             value: 'boolean',
+    //           },
+    //         ],
+    //       },
+    //     },
+    //     description: '',
+    //     name: 'fake:alpha',
+    //   },
+    // })
+  })
+
+  it('should call help', async () => {
+    const argv = {
+      params: [],
+      options: { help: [] },
+    }
+    const defineArgsMock = {
+      parseArgs: vi.fn().mockImplementationOnce(() => argv),
+      showHelp: vi.fn(),
+      showErrors: vi.fn(),
+    }
+    const { tasks } = defineTasks(
+      (argsDefinition: ArgsDefinition) => defineArgsMock,
+    )
+
+    const alpha = vi.fn()
+    expect(defineArgsMock.showHelp).not.toBeCalled()
+    tasks({
+      alpha,
     })
+    expect(defineArgsMock.showHelp).toBeCalledTimes(1)
+    expect(defineArgsMock.showHelp).toBeCalledWith()
   })
 })

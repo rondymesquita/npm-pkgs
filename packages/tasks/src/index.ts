@@ -6,16 +6,18 @@ import {
   help as helpArgs,
   Options,
   Modifier,
+  ArgvOptions,
 } from '@rondymesquita/args'
 import { TaskNameNotInformedError, TaskNotFoundError } from './errors'
 import { showGlobalHelp } from './help'
-import { buildTaskName, generateBasicDefinition } from './util'
+import { asyncLoop, buildTaskName, generateBasicDefinition } from './util'
 import { flow, Context, Flow, Status } from '@rondymesquita/flow'
 import { defineTasksFunction } from './functions'
 
 export { Context } from '@rondymesquita/flow'
 
-export type Task = (ctx: Context) => Promise<any> | any
+export type Task = (options: ArgvOptions, ctx: Context) => Promise<any> | any
+
 export interface Definition {
   [key: string]: Task | Definition | Task[]
 }
@@ -38,33 +40,24 @@ export type TasksDefinition = Record<
 >
 
 export interface DefineTasks {
-  definition: TasksDefinition
-  args: (task: Task, definition: TaskArgDefinition) => void
+  // definition: TasksDefinition
+  getDefinition: () => TasksDefinition
   tasks: (taskDef: Definition) => Promise<void>
-  help: (task: Task, description: string) => void
-  namespace: (
-    name: string,
-    defineNamespaceTasks: (params: CreateNamespace) => PlainDefinition,
-  ) => Definition
 }
-
-interface CreateNamespace {
-  tasks: ReturnType<typeof defineTasksFunction>
-  args: (task: Task, taskArgDefinition: TaskArgDefinition) => void
-}
-
-const createTaskDefinition = () => {
+const createTasksDefinition = (namespace: string) => {
   let definition: TasksDefinition = {}
 
   const setArgsDefinition = (
     taskName: string,
     taskArgDefinition: TaskArgDefinition,
   ) => {
-    if (definition[taskName]) {
-      definition[taskName].argsDefinition = taskArgDefinition
+    const name = buildTaskName(namespace, taskName)
+
+    if (definition[name]) {
+      definition[name].argsDefinition = taskArgDefinition
     } else {
-      definition[taskName] = {
-        name: taskName,
+      definition[name] = {
+        name: name,
         description: '',
         argsDefinition: taskArgDefinition,
       }
@@ -91,6 +84,11 @@ const createTaskDefinition = () => {
   return {
     getDefinition: () => definition,
     setDefinition: (_definition: TasksDefinition) => (definition = _definition),
+    mergeDefinition: (_definition: TasksDefinition) =>
+      (definition = {
+        ...definition,
+        ..._definition,
+      }),
     setArgsDefinition,
     setModifiers,
     addModifiers,
@@ -98,67 +96,14 @@ const createTaskDefinition = () => {
 }
 
 export const defineTasks = (defineArgs: typeof ArgsDefineArgs): DefineTasks => {
-  let {
+  const {
     getDefinition,
     setDefinition,
     setArgsDefinition,
     setModifiers,
     addModifiers,
-  } = createTaskDefinition()
-
-  const args = (task: Task, taskArgDefinition: TaskArgDefinition) => {
-    const name = buildTaskName('', task.name)
-    setArgsDefinition(name, taskArgDefinition)
-    setModifiers(name, 'help', [
-      helpArgs('Show help message'),
-      type('boolean'),
-      defaultValue(false),
-    ])
-  }
-
-  const help = (task: Task, description: string) => {
-    const name = buildTaskName('', task.name)
-
-    if (getDefinition()[name]) {
-      addModifiers(name, 'help', [
-        helpArgs('Show help message'),
-        type('boolean'),
-        defaultValue(false),
-      ])
-    } else {
-      setModifiers(name, 'help', [
-        helpArgs('Show help message'),
-        type('boolean'),
-        defaultValue(false),
-      ])
-    }
-  }
-
-  const namespace = (
-    name: string,
-    defineNamespaceTasks: (params: CreateNamespace) => PlainDefinition,
-  ): Definition => {
-    const tasks = defineTasksFunction(name)
-    // const { args } = defineArgsFunction(name)
-    const args = ((namespace: string) => {
-      return (task: Task, taskArgDefinition: TaskArgDefinition) => {
-        const name = buildTaskName(namespace, task.name)
-        setArgsDefinition(name, taskArgDefinition)
-        setModifiers(name, 'help', [
-          helpArgs('Show help message'),
-          type('boolean'),
-          defaultValue(false),
-        ])
-      }
-    })(name)
-
-    const fn = defineNamespaceTasks({
-      tasks,
-      args,
-    })
-
-    return fn
-  }
+    mergeDefinition,
+  } = createTasksDefinition('')
 
   const tasks = async (taskDef: Definition) => {
     const { parseArgs, showHelp, showErrors } = defineArgs({
@@ -180,14 +125,17 @@ export const defineTasks = (defineArgs: typeof ArgsDefineArgs): DefineTasks => {
     const createTasks = defineTasksFunction()
     const tasks: PlainDefinition = createTasks(taskDef)
     const task: Task = name ? tasks[name] : tasks.default
-    const basicDefinition = generateBasicDefinition(tasks, getDefinition())
-    setDefinition(basicDefinition)
+
+    const basicDefinition = generateBasicDefinition(getDefinition())
+    mergeDefinition(basicDefinition)
 
     if (argv.options.help && !name) {
       showHelp()
       showGlobalHelp(getDefinition())
       return
     }
+
+    console.log(argv)
 
     if (argv.errors.length > 0) {
       console.log(`Errors`)
@@ -226,33 +174,32 @@ export const defineTasks = (defineArgs: typeof ArgsDefineArgs): DefineTasks => {
       }
     }
 
-    let { runAsync, context }: Partial<Flow> = {}
     let results
     let errors
+    let { runAsync, context, provideArgs, setStages } = flow()
+    context.set('argv', argv)
+    provideArgs((ctx) => {
+      return [argv.options, ctx]
+    })
+
     if (Array.isArray(task)) {
-      ;({ runAsync, context } = flow(task))
-      context.set('argv', argv)
-      results = await runAsync()
+      setStages(task)
     } else {
-      ;({ runAsync, context } = flow([task]))
-      context.set('argv', argv)
-      results = await runAsync()
+      setStages([task])
     }
+    results = await runAsync()
 
     errors = results.filter((result) => result.status === Status.FAIL)
     if (errors.length > 0) {
       errors.forEach((error) => {
-        console.error(error.data)
+        console.error(error)
       })
     }
   }
 
   return {
     tasks,
-    args,
-    help,
-    namespace,
-    definition: getDefinition(),
+    getDefinition,
   }
 }
 

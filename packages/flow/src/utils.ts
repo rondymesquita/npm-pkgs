@@ -12,7 +12,7 @@ export const createObjectFromArray = <T extends object>(array: Array<T>): T => {
   return optionsObject as T
 }
 
-export const processResult = async (result: Result): Promise<Result> => {
+export const processResultPromise = async (result: Result): Promise<Result> => {
   let { data, status } = result
   if (data instanceof Promise) {
     try {

@@ -1,5 +1,5 @@
 import { defaultValue, help, type } from '@rondymesquita/args'
-import { PlainDefinition, TasksDefinition } from '.'
+import { PlainDefinition, Task, TasksDefinition } from '.'
 
 export const buildTaskName = (namespace: string, fnName: string) => {
   let name: string = namespace ? `${namespace}:${fnName}` : fnName
@@ -24,29 +24,22 @@ export function deepFlattenTask(obj: any, namespace = '', result: any = {}) {
   return result
 }
 
-export const generateBasicDefinition = (
-  tasks: PlainDefinition,
-  definition: TasksDefinition,
-) => {
+export const generateBasicDefinition = (definition: TasksDefinition) => {
   const clonedDefinition = JSON.parse(
     JSON.stringify(definition),
   ) as TasksDefinition
 
-  Object.entries(tasks).forEach(([taskName, task]) => {
-    if (!clonedDefinition[taskName]) {
-      clonedDefinition[taskName] = {
-        name: taskName,
-        description: '',
-        argsDefinition: {
-          options: {
-            help: [
-              help('Show help message'),
-              type('boolean'),
-              defaultValue(false),
-            ],
-          },
-        },
-      }
+  Object.entries(clonedDefinition).forEach(([name, details]) => {
+    if (!clonedDefinition[name].argsDefinition.options.help) {
+      clonedDefinition[name].argsDefinition.options.help = [
+        help('Show help message'),
+        type('boolean'),
+        defaultValue(false),
+      ]
+    }
+
+    if (!clonedDefinition[name].argsDefinition.name) {
+      clonedDefinition[name].argsDefinition.name = name
     }
   })
 

@@ -5,24 +5,23 @@ import {
   type,
   ArgsDefinition,
 } from '@rondymesquita/args'
-import { Context, defineTasks, tasks, namespace, Task } from './index'
+import { Context, defineTasks, tasks, Task } from './index'
 
-interface UnitArgs {
-  name: string
-  id: number
-}
-const unit = (ctx: Context) => {
-  ctx
-  ctx.getParams()
-  ctx.getErrors()
-  console.log('unit')
+async function clean() {
+  return new Promise((res) => {
+    console.log('running clean')
+    setTimeout(() => {
+      console.log('cleaned')
+      res({})
+    }, 1000)
+  })
 }
 
-function e2e() {
-  console.log('e2e')
+const unit = ({ watch, help }: any, ctx: any) => {
+  console.log('>>> running unit', { watch, help }, ctx)
 }
 
 tasks({
-  unit,
-  e2e,
+  unit: [clean, unit],
+  // unit,
 })
