@@ -1,11 +1,11 @@
 import { vi, describe, it, expect } from 'vitest'
 import { HelpMessages, buildGlobalHelp } from './help'
 import { type } from '@rondymesquita/args'
-import { TaskDefinition } from '.'
+import { TasksDefinition } from '.'
 
 describe('help', () => {
   it('should build global help for tasks', () => {
-    const definition: TaskDefinition = {
+    const definition: TasksDefinition = {
       'fake:task': {
         name: 'fake:task',
         description: 'fake task help message',
