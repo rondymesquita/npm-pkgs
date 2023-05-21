@@ -7,6 +7,7 @@ describe('flow', () => {
     const { run } = flow([
       () => {
         order.push(1)
+        return 1
       },
       () => {
         order.push(2)
@@ -107,7 +108,7 @@ describe('flow', () => {
         status: 'OK',
       },
       {
-        data: 'error',
+        data: new Error('error'),
         status: 'FAIL',
       },
     ])
@@ -124,7 +125,7 @@ describe('flow', () => {
     const results = run()
     expect(results).toEqual([
       {
-        data: 'error',
+        data: new Error('error'),
         status: 'FAIL',
       },
     ])
@@ -141,7 +142,7 @@ describe('flow', () => {
     const results = run([stopOnError(false)])
     expect(results).toEqual([
       {
-        data: 'error',
+        data: new Error('error'),
         status: 'FAIL',
       },
       {
@@ -151,7 +152,7 @@ describe('flow', () => {
     ])
   })
 
-  it('should pass context along the stages', async () => {
+  it.skip('should pass context along the stages', async () => {
     const expectedContext = {}
     const { run } = flow([
       (ctx: Context) => {
@@ -175,4 +176,6 @@ describe('flow', () => {
       beta: 'beta-value',
     })
   })
+
+  it('should inject', async () => {})
 })

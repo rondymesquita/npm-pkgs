@@ -11,8 +11,7 @@ export interface Result {
 export type Results = Array<Result>
 
 export interface Option {
-  stopOnError?: boolean
-  fulano?: boolean
+  stopOnError: boolean
 }
 
 export type Context<K = any, V = any> = Map<K, V>
