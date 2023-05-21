@@ -18,10 +18,14 @@ async function clean() {
 }
 
 const unit = ({ watch, help }: any, ctx: any) => {
-  console.log('>>> running unit', { watch, help }, ctx)
+  console.log('>>> running unit')
+}
+const test = {
+  unit,
 }
 
 tasks({
+  test,
   unit: [clean, unit],
   // unit,
 })

@@ -13,10 +13,11 @@ import { showGlobalHelp } from './help'
 import { generateBasicDefinition } from './util'
 import { flow, Context, Flow, Status } from '@rondymesquita/flow'
 import { defineTasksFunction } from './functions'
+import { Stage } from '@rondymesquita/flow'
 
 export { Context } from '@rondymesquita/flow'
 
-export type Task = (options: ArgvOptions, ctx: Context) => Promise<any> | any
+export type Task = Stage
 
 export interface Definition {
   [key: string]: Task | Definition | Task[]
@@ -68,7 +69,7 @@ export const defineTasks = (defineArgs: typeof ArgsDefineArgs): DefineTasks => {
     const tasks: PlainDefinition = createTasks(taskDef)
     const task: Task = name ? tasks[name] : tasks.default
 
-    definition = generateBasicDefinition(definition)
+    definition = generateBasicDefinition(tasks)
 
     if (argv.options.help && !name) {
       showHelp()

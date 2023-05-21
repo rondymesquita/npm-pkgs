@@ -24,7 +24,7 @@ export const flow = (stages: Array<Stage> = []): Flow => {
     stages,
   }
 
-  const runStage = (stage: Stage) => {
+  const runStage = (stage: Stage): Result => {
     try {
       const args = provideArgsFn
         ? provideArgsFn!(state.context)

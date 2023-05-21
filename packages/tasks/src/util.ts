@@ -1,5 +1,5 @@
 import { defaultValue, help, type } from '@rondymesquita/args'
-import { TasksDefinition } from '.'
+import { PlainDefinition, TasksDefinition } from '.'
 
 export const buildTaskName = (namespace: string, fnName: string) => {
   let name: string = namespace ? `${namespace}:${fnName}` : fnName
@@ -24,41 +24,25 @@ export function deepFlattenTask(obj: any, namespace = '', result: any = {}) {
   return result
 }
 
-export const generateBasicDefinition = (definition: TasksDefinition) => {
-  const clonedDefinition = JSON.parse(
-    JSON.stringify(definition),
-  ) as TasksDefinition
+export const generateBasicDefinition = (tasks: PlainDefinition) => {
+  let definition: TasksDefinition = {}
 
-  Object.entries(clonedDefinition).forEach(([name, details]) => {
-    if (!clonedDefinition[name].argsDefinition.options.help) {
-      clonedDefinition[name].argsDefinition.options.help = [
-        help('Show help message'),
-        type('boolean'),
-        defaultValue(false),
-      ]
+  for (const name in tasks) {
+    if (Object.prototype.hasOwnProperty.call(tasks, name)) {
+      definition[name] = {
+        name,
+        description: '',
+        argsDefinition: {
+          options: {
+            help: [
+              help('Show help message'),
+              type('boolean'),
+              defaultValue(false),
+            ],
+          },
+        },
+      }
     }
-
-    if (!clonedDefinition[name].argsDefinition.name) {
-      clonedDefinition[name].argsDefinition.name = name
-    }
-  })
-
-  return clonedDefinition
-}
-
-export const defineCallback = <T extends any>(): [
-  (...data: T[]) => void,
-  (c: Function) => void,
-] => {
-  let callback: Function = () => {}
-
-  const setCallback = (_callback: Function) => {
-    callback = _callback
   }
-
-  const invokeCallback = (...data: T[]) => {
-    callback(...data)
-  }
-
-  return [invokeCallback, setCallback]
+  return definition
 }
