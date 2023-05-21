@@ -10,7 +10,7 @@ import {
 } from '@rondymesquita/args'
 import { TaskNameNotInformedError, TaskNotFoundError } from './errors'
 import { showGlobalHelp } from './help'
-import { asyncLoop, buildTaskName, generateBasicDefinition } from './util'
+import { generateBasicDefinition } from './util'
 import { flow, Context, Flow, Status } from '@rondymesquita/flow'
 import { defineTasksFunction } from './functions'
 
@@ -40,70 +40,12 @@ export type TasksDefinition = Record<
 >
 
 export interface DefineTasks {
-  // definition: TasksDefinition
   getDefinition: () => TasksDefinition
   tasks: (taskDef: Definition) => Promise<void>
 }
-const createTasksDefinition = (namespace: string) => {
-  let definition: TasksDefinition = {}
-
-  const setArgsDefinition = (
-    taskName: string,
-    taskArgDefinition: TaskArgDefinition,
-  ) => {
-    const name = buildTaskName(namespace, taskName)
-
-    if (definition[name]) {
-      definition[name].argsDefinition = taskArgDefinition
-    } else {
-      definition[name] = {
-        name: name,
-        description: '',
-        argsDefinition: taskArgDefinition,
-      }
-    }
-  }
-
-  const setModifiers = (
-    taskName: string,
-    optionName: string,
-    modifiers: Modifier[],
-  ) => {
-    definition[taskName].argsDefinition.options[optionName] = modifiers
-  }
-  const addModifiers = (
-    taskName: string,
-    optionName: string,
-    modifiers: Modifier[],
-  ) => {
-    definition[taskName].argsDefinition.options[optionName] = [
-      ...definition[taskName].argsDefinition.options[optionName],
-      ...modifiers,
-    ]
-  }
-  return {
-    getDefinition: () => definition,
-    setDefinition: (_definition: TasksDefinition) => (definition = _definition),
-    mergeDefinition: (_definition: TasksDefinition) =>
-      (definition = {
-        ...definition,
-        ..._definition,
-      }),
-    setArgsDefinition,
-    setModifiers,
-    addModifiers,
-  }
-}
 
 export const defineTasks = (defineArgs: typeof ArgsDefineArgs): DefineTasks => {
-  const {
-    getDefinition,
-    setDefinition,
-    setArgsDefinition,
-    setModifiers,
-    addModifiers,
-    mergeDefinition,
-  } = createTasksDefinition('')
+  let definition: TasksDefinition = {}
 
   const tasks = async (taskDef: Definition) => {
     const { parseArgs, showHelp, showErrors } = defineArgs({
@@ -126,16 +68,13 @@ export const defineTasks = (defineArgs: typeof ArgsDefineArgs): DefineTasks => {
     const tasks: PlainDefinition = createTasks(taskDef)
     const task: Task = name ? tasks[name] : tasks.default
 
-    const basicDefinition = generateBasicDefinition(getDefinition())
-    mergeDefinition(basicDefinition)
+    definition = generateBasicDefinition(definition)
 
     if (argv.options.help && !name) {
       showHelp()
-      showGlobalHelp(getDefinition())
+      showGlobalHelp(definition)
       return
     }
-
-    console.log(argv)
 
     if (argv.errors.length > 0) {
       console.log(`Errors`)
@@ -151,8 +90,8 @@ export const defineTasks = (defineArgs: typeof ArgsDefineArgs): DefineTasks => {
       throw new TaskNotFoundError(name)
     }
 
-    if (name && getDefinition()[name]) {
-      const taskArgDefinition = getDefinition()[name].argsDefinition
+    if (name && definition[name]) {
+      const taskArgDefinition = definition[name].argsDefinition
 
       const {
         parseArgs: parseTaskArgs,
@@ -199,7 +138,7 @@ export const defineTasks = (defineArgs: typeof ArgsDefineArgs): DefineTasks => {
 
   return {
     tasks,
-    getDefinition,
+    getDefinition: () => definition,
   }
 }
 
