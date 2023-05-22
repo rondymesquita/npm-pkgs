@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.1.1](https://github.com/rondymesquita/shell/compare/@rondymesquita/flow@0.1.0...@rondymesquita/flow@0.1.1) (2023-05-22)
+
+### Chores
+
+- captain jack sparrow ([1e81fd3](https://github.com/rondymesquita/shell/commit/1e81fd3795f4c3881983e6cc8a35ab2381c860ad))
+
 ## 0.1.0 (2023-05-22)
 
 ### Features

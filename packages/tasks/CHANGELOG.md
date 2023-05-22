@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.1.1](https://github.com/rondymesquita/shell/compare/@rondymesquita/tasks@0.1.0...@rondymesquita/tasks@0.1.1) (2023-05-22)
+
+**Note:** Version bump only for package @rondymesquita/tasks
+
 ## 0.1.0 (2023-05-22)
 
 ### Features
