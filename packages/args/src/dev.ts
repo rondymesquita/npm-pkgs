@@ -15,8 +15,8 @@ const max = defineValidator('max', (rule: number, value: number) => {
   return value <= rule
 })
 const { parseArgs, showHelp, showErrors } = defineArgs({
-  name: 'mycli',
-  usage: 'mycli [options]',
+  name: 'cli',
+  usage: 'cli [options]',
   options: {
     alpha: [type('number'), required()],
     beta: [type('string'), defaultValue('value')],
