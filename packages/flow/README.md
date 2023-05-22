@@ -1,6 +1,6 @@
 # flow
 
-Simple execute functions in sequence.
+Simply execute functions in sequence.
 
 - Easy exception handling
 - Improve code readability
@@ -83,7 +83,9 @@ const successes = results.filter((result) => result.status === Status.OK)
 const errors = results.filter((result) => result.status === Status.FAIL)
 ```
 
-### Context - share data between stages
+### Context
+
+Share data between stages.
 
 ```js
 const { run } = flow([
@@ -107,12 +109,29 @@ Inject data in context before running.
 
 ```js
 const { run, context } = flow([
-  (ctx) => {
+  (ctx: Context) => {
     ctx.get('mode') // light
   },
 ])
 
 context.set('mode', 'light')
+const results = run()
+```
+
+### Provide custom arguments
+
+Inject data on stages.
+
+```js
+const { run, provideArgs } = flow([
+  (pirate, ctx) => {
+    // pirate.name is 'Jack Sparrow'
+  },
+])
+provideArgs((ctx: Context) => {
+  const pirate = { name: 'Jack Sparrow' }
+  return [pirate, ctx]
+})
 const results = run()
 ```
 

@@ -1,5 +1,5 @@
 import { Context, flow, stopOnError } from './index'
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 
 describe('flow', () => {
   it('should run a flow in sequence', () => {
@@ -151,8 +151,28 @@ describe('flow', () => {
       },
     ])
   })
+  it('should not stop flow when stopOnError is false', async () => {
+    const { runAsync } = flow([
+      () => {
+        return Promise.reject(new Error('error'))
+      },
+      () => 'this will be executed normally',
+    ])
 
-  it.skip('should pass context along the stages', async () => {
+    const results = await runAsync([stopOnError(false)])
+    expect(results).toEqual([
+      {
+        data: new Error('error'),
+        status: 'FAIL',
+      },
+      {
+        data: 'this will be executed normally',
+        status: 'OK',
+      },
+    ])
+  })
+
+  it('should inject context', async () => {
     const expectedContext = {}
     const { run } = flow([
       (ctx: Context) => {
@@ -176,6 +196,44 @@ describe('flow', () => {
       beta: 'beta-value',
     })
   })
+  it('should provide custom arguments', async () => {
+    const alpha = vi.fn()
+    const beta = vi.fn()
 
-  it('should inject', async () => {})
+    const { run, provideArgs } = flow([alpha, beta])
+    provideArgs((ctx) => {
+      const fake = { key: 'value' }
+      return [fake, ctx]
+    })
+
+    expect(alpha).not.toBeCalled()
+    expect(beta).not.toBeCalled()
+    run()
+    expect(alpha).toBeCalledWith({ key: 'value' }, new Map())
+    expect(beta).toBeCalledWith({ key: 'value' }, new Map())
+  })
+  it('should set context value before running', async () => {
+    const alpha = vi.fn()
+    const beta = vi.fn()
+
+    const { run, context } = flow([alpha, beta])
+
+    context.set('fake', 'fake-value')
+    run()
+    expect(alpha).toBeCalledWith(new Map([['fake', 'fake-value']]))
+    expect(beta).toBeCalledWith(new Map([['fake', 'fake-value']]))
+  })
+  it('should set stages after creating it', async () => {
+    const alpha = vi.fn()
+    const beta = vi.fn()
+
+    const { run, setStages } = flow()
+
+    setStages([alpha, beta])
+    expect(alpha).not.toBeCalled()
+    expect(beta).not.toBeCalled()
+    run()
+    expect(alpha).toBeCalledWith(new Map())
+    expect(beta).toBeCalledWith(new Map())
+  })
 })

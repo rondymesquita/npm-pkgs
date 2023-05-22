@@ -2,14 +2,13 @@ import { flow } from '.'
 import { Context } from './types'
 
 const stages = [
-  // (ctx: Context) => {
-  //   console.log('args', ctx)
-  (user: any, ctx: Context) => {
-    console.log('args', user, ctx)
+  (pirate: any, ctx: Context) => {
+    console.log('args', pirate, ctx)
   },
 ]
 const { run, provideArgs } = flow(stages)
 provideArgs((context: Context) => {
-  return [{ name: 'rondy' }, context]
+  const pirate = { name: 'Jack Sparrow' }
+  return [pirate, context]
 })
 run()

@@ -1,7 +1,6 @@
-import { isPromise } from 'util/types'
 import { stopOnError } from './options'
 import { Context, Option, ProvideArgsFn, Result, Stage, Status } from './types'
-import { createObjectFromArray, processResultPromise } from './utils'
+import { createObjectFromArray } from './utils'
 
 export * from './types'
 export * from './options'
@@ -14,22 +13,40 @@ export interface Flow {
   setStages: (stages: Array<Stage>) => void
 }
 
+interface FlowState {
+  context: Context
+  stages: Array<Stage>
+  provideArgsFn: ProvideArgsFn | null
+}
+
 export const flow = (stages: Array<Stage> = []): Flow => {
-  let provideArgsFn: ProvideArgsFn | null = null
-  const state: {
-    context: Context
-    stages: Array<Stage>
-  } = {
+  const state: FlowState = {
     context: new Map(),
     stages,
+    provideArgsFn: null,
   }
 
-  const runStage = (stage: Stage): Result => {
+  const runStage = (stage: Stage): Result | Promise<Result> => {
     try {
-      const args = provideArgsFn
-        ? provideArgsFn!(state.context)
+      const args = state.provideArgsFn
+        ? state.provideArgsFn!(state.context)
         : [state.context]
       const stageResult = stage(...args)
+      console.log('stageResult', stageResult)
+
+      if (stageResult instanceof Promise) {
+        return new Promise((resolve) => {
+          stageResult
+            .then((data: any) => {
+              console.log('data', data)
+              resolve({ data, status: Status.OK })
+            })
+            .catch((err: any) => {
+              resolve({ data: err, status: Status.FAIL })
+            })
+        })
+      }
+
       return {
         data: stageResult,
         status: Status.OK,
@@ -47,7 +64,7 @@ export const flow = (stages: Array<Stage> = []): Flow => {
   }
 
   const provideArgs = (fn: ProvideArgsFn) => {
-    provideArgsFn = fn
+    state.provideArgsFn = fn
   }
 
   const runAsync = async (
@@ -57,8 +74,7 @@ export const flow = (stages: Array<Stage> = []): Flow => {
     const optionsObject = createObjectFromArray(options)
 
     for (const stage of state.stages) {
-      let result = runStage(stage)
-      result = await processResultPromise(result)
+      let result = await runStage(stage)
       results.push(result)
       if (result.status === Status.FAIL && optionsObject.stopOnError) {
         break
@@ -72,7 +88,7 @@ export const flow = (stages: Array<Stage> = []): Flow => {
     const optionsObject = createObjectFromArray(options)
 
     for (const stage of state.stages) {
-      const result = runStage(stage)
+      const result = runStage(stage) as Result
       results.push(result)
       if (result.status === Status.FAIL && optionsObject.stopOnError) {
         break

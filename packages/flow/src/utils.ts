@@ -1,4 +1,4 @@
-import { Result } from './types'
+import { Result, Status } from './types'
 
 export const createObjectFromArray = <T extends object>(array: Array<T>): T => {
   let optionsObject = {}
@@ -10,16 +10,4 @@ export const createObjectFromArray = <T extends object>(array: Array<T>): T => {
   })
 
   return optionsObject as T
-}
-
-export const processResultPromise = async (result: Result): Promise<Result> => {
-  let { data, status } = result
-  if (data instanceof Promise) {
-    try {
-      data = await data
-    } catch (err) {
-      data = err
-    }
-  }
-  return { data, status }
 }
