@@ -8,7 +8,7 @@ const stages = [
 ]
 const { run, provideArgs } = flow(stages)
 provideArgs((context: Context) => {
-  const pirate = { name: 'Jack Sparrow' }
+  const pirate = { name: 'Captain Jack Sparrow' }
   return [pirate, context]
 })
 run()
