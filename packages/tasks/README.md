@@ -103,7 +103,7 @@ $ node tasks.js build
 
 ### Context
 
-Share data between tasks
+Share data between tasks in sequence
 
 ```js
 function jobid(options, ctx) {
