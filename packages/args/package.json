@@ -1,6 +1,6 @@
 {
   "name": "@rondymesquita/args",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "",
   "repository": {
     "type": "git",
@@ -42,7 +42,7 @@
   "author": "rondymesquita",
   "license": "MIT",
   "dependencies": {
-    "@rondymesquita/flow": "^0.0.0",
+    "@rondymesquita/flow": "^0.1.0",
     "cliui": "^8.0.1"
   }
 }
