@@ -10,9 +10,8 @@ import {
 } from '@rondymesquita/args'
 import { TaskNameNotInformedError, TaskNotFoundError } from './errors'
 import { showGlobalHelp } from './help'
-import { generateBasicDefinition } from './utils'
+import { generateBasicDefinition, defineTasksFunction } from './utils'
 import { flow, Context, Flow, Status } from '@rondymesquita/flow'
-import { defineTasksFunction } from './functions'
 import { Stage } from '@rondymesquita/flow'
 
 export { Context } from '@rondymesquita/flow'

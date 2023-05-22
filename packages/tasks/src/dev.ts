@@ -7,25 +7,19 @@ import {
 } from '@rondymesquita/args'
 import { Context, defineTasks, tasks, Task } from './index'
 
-async function clean() {
-  return new Promise((res) => {
-    console.log('running clean')
-    setTimeout(() => {
-      console.log('cleaned')
-      res({})
-    }, 1000)
-  })
+function jobid(options, ctx) {
+  ctx.set('id', 12345)
 }
 
-const unit = ({ watch, help }: any, ctx: any) => {
-  console.log('>>> running unit')
+async function clean(options, ctx) {
+  console.log('cleaning', ctx.get('id'))
+  await new Promise((res) => setTimeout(res, 2000))
 }
-const test = {
-  unit,
+
+function build(options, ctx) {
+  console.log('building', ctx.get('id'))
 }
 
 tasks({
-  test,
-  unit: [clean, unit],
-  // unit,
+  build: [jobid, clean, build],
 })

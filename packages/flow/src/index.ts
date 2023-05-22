@@ -32,13 +32,11 @@ export const flow = (stages: Array<Stage> = []): Flow => {
         ? state.provideArgsFn!(state.context)
         : [state.context]
       const stageResult = stage(...args)
-      console.log('stageResult', stageResult)
 
       if (stageResult instanceof Promise) {
         return new Promise((resolve) => {
           stageResult
             .then((data: any) => {
-              console.log('data', data)
               resolve({ data, status: Status.OK })
             })
             .catch((err: any) => {
