@@ -16,10 +16,6 @@ export * from './options'
 export * from './validator'
 export * from './help'
 
-// export type ArgvOptionValue = any
-// export type ArgvOptions<T extends Record<string, ArgvOptionValue> = Record<string, ArgvOptionValue>> = T
-// ArgvOptions
-
 export interface ArgvOptions {
   [k: string]: any
 }
