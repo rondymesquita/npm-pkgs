@@ -1,4 +1,4 @@
-import { Argv, ArgvOptionValue, ArgvOptions } from '.'
+import { Argv, ArgvOptions } from '.'
 import { ConfigModifier, Modifier } from './modifiers'
 
 export const isBoolean = (value: string) => {
@@ -20,7 +20,7 @@ export const parseValue = (value: any) => {
 export const fillOptionsDefaultValues = (
   name: string,
   modifiers: Modifier[],
-  value: ArgvOptionValue,
+  value: any,
   argv: Argv,
 ): ArgvOptions => {
   const cloneArgOptions: ArgvOptions = { ...argv.options }

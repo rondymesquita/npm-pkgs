@@ -10,32 +10,17 @@
   "publishConfig": {
     "access": "public"
   },
-  "main": "./src/index.ts",
-  "bin": {
-    "nutshell": "./src/bin.ts"
-  },
+  "main": "./dist/index.ts",
   "files": [
-    "src/**/*"
+    "dist/**/*"
   ],
-  "exports": {
-    ".": "./src/index.ts"
-  },
-  "typesVersions": {
-    "*": {
-      "globals": [
-        "./src/globals.ts"
-      ],
-      "core": [
-        "./src/core.ts"
-      ]
-    }
-  },
+  "types": "./src",
   "scripts": {
     "test": "vitest --watch=false  --coverage",
     "test:watch": "vitest --watch=true",
     "dev": "tsx --watch ./src/dev.ts build",
     "dev:bin": "tsx --watch './src' --ext 'ts,js,json' --exec ts-node ./src/bin.ts ./src/example.js",
-    "build": "rimraf ./dist && tsc && copyfiles ./example ./dist",
+    "build": "rimraf ./dist && tsc",
     "release": "release-it --ci",
     "docs": "typedoc"
   },

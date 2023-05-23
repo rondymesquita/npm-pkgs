@@ -1,11 +1,6 @@
-import { ArgvOptionValue } from './'
 import { Modifier, ValidatorModifier } from './modifiers'
 
-export const checkValue = (
-  name: string,
-  modifiers: Modifier[],
-  value: ArgvOptionValue,
-) => {
+export const checkValue = (name: string, modifiers: Modifier[], value: any) => {
   const requiredModifier = modifiers.find(
     (mod: Modifier) => mod.name === 'required',
   )
@@ -19,7 +14,7 @@ export const checkValue = (
 export const checkValidator = (
   name: string,
   modifier: Modifier,
-  value: ArgvOptionValue,
+  value: any,
 ) => {
   if (!(modifier as ValidatorModifier<any>).validate(value)) {
     throw new Error(
@@ -28,11 +23,7 @@ export const checkValidator = (
   }
 }
 
-export const checkType = (
-  name: string,
-  modifiers: Modifier[],
-  value: ArgvOptionValue,
-) => {
+export const checkType = (name: string, modifiers: Modifier[], value: any) => {
   const typeOption = modifiers.find((mod: Modifier) => mod.name === 'type')
 
   if (!typeOption) {
