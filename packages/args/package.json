@@ -10,7 +10,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "main": "./dist/index.ts",
+  "main": "./dist/index.js",
   "files": [
     "dist/**/*"
   ],

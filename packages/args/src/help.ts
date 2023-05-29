@@ -1,3 +1,4 @@
+// @ts-ignore
 import cliui from 'cliui'
 import {
   ArgsDefinition,

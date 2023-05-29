@@ -1,0 +1,44 @@
+{
+  "name": "@rondymesquita/nutshell",
+  "version": "0.4.0",
+  "description": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rondymesquita/nutshell.git"
+  },
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "bin": {
+    "nutshell": "./dist/bin.js"
+  },
+  "main": "./dist/index.js",
+  "files": [
+    "dist/**/*"
+  ],
+  "types": "./src",
+  "scripts": {
+    "test": "vitest --watch=false --coverage",
+    "test:watch": "vitest --threads=false",
+    "dev": "tsx --watch ./src/dev.ts --alpha=5 -a=0 --beta=1.0 -b=0.5 --gama=gama -g=gama --delta -d --epsilon=true -e=false",
+    "build:dev": "esbuild  --platform=node --format=cjs --outdir=dist --watch ./src/**/*.ts ./src/*.ts",
+    "build": "rimraf ./dist && tsc",
+    "release": "release-it --ci",
+    "docs": "typedoc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^4.1.0",
+    "fs-extra": "^10.1.0",
+    "globby": "^13.1.2",
+    "winston": "^3.8.1",
+    "yaml": "^2.1.1",
+    "yargs": "^17.5.1"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^9.0.13"
+  }
+}
