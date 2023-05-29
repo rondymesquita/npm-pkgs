@@ -14,6 +14,7 @@ jobs:
 
     env:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
     steps:
@@ -30,16 +31,22 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
       - run: npm ci
-      - run: npm run test
-      - run: npm run build
-      - run: npm pack
-      - run: npm run docs
+      - run: npx lerna bootstrap
+      - run: npx lerna exec npm run test
+      - run: npx lerna exec npm run build
+      - run: npx lerna exec npm pack
+      - run: npx lerna exec npm run docs
       - name: Deploy Docs
         uses: JamesIves/github-pages-deploy-action@4.1.5
         with:
           branch: gh-pages-docs # The branch the action should deploy to.
           folder: ./typedoc # The folder the action should deploy.
-      - run: npm run release
+      - run: git checkout -b release
+      - run: |
+        VERSION_BUMP=$(node scripts/conventional-recommended-bump.js)
+        npx lerna version --conventional-commits --changelog-preset conventionalcommits --create-release=github --yes $VERSION_BUMP
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
       - uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{ secrets.NPM_TOKEN }}
