@@ -1,6 +1,6 @@
 {
   "name": "@rondymesquita/tasks",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "",
   "repository": {
     "type": "git",
@@ -28,7 +28,7 @@
   "author": "rondymesquita",
   "license": "MIT",
   "dependencies": {
-    "@rondymesquita/args": "^0.3.0",
+    "@rondymesquita/args": "^0.4.0",
     "cliui": "^8.0.1"
   }
 }
