@@ -14,9 +14,8 @@ import { generateBasicDefinition, defineTasksFunction } from './utils'
 import { flow, Context, Flow, Status } from '@rondymesquita/flow'
 import { Stage } from '@rondymesquita/flow'
 
-export { Context } from '@rondymesquita/flow'
 export * from '@rondymesquita/args'
-export * from '@rondymesquita/tasks'
+export * from '@rondymesquita/flow'
 
 export type Task = Stage
 

@@ -168,7 +168,7 @@ describe('test', () => {
     })
   })
 
-  it.only('should return typed options with custom type', () => {
+  it('should return typed options with custom type', () => {
     interface CustomOptions {
       alpha: string
       gamma: number
@@ -180,7 +180,7 @@ describe('test', () => {
     expect(options.gamma).toEqual(6)
   })
 
-  it.only('should return typed options with any type', () => {
+  it('should return typed options with any type', () => {
     const argv = parseArgs('--alpha=alpha --gamma=6'.split(' '))
     expect(argv.options.alpha).toEqual('alpha')
     expect(argv.options.gamma).toEqual(6)

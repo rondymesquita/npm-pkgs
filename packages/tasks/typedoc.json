@@ -1,5 +1,5 @@
 {
-  "entryPoints": ["src/globals.ts"],
+  "entryPoints": ["src/index.ts"],
   "out": "typedoc",
   "exclude": ["src/**/*spec.ts", "src/coredefaults.ts", "src/**/__fixtures__"],
   "excludePrivate": true,

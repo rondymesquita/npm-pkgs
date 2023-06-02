@@ -117,6 +117,6 @@ describe('core', () => {
         readdir: vi.fn(() => ['fake-file']),
       },
     })
-    expect(ls()).toEqual(['fake-file'])
+    expect(ls()).resolves.toEqual(['fake-file'])
   })
 })

@@ -3,7 +3,7 @@ import { defineTasksFunction } from './utils'
 import { vi, describe, it, expect } from 'vitest'
 
 describe('functions', () => {
-	it('should define a new task function without namespace', () => {
+  it('should define a new task function without namespace', () => {
     const beta = () => {}
     const gamma = () => {}
     const tasks = defineTasksFunction()
@@ -33,4 +33,5 @@ describe('functions', () => {
       'delta:alpha:beta': beta,
       'delta:gamma': gamma,
     })
+  })
 })

@@ -14,7 +14,7 @@
   "files": [
     "dist/**/*"
   ],
-  "types": "./src",
+  "types": "./src/index.ts",
   "scripts": {
     "test": "vitest --watch=false  --coverage",
     "test:watch": "vitest --watch=true",

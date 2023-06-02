@@ -7,6 +7,9 @@
   "private": "true",
   "scripts": {
     "dev": "tsx watch example.ts",
+    "build": "",
+    "test": "",
+    "docs": "",
     "link": "npm uninstall --save @rondymesquita/nutshell && npm link --save ../"
   },
   "keywords": [],

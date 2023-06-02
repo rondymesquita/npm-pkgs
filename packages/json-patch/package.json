@@ -1,5 +1,5 @@
 {
-  "name": "@rondymesquita/args",
+  "name": "@rondymesquita/json-patch",
   "version": "0.0.0",
   "description": "",
   "repository": {
@@ -10,24 +10,25 @@
   "publishConfig": {
     "access": "public"
   },
+  "bin": {
+    "json-patch": "./dist/bin.js"
+  },
   "main": "./dist/index.js",
   "files": [
     "dist/**/*"
   ],
   "types": "./src/index.ts",
   "scripts": {
-    "test": "vitest --watch=false --coverage",
-    "test:watch": "vitest",
-    "dev": "tsx --watch ./src/dev.ts --help",
-    "build": "rimraf ./dist && tsc",
-    "release": "release-it --ci",
-    "docs": "typedoc"
+    "test": "",
+    "dev": "tsx --watch ./src/dev.ts",
+    "bin": "tsx --watch ./src/bin.ts",
+    "build": "",
+    "docs": ""
   },
   "keywords": [],
   "author": "rondymesquita",
   "license": "MIT",
   "dependencies": {
-    "@rondymesquita/flow": "^0.0.0",
-    "cliui": "^8.0.1"
+    "@rondymesquita/args": "^0.0.0"
   }
 }
