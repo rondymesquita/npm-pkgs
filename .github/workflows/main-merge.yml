@@ -33,11 +33,10 @@ jobs:
       - run: npx lerna exec npm run test
       - run: npx lerna exec npm run build
       - run: npx lerna exec npm pack
-      - run: npx lerna exec npm run docs
+      # - run: npx lerna exec npm run docs
       - run: |
           VERSION_BUMP=$(node scripts/conventional-recommended-bump.js)
-          npx lerna publish $VERSION_BUMP --force-publish=* --conventional-commits --changelog-preset conventionalcommits --create-release=github --yes
-          # npx lerna publish --yes from-git
+          npx lerna publish $VERSION_BUMP --no-verify-access --force-publish=* --conventional-commits --changelog-preset conventionalcommits --create-release=github --yes
       # - uses: JS-DevTools/npm-publish@v1
       #   with:
       #     token: ${{ secrets.NPM_TOKEN }}
