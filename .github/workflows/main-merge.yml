@@ -37,8 +37,9 @@ jobs:
       - run: |
           VERSION_BUMP=$(node scripts/conventional-recommended-bump.js)
           npx lerna version --conventional-commits --changelog-preset conventionalcommits --create-release=github --yes $VERSION_BUMP
-      - uses: JS-DevTools/npm-publish@v1
-        with:
-          token: ${{ secrets.NPM_TOKEN }}
-          access: public
-          check-version: false
+          npx lerna publish --yes from-package
+      # - uses: JS-DevTools/npm-publish@v1
+      #   with:
+      #     token: ${{ secrets.NPM_TOKEN }}
+      #     access: public
+      #     check-version: false
