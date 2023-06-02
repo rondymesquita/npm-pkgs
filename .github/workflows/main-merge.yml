@@ -24,9 +24,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          # node-version: ${{ matrix.node-version }}
           node-version: 18.x
-          # cache: 'npm'
       - run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
@@ -36,21 +34,11 @@ jobs:
       - run: npx lerna exec npm run build
       - run: npx lerna exec npm pack
       - run: npx lerna exec npm run docs
-      # - name: Deploy Docs
-      #   uses: JamesIves/github-pages-deploy-action@4.1.5
-      #   with:
-      #     branch: gh-pages-docs # The branch the action should deploy to.
-      #     folder: ./typedoc # The folder the action should deploy.
-      # - run: git checkout -b release
       - run: |
           VERSION_BUMP=$(node scripts/conventional-recommended-bump.js)
           npx lerna version --conventional-commits --changelog-preset conventionalcommits --create-release=github --yes $VERSION_BUMP
-      # - name: Create Pull Request
-      #   uses: peter-evans/create-pull-request@v5
-      #   with:
-      #     branch: release
       - uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{ secrets.NPM_TOKEN }}
-      access: public
-      check-version: false
+          access: public
+          check-version: false
