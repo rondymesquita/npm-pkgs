@@ -32,7 +32,6 @@ jobs:
           git config --local user.name "github-actions[bot]"
       - run: npm ci
       - run: npx lerna bootstrap
-      # - run: npx lerna exec npm install
       - run: npx lerna exec npm run test
       - run: npx lerna exec npm run build
       - run: npx lerna exec npm pack
@@ -43,13 +42,15 @@ jobs:
       #     branch: gh-pages-docs # The branch the action should deploy to.
       #     folder: ./typedoc # The folder the action should deploy.
       # - run: git checkout -b release
-      # - run: |
-      #     VERSION_BUMP=$(node scripts/conventional-recommended-bump.js)
-      #     npx lerna version --conventional-commits --changelog-preset conventionalcommits --create-release=github --yes $VERSION_BUMP
+      - run: |
+          VERSION_BUMP=$(node scripts/conventional-recommended-bump.js)
+          npx lerna version --conventional-commits --changelog-preset conventionalcommits --create-release=github --yes $VERSION_BUMP
       # - name: Create Pull Request
       #   uses: peter-evans/create-pull-request@v5
-      # - uses: JS-DevTools/npm-publish@v1
       #   with:
-      #     token: ${{ secrets.NPM_TOKEN }}
-      # access: public
-      # check-version: false
+      #     branch: release
+      - uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
+      access: public
+      check-version: false
