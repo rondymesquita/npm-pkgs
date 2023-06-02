@@ -16,6 +16,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@rondymesquita/nutshell": "^0.4.0"
+    "@rondymesquita/nutshell": "^0.0.0"
   }
 }
