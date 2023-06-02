@@ -16,6 +16,7 @@ jobs:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
       GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
     steps:
       - uses: actions/checkout@v3
@@ -35,6 +36,7 @@ jobs:
       - run: npx lerna exec npm pack
       # - run: npx lerna exec npm run docs
       - run: |
+          echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
           VERSION_BUMP=$(node scripts/conventional-recommended-bump.js)
           npx lerna publish $VERSION_BUMP --no-verify-access --force-publish=* --conventional-commits --changelog-preset conventionalcommits --create-release=github --yes
       # - uses: JS-DevTools/npm-publish@v1
