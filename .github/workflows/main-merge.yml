@@ -36,8 +36,8 @@ jobs:
       - run: npx lerna exec npm run docs
       - run: |
           VERSION_BUMP=$(node scripts/conventional-recommended-bump.js)
-          npx lerna version --conventional-commits --changelog-preset conventionalcommits --create-release=github --yes $VERSION_BUMP
-          npx lerna publish --yes from-git
+          npx lerna publish --conventional-commits --changelog-preset conventionalcommits --create-release=github --yes $VERSION_BUMP
+          # npx lerna publish --yes from-git
       # - uses: JS-DevTools/npm-publish@v1
       #   with:
       #     token: ${{ secrets.NPM_TOKEN }}
