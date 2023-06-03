@@ -8,10 +8,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    # strategy:
-    #   matrix:
-    #     node-version: [14.x]
-
     env:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
       GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -39,8 +35,3 @@ jobs:
           echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
           VERSION_BUMP=$(node scripts/conventional-recommended-bump.js)
           npx lerna publish $VERSION_BUMP --no-verify-access --force-publish=* --conventional-commits --changelog-preset conventionalcommits --create-release=github --yes
-      # - uses: JS-DevTools/npm-publish@v1
-      #   with:
-      #     token: ${{ secrets.NPM_TOKEN }}
-      #     access: public
-      #     check-version: false
