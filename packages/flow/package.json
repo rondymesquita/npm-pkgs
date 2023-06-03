@@ -11,10 +11,11 @@
     "access": "public"
   },
   "main": "./dist/index.js",
-  "files": [
-    "dist/**/*"
-  ],
   "types": "./src/index.ts",
+  "files": [
+    "dist/**/*",
+    "src/**/*"
+  ],
   "scripts": {
     "test": "vitest --watch=false --coverage",
     "test:watch": "vitest",

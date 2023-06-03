@@ -8,6 +8,7 @@ Write better shell scripts using NodeJS
 <br>
 
 Create a `example.js`
+
 ```ts
 #!/usr/bin/env nutshell
 
@@ -28,6 +29,7 @@ Create a `example.js`
 ```
 
 Run with:
+
 ```bash
 ./example.js
 ```
@@ -42,7 +44,6 @@ You should have `ts-node` installed.
 
 // import to enable type checking
 import '@rondymesquita/nutshell'
-
 ;(async () => {
   await $`echo "Hello"`
 
@@ -57,7 +58,6 @@ import '@rondymesquita/nutshell'
     `
   })
 })()
-
 ```
 
 ## Configuration
@@ -68,11 +68,9 @@ Set custom configuration with `setConfig`
 setConfig({
   loggerLevel: 'verbose',
 })
-
 ;(async () => {
   await $`echo "Hello"`
 })()
-
 ```
 
 ## Configuration options
