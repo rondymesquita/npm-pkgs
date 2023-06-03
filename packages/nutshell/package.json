@@ -35,13 +35,6 @@
     "@rondymesquita/args": "^0.4.0",
     "@rondymesquita/tasks": "^0.4.0",
     "chalk": "^4.1.0",
-    "fs-extra": "^10.1.0",
-    "globby": "^13.1.2",
-    "winston": "^3.8.1",
-    "yaml": "^2.1.1",
-    "yargs": "^17.5.1"
-  },
-  "devDependencies": {
-    "@types/fs-extra": "^9.0.13"
+    "winston": "^3.8.1"
   }
 }
