@@ -17,5 +17,4 @@ declare global {
   const setConfig: typeof core.setConfig
   const ls: typeof core.ls
   const chalk: typeof libs.chalk
-  const fs: typeof libs.fs
 }
