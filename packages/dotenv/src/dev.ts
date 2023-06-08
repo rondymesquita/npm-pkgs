@@ -1,19 +1,15 @@
-import { defineDotenv } from './'
+import { parseDotenv } from './'
 import { z } from 'zod'
 
-const MY = z.object({
-  DEV: z.coerce.string(),
+const schema = z.object({
+  DEV: z.coerce.number(),
 })
 
-const { parseDotenv } = defineDotenv({
-  // cwd: process.
+type Schema = z.infer<typeof schema>
+
+const env: Schema = parseDotenv({
   filename: '.env-dev',
+  schema,
 })
-
-// interface MY {
-//   DEV: number
-// }
-
-const env = parseDotenv(MY)
 
 console.log(env)

@@ -2,6 +2,7 @@ import { describe, it, expect, vi, Mock } from 'vitest'
 import { CoreFactory } from './core'
 import { IFS, IPath, Path } from './infra'
 import path from 'path'
+import { z } from 'zod'
 
 describe('core', () => {
   it('should read env to variable', () => {
@@ -108,5 +109,65 @@ describe('core', () => {
     expect(fsMock.readFileSync).toHaveBeenCalledWith(
       path.resolve('fake-folder-path', '.env'),
     )
+  })
+
+  it('should parse zod schema', () => {
+    const fsMock: IFS = {
+      readFileSync: vi.fn(() =>
+        Buffer.from(`ALPHA=1
+      BETA="value"
+      GAMMA=true
+      ETA=`),
+      ),
+    }
+
+    const pathMock: IPath = {
+      resolve: vi.fn(),
+    }
+
+    const { parseDotenv } = CoreFactory({ fs: fsMock, path: pathMock })
+
+    const env = parseDotenv({
+      schema: z.object({
+        ALPHA: z.number(),
+        BETA: z.string(),
+        GAMMA: z.boolean(),
+        ETA: z.undefined(),
+      }),
+    })
+    expect(env).toEqual({
+      ALPHA: 1,
+      BETA: 'value',
+      GAMMA: true,
+    })
+  })
+  it('should throw when parse zod schema fails', () => {
+    const fsMock: IFS = {
+      readFileSync: vi.fn(() =>
+        Buffer.from(
+          `ALPHA=1
+      BETA="value"
+      GAMMA=true
+      ETA=`,
+        ),
+      ),
+    }
+
+    const pathMock: IPath = {
+      resolve: vi.fn(),
+    }
+
+    const { parseDotenv } = CoreFactory({ fs: fsMock, path: pathMock })
+
+    expect(() =>
+      parseDotenv({
+        schema: z.object({
+          ALPHA: z.number(),
+          BETA: z.boolean(),
+          GAMMA: z.boolean(),
+          ETA: z.undefined(),
+        }),
+      }),
+    ).toThrowError()
   })
 })

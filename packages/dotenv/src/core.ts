@@ -1,5 +1,6 @@
 import { parseDotenvFile } from './parser'
 import * as infra from './infra'
+import { z } from 'zod'
 
 export interface CoreInput {
   fs: infra.IFS
@@ -9,64 +10,36 @@ export interface CoreInput {
 export interface Definition {
   cwd?: string
   filename?: string
+  schema?: z.ZodObject<any> | null
 }
 
-const DEFAULT = {
+const DEFAULT: Required<Definition> = {
   cwd: process.cwd(),
   filename: '.env',
+  schema: null,
 }
 
 export interface Env {
   [key: string]: any
 }
 
-// class Parser {
-//   private definition: Required<Definition>
-//   constructor(private fs: infra.IFS, private path: infra.IPath) {}
-//   setDefinition(definition: Required<Definition>) {
-//     this.definition = definition
-//   }
-//   parseDotenv() {
-//     const { cwd, filename } = this.definition
-//     const filePath = this.path.resolve(cwd, filename)
-//     const file = this.fs.readFileSync(filePath).toString()
-//     let env = parseDotenvFile(file)
-//     return env
-//   }
-// }
-
-// export class Core {
-//   private parser: Parser
-//   constructor(private fs: infra.IFS, private path: infra.IPath) {
-//     this.parser = new Parser(this.fs, this.path)
-//     this.parser.setDefinition(DEFAULT)
-//   }
-
-//   defineDotenv(definition?: Definition) {
-//     const d: Required<Definition> = {
-//       ...DEFAULT,
-//       ...definition,
-//     }
-//     this.parser.setDefinition(d)
-//   }
-
-//   parseDotenv() {
-//     return this.parser.parseDotenv()
-//   }
-// }
-
 const createParser = (fs: infra.IFS, path: infra.IPath) => {
   return (definition: Required<Definition>) => {
-    const { cwd, filename } = definition
+    const { cwd, filename, schema } = definition
     const filePath = path.resolve(cwd, filename)
     const file = fs.readFileSync(filePath).toString()
     let env = parseDotenvFile(file)
-    return env
+
+    if (schema) {
+      env = schema.parse(env)
+    }
+
+    return env as any
   }
 }
 
 export const CoreFactory = ({ fs, path }: CoreInput) => {
-  const parseDotenv = (definition?: Definition) => {
+  const parseDotenv = <T>(definition?: Definition): T => {
     const parser = createParser(fs, path)
     const finalDefinition = definition ? { ...DEFAULT, ...definition } : DEFAULT
     return parser(finalDefinition)
