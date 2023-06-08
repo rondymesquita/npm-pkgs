@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, Mock } from 'vitest'
-import { defineCore } from './core'
+import { CoreFactory } from './core'
 import { IFS, IPath, Path } from './infra'
 import path from 'path'
 
@@ -21,12 +21,8 @@ describe('core', () => {
       resolve: vi.fn(),
     }
 
-    const { defineDotenv } = defineCore({
-      fs: fsMock,
-      path: pathMock,
-    })
+    const { parseDotenv } = CoreFactory({ fs: fsMock, path: pathMock })
 
-    const { parseDotenv } = defineDotenv()
     const env = parseDotenv()
     expect(env).toEqual({
       ALPHA: 1,
@@ -47,12 +43,8 @@ describe('core', () => {
       readFileSync: vi.fn(() => Buffer.from('')),
     }
 
-    const { defineDotenv } = defineCore({
-      path: pathMock,
-      fs: (fsMock as unknown) as IFS,
-    })
+    const { parseDotenv } = CoreFactory({ fs: fsMock, path: pathMock })
 
-    const { parseDotenv } = defineDotenv()
     parseDotenv()
 
     expect(pathMock.resolve).toHaveBeenCalledOnce()
@@ -72,15 +64,14 @@ describe('core', () => {
       readFileSync: vi.fn(() => Buffer.from('')),
     }
 
-    const { defineDotenv } = defineCore({
+    const { parseDotenv } = CoreFactory({
+      fs: fsMock,
       path: pathMock,
-      fs: (fsMock as unknown) as IFS,
     })
 
-    const { parseDotenv } = defineDotenv({
+    parseDotenv({
       filename: '.env-development',
     })
-    parseDotenv()
 
     expect(pathMock.resolve).toHaveBeenCalledOnce()
     expect(pathMock.resolve.mock.lastCall).toMatchObject([
@@ -99,15 +90,14 @@ describe('core', () => {
       readFileSync: vi.fn(() => Buffer.from('')),
     }
 
-    const { defineDotenv } = defineCore({
+    const { parseDotenv } = CoreFactory({
+      fs: fsMock,
       path: pathMock,
-      fs: (fsMock as unknown) as IFS,
     })
 
-    const { parseDotenv } = defineDotenv({
+    parseDotenv({
       cwd: 'fake-folder-path',
     })
-    parseDotenv()
 
     expect(pathMock.resolve).toHaveBeenCalledOnce()
     expect(pathMock.resolve.mock.lastCall).toMatchObject([

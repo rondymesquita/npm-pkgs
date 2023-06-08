@@ -25,7 +25,7 @@ export const parseValue = (value: any) => {
   }
 }
 
-export const parseDotenvFile = (fileContent: string) => {
+export const parseDotenvFile = (fileContent: string): any => {
   const fileJSON: Record<string, any> = {}
   const lines = fileContent.split('\n')
   lines.forEach((line: string) => {

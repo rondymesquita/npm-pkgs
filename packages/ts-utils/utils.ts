@@ -3,13 +3,8 @@ interface ExportedClassMembers {
 }
 
 export const exportClassMembers = <T = ExportedClassMembers>(
-  object: any | Function,
+  instance: any,
 ): T => {
-  let instance = object
-  if (typeof object === 'function') {
-    instance = object()
-  }
-
   const properties = Reflect.ownKeys(Object.getPrototypeOf(instance)).filter(
     (p) => p !== 'constructor',
   )
@@ -25,6 +20,7 @@ export const exportClassMembers = <T = ExportedClassMembers>(
 const defaults = <T = any>(object: T | undefined, defaultValues: any) => {
   const values: Record<string, any> = {}
   Object.entries(defaultValues).forEach(([key, value]) => {
+    console.log({ key, value })
     if ((object as any)[key]) {
       values[key] = (object as any)[key]
     } else {
