@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.0](https://github.com/rondymesquita/nutshell/compare/@rondymesquita/nutshell@0.8.0...@rondymesquita/nutshell@0.9.0) (2023-06-08)
+
+### Features
+
+- add dotenv package ([7df421b](https://github.com/rondymesquita/nutshell/commit/7df421b0e38392aa586330b572663dabbc96f43a))
+- uninstall unused dependencies ([790e52a](https://github.com/rondymesquita/nutshell/commit/790e52a4db9d4b0603378d709ca3e18bc820e27e))
+
 ## [0.8.0](https://github.com/rondymesquita/nutshell/compare/@rondymesquita/nutshell@0.7.0...@rondymesquita/nutshell@0.8.0) (2023-06-03)
 
 **Note:** Version bump only for package @rondymesquita/nutshell
