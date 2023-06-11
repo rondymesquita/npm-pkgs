@@ -26,8 +26,5 @@
   },
   "keywords": [],
   "author": "rondymesquita",
-  "license": "MIT",
-  "dependencies": {
-    "zod": "^3.21.4"
-  }
+  "license": "MIT"
 }

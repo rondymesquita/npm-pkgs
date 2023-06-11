@@ -1,4 +1,4 @@
-import { Validators } from './core'
+import { Validators } from './schemas'
 
 export const checkType = (ctx: Map<string, any>) => {
   const { validators, value }: { validators: Validators; value: any } = ctx.get(
