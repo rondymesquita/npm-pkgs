@@ -1,5 +1,15 @@
 import { stopOnError } from './options'
-import { Context, Option, ProvideArgsFn, Result, Stage, Status } from './types'
+import {
+  Context,
+  Option,
+  ProvideArgsFn,
+  Result,
+  Stage,
+  StageMap,
+  StageObject,
+  Stages,
+  Status,
+} from './types'
 import { createObjectFromArray } from './utils'
 
 export * from './types'
@@ -10,23 +20,40 @@ export interface Flow {
   runAsync: (options?: Option[]) => Promise<Array<Result>>
   context: Map<any, any>
   provideArgs: (fn: (ctx: Context) => Array<any>) => void
-  setStages: (stages: Array<Stage>) => void
+  setStages: (stages: Stages) => void
 }
 
 interface FlowState {
   context: Context
-  stages: Array<Stage>
+  stages: StageObject
   provideArgsFn: ProvideArgsFn | null
 }
 
-export const flow = (stages: Array<Stage> = []): Flow => {
+const parseStages = (stages: Stages): StageObject => {
+  let stagesObject = {}
+  if (Array.isArray(stages)) {
+    stagesObject = Object.fromEntries(
+      stages.map((stage, index) => {
+        return [String(index), stage]
+      }),
+    )
+  } else if (stages instanceof Map) {
+    stagesObject = Object.fromEntries(Array.from(stages))
+  } else {
+    stagesObject = stages
+  }
+
+  return stagesObject
+}
+
+export const flow = (stages: Stages = []): Flow => {
   const state: FlowState = {
     context: new Map(),
-    stages,
+    stages: parseStages(stages),
     provideArgsFn: null,
   }
 
-  const runStage = (stage: Stage): Result | Promise<Result> => {
+  const runStage = (name: string, stage: Stage): Result | Promise<Result> => {
     try {
       const args = state.provideArgsFn
         ? state.provideArgsFn!(state.context)
@@ -37,28 +64,30 @@ export const flow = (stages: Array<Stage> = []): Flow => {
         return new Promise((resolve) => {
           stageResult
             .then((data: any) => {
-              resolve({ data, status: Status.OK })
+              resolve({ name, data, status: Status.OK })
             })
             .catch((err: any) => {
-              resolve({ data: err, status: Status.FAIL })
+              resolve({ name, data: err, status: Status.FAIL })
             })
         })
       }
 
       return {
+        name,
         data: stageResult,
         status: Status.OK,
       }
     } catch (err) {
       return {
+        name,
         data: err,
         status: Status.FAIL,
       }
     }
   }
 
-  const setStages = (stages: Array<Stage>) => {
-    state.stages = stages
+  const setStages = (stages: Stages) => {
+    state.stages = parseStages(stages)
   }
 
   const provideArgs = (fn: ProvideArgsFn) => {
@@ -71,8 +100,9 @@ export const flow = (stages: Array<Stage> = []): Flow => {
     let results: Array<Result> = []
     const optionsObject = createObjectFromArray(options)
 
-    for (const stage of state.stages) {
-      let result = await runStage(stage)
+    const stages = parseStages(state.stages)
+    for (const name in stages) {
+      let result = await runStage(name, stages[name])
       results.push(result)
       if (result.status === Status.FAIL && optionsObject.stopOnError) {
         break
@@ -85,8 +115,9 @@ export const flow = (stages: Array<Stage> = []): Flow => {
     let results: Array<Result> = []
     const optionsObject = createObjectFromArray(options)
 
-    for (const stage of state.stages) {
-      const result = runStage(stage) as Result
+    const stages = parseStages(state.stages)
+    for (const name in stages) {
+      let result = runStage(name, stages[name]) as Result
       results.push(result)
       if (result.status === Status.FAIL && optionsObject.stopOnError) {
         break

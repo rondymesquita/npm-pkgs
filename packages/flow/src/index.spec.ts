@@ -84,10 +84,12 @@ describe('flow', () => {
     expect(results).toEqual([
       {
         data: 1,
+        name: '0',
         status: 'OK',
       },
       {
         data: 2,
+        name: '1',
         status: 'OK',
       },
     ])
@@ -105,10 +107,12 @@ describe('flow', () => {
     expect(results).toEqual([
       {
         data: 1,
+        name: '0',
         status: 'OK',
       },
       {
         data: new Error('error'),
+        name: '1',
         status: 'FAIL',
       },
     ])
@@ -125,6 +129,7 @@ describe('flow', () => {
     const results = run()
     expect(results).toEqual([
       {
+        name: '0',
         data: new Error('error'),
         status: 'FAIL',
       },
@@ -142,10 +147,12 @@ describe('flow', () => {
     const results = run([stopOnError(false)])
     expect(results).toEqual([
       {
+        name: '0',
         data: new Error('error'),
         status: 'FAIL',
       },
       {
+        name: '1',
         data: 'this will be executed normally',
         status: 'OK',
       },
@@ -162,10 +169,12 @@ describe('flow', () => {
     const results = await runAsync([stopOnError(false)])
     expect(results).toEqual([
       {
+        name: '0',
         data: new Error('error'),
         status: 'FAIL',
       },
       {
+        name: '1',
         data: 'this will be executed normally',
         status: 'OK',
       },
@@ -235,5 +244,66 @@ describe('flow', () => {
     run()
     expect(alpha).toBeCalledWith(new Map())
     expect(beta).toBeCalledWith(new Map())
+  })
+
+  it('should set stages as array', async () => {
+    const alpha = vi.fn()
+    const stages = [alpha]
+    const { run, runAsync } = flow(stages)
+    expect(run()).toEqual([
+      {
+        data: undefined,
+        name: '0',
+        status: 'OK',
+      },
+    ])
+    expect(runAsync()).resolves.toEqual([
+      {
+        data: undefined,
+        name: '0',
+        status: 'OK',
+      },
+    ])
+  })
+  it('should set stages as a map', () => {
+    const alpha = vi.fn()
+    const stages = new Map()
+    stages.set('alpha', alpha)
+    const { run, runAsync } = flow(stages)
+    expect(run()).toEqual([
+      {
+        data: undefined,
+        name: 'alpha',
+        status: 'OK',
+      },
+    ])
+    expect(runAsync()).resolves.toEqual([
+      {
+        data: undefined,
+        name: 'alpha',
+        status: 'OK',
+      },
+    ])
+  })
+  it('should set stages as object', () => {
+    const stages = {
+      alpha: vi.fn(),
+    }
+
+    const { run, runAsync } = flow(stages)
+    expect(run()).toEqual([
+      {
+        data: undefined,
+        name: 'alpha',
+        status: 'OK',
+      },
+    ])
+    expect(runAsync()).resolves.toEqual([
+      {
+        data: undefined,
+        name: 'alpha',
+        status: 'OK',
+      },
+    ])
   })
 })
