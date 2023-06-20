@@ -34,4 +34,4 @@ jobs:
       - run: |
           echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
           VERSION_BUMP=$(node scripts/conventional-recommended-bump.js)
-          npx lerna publish $VERSION_BUMP --no-verify-access --conventional-commits --changelog-preset conventionalcommits --create-release=github --yes
+          npx lerna publish $VERSION_BUMP --no-verify-access --force-publish=* --conventional-commits --changelog-preset conventionalcommits --create-release=github --yes
