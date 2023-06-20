@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.0](https://github.com/rondymesquita/shell/compare/@rondymesquita/flow@0.6.0...@rondymesquita/flow@0.7.0) (2023-06-19)
+
+### Features
+
+- add name to stages to identify stages ([6812728](https://github.com/rondymesquita/shell/commit/6812728c4b0055e24df9d8465b1822484160312d))
+
 ## [0.6.0](https://github.com/rondymesquita/shell/compare/@rondymesquita/flow@0.5.0...@rondymesquita/flow@0.6.0) (2023-06-08)
 
 **Note:** Version bump only for package @rondymesquita/flow

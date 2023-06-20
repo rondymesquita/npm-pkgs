@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.0](https://github.com/rondymesquita/shell/compare/@rondymesquita/args@0.6.0...@rondymesquita/args@0.7.0) (2023-06-19)
+
+**Note:** Version bump only for package @rondymesquita/args
+
 ## [0.6.0](https://github.com/rondymesquita/shell/compare/@rondymesquita/args@0.5.0...@rondymesquita/args@0.6.0) (2023-06-08)
 
 **Note:** Version bump only for package @rondymesquita/args
