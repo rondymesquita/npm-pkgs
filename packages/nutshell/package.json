@@ -19,6 +19,10 @@
     "dist/**/*",
     "src/**/*"
   ],
+  "exports": {
+		"./package.json": "./package.json",
+		".": "./dist/globals.js"
+	},
   "scripts": {
     "test": "vitest --watch=false --coverage",
     "test:watch": "vitest --threads=false",

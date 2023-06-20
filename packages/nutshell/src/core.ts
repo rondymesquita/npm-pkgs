@@ -1,25 +1,56 @@
-import { fork } from 'child_process'
+import * as ChildProcess from 'child_process'
+import * as FS from 'fs'
 import { DEFAULT_CONFIG } from './coredefaults'
 import { createLogger } from './logger'
 import { CmdResult, Config } from './models'
 import { prepareCommand } from './utils'
-import * as shell from './infra/shell'
-import * as fs from './infra/fs'
 
 const defineCoreFactory = () => {
-  return defineCore({ shell, process, fs })
+  return defineCore({
+    shell: { exec: ChildProcess.exec.__promisify__, spawn: ChildProcess.spawn },
+    process,
+    fs: {
+      readdir: FS.readdir.__promisify__,
+    },
+  })
 }
 
-export const { $, cd, withContext, setConfig, ls, config } = defineCoreFactory()
+export const {
+  $,
+  exec,
+  cd,
+  withContext,
+  setConfig,
+  ls,
+  config,
+} = defineCoreFactory()
 
-export class DefineCoreInput {
-  public shell: shell.Shell
-  public process: Pick<NodeJS.Process, 'chdir' | 'cwd'>
-  public fs: fs.FS
+export interface DefineCoreInput {
+  shell: {
+    exec: typeof ChildProcess.exec.__promisify__
+    spawn: typeof ChildProcess.spawn
+  }
+  process: Pick<NodeJS.Process, 'chdir' | 'cwd'>
+  fs: {
+    readdir: typeof FS.readdir.__promisify__
+  }
 }
 
-export function defineCore({ shell, process, fs }: DefineCoreInput) {
-  const { exec } = shell
+export interface Core {
+  $: (
+    cmd: string | Array<string> | TemplateStringsArray,
+  ) => Promise<CmdResult | CmdResult[]>
+  exec: typeof $
+  spawn: typeof ChildProcess.spawn
+  cd: (dir: string) => void
+  withContext: (fn: Function) => Promise<number | null>
+  setConfig: (userConfig: Partial<Config>) => void
+  ls: () => Promise<string[]>
+  config: Config
+}
+
+export function defineCore({ shell, process, fs }: DefineCoreInput): Core {
+  const { exec: shellExec, spawn: shellSpawn } = shell
   const { chdir, cwd } = process
   const { readdir } = fs
 
@@ -30,7 +61,7 @@ export function defineCore({ shell, process, fs }: DefineCoreInput) {
    *
    * Runs a command using child_process.exec.
    */
-  const $ = async (
+  const exec = async (
     cmd: string | Array<string> | TemplateStringsArray,
   ): Promise<CmdResult | CmdResult[]> => {
     const finalCmd = prepareCommand(cmd)
@@ -39,7 +70,7 @@ export function defineCore({ shell, process, fs }: DefineCoreInput) {
       const results: Array<CmdResult> = []
       for (const cmd of finalCmd) {
         logger.verbose(cmd)
-        const result = await exec(cmd)
+        const result = await shellExec(cmd)
         logger.info(result.stdout)
 
         results.push(result)
@@ -47,12 +78,16 @@ export function defineCore({ shell, process, fs }: DefineCoreInput) {
       return results
     } else {
       logger.verbose(finalCmd)
-      const result = await exec(finalCmd)
+      const result = await shellExec(finalCmd)
       logger.info(result.stdout)
 
       return result
     }
   }
+
+  const $ = exec
+
+  const spawn = shellSpawn
 
   /**
    *
@@ -67,13 +102,15 @@ export function defineCore({ shell, process, fs }: DefineCoreInput) {
    *
    * Run a command in a separated process using child_process.fork.
    */
-  const withContext = async (fn: Function) => {
-    const childProcess = fork(`${__dirname}/subprocess`, ['subprocess'])
+  const withContext = async (fn: Function): Promise<number | null> => {
+    const childProcess = ChildProcess.fork(`${__dirname}/subprocess`, [
+      'subprocess',
+    ])
     childProcess.send({ fn: fn.toString() })
 
     return new Promise((resolve, reject) => {
       childProcess.on('close', (exitCode) => {
-        resolve({ exitCode })
+        resolve(exitCode)
       })
       childProcess.on('error', (error: Error) => {
         logger.error(error)
@@ -104,6 +141,8 @@ export function defineCore({ shell, process, fs }: DefineCoreInput) {
 
   return {
     $,
+    exec,
+    spawn,
     cd,
     withContext,
     setConfig,

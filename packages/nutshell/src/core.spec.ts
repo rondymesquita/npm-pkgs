@@ -1,7 +1,6 @@
 import { defineCore, DefineCoreInput } from './core'
 import { DEFAULT_CONFIG } from './coredefaults'
 import { vi, describe, it, expect } from 'vitest'
-import { Shell } from './infra/shell'
 import { fillMocks } from './testutils'
 import { DeepPartial } from './models'
 
@@ -20,7 +19,7 @@ const createSut = (input: DeepPartial<DefineCoreInput>) => {
 
 describe('core', () => {
   it('should execute a single line command', async () => {
-    const shell: Shell = {
+    const shell = {
       exec: vi.fn().mockResolvedValueOnce({
         stderr: '',
         stdout: 'Hello\n',
@@ -37,7 +36,7 @@ describe('core', () => {
   })
 
   it('should execute a multiple line command', async () => {
-    const shell: Shell = {
+    const shell = {
       exec: vi
         .fn()
         .mockResolvedValueOnce({
@@ -66,7 +65,7 @@ describe('core', () => {
   })
 
   it('should enters into folder', async () => {
-    const shell: Shell = {
+    const shell = {
       exec: vi.fn(),
     }
 
