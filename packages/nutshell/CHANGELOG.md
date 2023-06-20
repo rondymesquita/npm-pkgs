@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.0](https://github.com/rondymesquita/nutshell/compare/@rondymesquita/nutshell@0.10.0...@rondymesquita/nutshell@0.11.0) (2023-06-20)
+
+### Features
+
+- add linux service to nutshell ([092f0b0](https://github.com/rondymesquita/nutshell/commit/092f0b051ff4ec5722c0254503ff8c246a2172db))
+
 ## [0.10.0](https://github.com/rondymesquita/nutshell/compare/@rondymesquita/nutshell@0.9.0...@rondymesquita/nutshell@0.10.0) (2023-06-19)
 
 **Note:** Version bump only for package @rondymesquita/nutshell
