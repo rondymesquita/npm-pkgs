@@ -4,10 +4,18 @@ import { DEFAULT_CONFIG } from './coredefaults'
 import { createLogger } from './logger'
 import { CmdResult, Config } from './models'
 import { prepareCommand } from './utils'
+import { promisify } from 'util'
+import { log } from 'console'
+// import { prii } from './utils'
 
 const defineCoreFactory = () => {
   return defineCore({
-    shell: { exec: ChildProcess.exec.__promisify__, spawn: ChildProcess.spawn },
+    childProcess: {
+      execAsync: promisify(ChildProcess.exec),
+      execSync: ChildProcess.execSync,
+      exec: ChildProcess.execSync,
+      spawn: ChildProcess.spawn,
+    },
     process,
     fs: {
       readdir: FS.readdir.__promisify__,
@@ -18,6 +26,9 @@ const defineCoreFactory = () => {
 export const {
   $,
   exec,
+  execSync,
+  execAsync,
+  spawn,
   cd,
   withContext,
   setConfig,
@@ -26,8 +37,10 @@ export const {
 } = defineCoreFactory()
 
 export interface DefineCoreInput {
-  shell: {
-    exec: typeof ChildProcess.exec.__promisify__
+  childProcess: {
+    execAsync: typeof ChildProcess.exec.__promisify__
+    execSync: typeof ChildProcess.execSync
+    exec: typeof ChildProcess.execSync
     spawn: typeof ChildProcess.spawn
   }
   process: Pick<NodeJS.Process, 'chdir' | 'cwd'>
@@ -40,7 +53,9 @@ export interface Core {
   $: (
     cmd: string | Array<string> | TemplateStringsArray,
   ) => Promise<CmdResult | CmdResult[]>
-  exec: typeof $
+  execAsync: typeof ChildProcess.exec.__promisify__
+  execSync: typeof ChildProcess.execSync
+  exec: typeof ChildProcess.execSync
   spawn: typeof ChildProcess.spawn
   cd: (dir: string) => void
   withContext: (fn: Function) => Promise<number | null>
@@ -49,19 +64,27 @@ export interface Core {
   config: Config
 }
 
-export function defineCore({ shell, process, fs }: DefineCoreInput): Core {
-  const { exec: shellExec, spawn: shellSpawn } = shell
+export function defineCore({
+  childProcess,
+  process,
+  fs,
+}: DefineCoreInput): Core {
   const { chdir, cwd } = process
   const { readdir } = fs
 
   let logger = createLogger(DEFAULT_CONFIG)
   let config = { ...DEFAULT_CONFIG }
 
+  const execSync = childProcess.execSync
+  const exec = execSync
+  const execAsync = childProcess.execAsync
+  const spawn = childProcess.spawn
+
   /**
    *
    * Runs a command using child_process.exec.
    */
-  const exec = async (
+  const $ = async (
     cmd: string | Array<string> | TemplateStringsArray,
   ): Promise<CmdResult | CmdResult[]> => {
     const finalCmd = prepareCommand(cmd)
@@ -69,32 +92,24 @@ export function defineCore({ shell, process, fs }: DefineCoreInput): Core {
     if (Array.isArray(finalCmd)) {
       const results: Array<CmdResult> = []
       for (const cmd of finalCmd) {
-        logger.verbose(cmd)
-        const result = await shellExec(cmd)
-        logger.info(result.stdout)
-
+        const result = await execAsync(cmd)
+        console.log(result.stdout)
         results.push(result)
       }
       return results
     } else {
-      logger.verbose(finalCmd)
-      const result = await shellExec(finalCmd)
-      logger.info(result.stdout)
-
+      const result = await execAsync(finalCmd)
+      console.log(result.stdout)
       return result
     }
   }
-
-  const $ = exec
-
-  const spawn = shellSpawn
 
   /**
    *
    * Changes current directory using process.chdir.
    */
   const cd = (dir: string) => {
-    logger.debug(`cd ${dir}`)
+    console.log('cd', dir)
     chdir(dir)
   }
 
@@ -113,7 +128,6 @@ export function defineCore({ shell, process, fs }: DefineCoreInput): Core {
         resolve(exitCode)
       })
       childProcess.on('error', (error: Error) => {
-        logger.error(error)
         reject(error)
       })
     })
@@ -133,15 +147,15 @@ export function defineCore({ shell, process, fs }: DefineCoreInput): Core {
    * Lists file and directories from current working directory.
    */
   const ls = async () => {
-    logger.verbose('ls')
     const stdout = await readdir(cwd())
-    logger.info(stdout)
     return stdout
   }
 
   return {
     $,
     exec,
+    execSync,
+    execAsync,
     spawn,
     cd,
     withContext,

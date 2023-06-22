@@ -26,7 +26,7 @@
   "scripts": {
     "test": "vitest --watch=false --coverage",
     "test:watch": "vitest --threads=false",
-    "dev": "tsx --watch ./src/dev.ts --alpha=5 -a=0 --beta=1.0 -b=0.5 --gama=gama -g=gama --delta -d --epsilon=true -e=false",
+    "dev": "tsx --watch ./src/dev.ts --alpha=value",
     "build:dev": "esbuild  --platform=node --format=cjs --outdir=dist --watch ./src/**/*.ts ./src/*.ts",
     "build": "rimraf ./dist && tsc",
     "release": "release-it --ci",
@@ -39,6 +39,6 @@
     "@rondymesquita/args": "^0.9.0",
     "@rondymesquita/tasks": "^0.9.0",
     "chalk": "^4.1.0",
-    "winston": "^3.8.1"
+    "winston": "^3.9.0"
   }
 }

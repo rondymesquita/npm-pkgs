@@ -22,7 +22,6 @@ export const fillMocks = (object: DeepPartial<any>) => {
       if (!target[prop]) {
         target[prop] = vi.fn()
       }
-      // console.log({ target })
 
       return target[prop]
     },

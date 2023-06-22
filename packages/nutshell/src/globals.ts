@@ -14,9 +14,14 @@ Object.assign(global, args)
 
 declare global {
   const $: typeof core.$
-  const withContext: typeof core.withContext
+  const exec: typeof core.exec
+  const execSync: typeof core.execSync
+  const execAsync: typeof core.execAsync
+  const spawn: typeof core.spawn
   const cd: typeof core.cd
+  const withContext: typeof core.withContext
   const setConfig: typeof core.setConfig
   const ls: typeof core.ls
+  const config: typeof core.config
   const chalk: typeof libs.chalk
 }

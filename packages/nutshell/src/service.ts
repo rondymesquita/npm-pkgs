@@ -6,7 +6,7 @@ const defineServiceFactory = () => {
   return defineService({
     fs: FS,
     path: Path,
-    shell: ChildProcess,
+    childProcess: ChildProcess,
   })
 }
 
@@ -17,51 +17,60 @@ export interface ServiceInput {
   cmd: string
   cwdLog?: string
   cwdPid?: string
+  shell?: string
 }
 
-interface DefineServiceInput {
+export interface DefineServiceInput {
   fs: {
     openSync: typeof FS.openSync
     mkdirSync: typeof FS.mkdirSync
     writeFileSync: typeof FS.writeFileSync
     readFileSync: typeof FS.readFileSync
     rmSync: typeof FS.rmSync
+    existsSync: typeof FS.existsSync
   }
   path: {
     resolve: typeof Path.resolve
   }
-  shell: {
+  childProcess: {
     spawn: typeof ChildProcess.spawn
+    execSync: typeof ChildProcess.execSync
   }
 }
 
-export function defineService({ fs, path, shell }: DefineServiceInput) {
+export function defineService({ fs, path, childProcess }: DefineServiceInput) {
   const service = (input: ServiceInput) => {
     const DEFAULT = {
       cwdLog: '/var/log',
       cwdPid: '/var/pid',
     }
-    const { name, cmd, cwdLog, cwdPid } = Object.assign({}, input, DEFAULT)
+
+    const { name, cmd, cwdLog, cwdPid, shell }: ServiceInput = {
+      ...input,
+      ...DEFAULT,
+    }
+
     fs.mkdirSync(cwdPid, { recursive: true })
     const pidPath = path.resolve(cwdPid, `${name}.pid`)
     const out = fs.openSync(path.resolve(cwdLog, `${name}.log`), 'a')
     const err = fs.openSync(path.resolve(cwdLog, `${name}-err.log`), 'a')
+
     const start = () => {
-      const ls = shell.spawn(cmd, {
-        shell: 'bash',
+      const process = childProcess.spawn(cmd, {
+        shell,
         detached: true,
         stdio: ['ignore', out, err],
       })
 
-      console.log(ls.pid)
-      fs.writeFileSync(pidPath, String(ls.pid), { flag: 'w' })
-      process.exit(0)
+      fs.writeFileSync(pidPath, String(process.pid), { flag: 'w' })
     }
 
-    const stop = async () => {
-      const pid = fs.readFileSync(pidPath).toString()
-      await $(`kill -9 ${pid}`)
-      fs.rmSync(pidPath, { force: true })
+    const stop = () => {
+      if (fs.existsSync(pidPath)) {
+        const pid = fs.readFileSync(pidPath).toString()
+        childProcess.execSync(`kill -9 ${pid}`)
+        fs.rmSync(pidPath, { force: true })
+      }
     }
     const restart = () => {
       stop()

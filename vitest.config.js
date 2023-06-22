@@ -8,6 +8,11 @@ export default defineConfig({
     testTimeout: 2000,
     globals: true,
     clearMocks: true,
-    restoreMocks: true
+    restoreMocks: true,
+    browser: {
+      enabled: false
+    },
+    environment: 'node',
+    singleThread: true
   },
 })

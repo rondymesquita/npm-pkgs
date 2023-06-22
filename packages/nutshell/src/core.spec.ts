@@ -19,37 +19,45 @@ const createSut = (input: DeepPartial<DefineCoreInput>) => {
 
 describe('core', () => {
   it('should execute a single line command', async () => {
-    const shell = {
-      exec: vi.fn().mockResolvedValueOnce({
-        stderr: '',
-        stdout: 'Hello\n',
-      }),
+    const mocks = {
+      childProcess: {
+        execAsync: vi.fn().mockResolvedValueOnce({
+          stderr: '',
+          stdout: 'Hello\n',
+        }),
+      },
     }
 
-    const { $ } = createSut({ shell })
+    const { $ } = createSut(mocks)
     await expect($('echo "Hello"')).resolves.toEqual({
       stderr: '',
       stdout: 'Hello\n',
     })
 
-    expect(shell.exec).toHaveBeenNthCalledWith(1, 'echo "Hello"')
+    expect(mocks.childProcess.execAsync).toHaveBeenNthCalledWith(
+      1,
+      'echo "Hello"',
+    )
   })
 
   it('should execute a multiple line command', async () => {
-    const shell = {
-      exec: vi
-        .fn()
-        .mockResolvedValueOnce({
-          stderr: '',
-          stdout: 'Hello\n',
-        })
-        .mockResolvedValueOnce({
-          stderr: '',
-          stdout: 'World\n',
-        }),
+    const mocks = {
+      childProcess: {
+        execAsync: vi
+          .fn()
+          .mockResolvedValueOnce({
+            stderr: '',
+            stdout: 'Hello\n',
+          })
+          .mockResolvedValueOnce({
+            stderr: '',
+            stdout: 'World\n',
+          }),
+      },
+      process,
     }
 
-    const { $ } = createSut({ shell, process })
+    const { $ } = createSut(mocks)
     await expect(
       $`
       echo "Hello"
@@ -60,24 +68,31 @@ describe('core', () => {
       { stderr: '', stdout: 'World\n' },
     ])
 
-    expect(shell.exec).toHaveBeenNthCalledWith(1, 'echo "Hello"')
-    expect(shell.exec).toHaveBeenNthCalledWith(2, 'echo "World"')
+    expect(mocks.childProcess.execAsync).toHaveBeenNthCalledWith(
+      1,
+      'echo "Hello"',
+    )
+    expect(mocks.childProcess.execAsync).toHaveBeenNthCalledWith(
+      2,
+      'echo "World"',
+    )
   })
 
   it('should enters into folder', async () => {
-    const shell = {
-      exec: vi.fn(),
+    const mocks = {
+      childProcess: {
+        exec: vi.fn(),
+      },
+      process: {
+        chdir: vi.fn(),
+      },
     }
 
-    const process = {
-      chdir: vi.fn(),
-    }
+    const { cd } = createSut(mocks)
 
-    const { cd } = createSut({ shell, process })
-
-    expect(process.chdir).not.toHaveBeenCalled()
+    expect(mocks.process.chdir).not.toHaveBeenCalled()
     cd('./src/__fixtures__')
-    expect(process.chdir).toHaveBeenCalledWith('./src/__fixtures__')
+    expect(mocks.process.chdir).toHaveBeenCalledWith('./src/__fixtures__')
   })
 
   it('should have default configuration', () => {
