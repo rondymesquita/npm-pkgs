@@ -14,8 +14,8 @@ export interface Config {
 }
 
 export interface CmdResult {
-  stdout: string
-  stderr: string
+  stdout: string | Buffer
+  stderr: string | Buffer
 }
 
 export type DeepPartial<T> = T extends object

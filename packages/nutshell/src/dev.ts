@@ -1,4 +1,8 @@
 import './globals'
+// import { core } from './core'
 
-const r = execSync('echo hello')
-console.log(r.toString())
+c.$('echo hello').then((r) => {
+  // console.log(r)
+})
+
+c.spawn

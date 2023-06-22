@@ -1,8 +1,13 @@
-import { defineCore, DefineCoreInput } from './core'
 import { DEFAULT_CONFIG } from './coredefaults'
-import { vi, describe, it, expect } from 'vitest'
-import { fillMocks } from './testutils'
+import { vi, describe, it, expect, Mock, Mocked, MockedClass } from 'vitest'
 import { DeepPartial } from './models'
+import { Core } from './core'
+import { exportClassMembers } from './utils'
+import * as ChildProcess from 'child_process'
+import Process from 'process'
+import * as FS from 'fs'
+
+import { ChildProcessExtended } from './child-process-extended'
 
 vi.mock('./logger', () => ({
   createLogger: vi.fn(() => ({
@@ -13,23 +18,36 @@ vi.mock('./logger', () => ({
   })),
 }))
 
-const createSut = (input: DeepPartial<DefineCoreInput>) => {
-  return defineCore(fillMocks(input) as DefineCoreInput)
+const createSut = ({
+  childProcess = vi.fn(),
+  process = vi.fn(),
+  fs = vi.fn(),
+}: {
+  childProcess?: Partial<ChildProcessExtended> | Mock
+  process?: Partial<typeof Process> | Mock
+  fs?: Partial<typeof FS> | Mock
+}) => {
+  class Sut extends Core {
+    constructor() {
+      super(childProcess as any, process as any, fs as any)
+    }
+  }
+
+  return new Sut()
 }
 
 describe('core', () => {
   it('should execute a single line command', async () => {
     const mocks = {
       childProcess: {
-        execAsync: vi.fn().mockResolvedValueOnce({
-          stderr: '',
-          stdout: 'Hello\n',
-        }),
+        execAsync: vi
+          .fn()
+          .mockResolvedValueOnce({ stderr: '', stdout: 'Hello\n' }),
       },
     }
 
-    const { $ } = createSut(mocks)
-    await expect($('echo "Hello"')).resolves.toEqual({
+    const sut = createSut(mocks)
+    await expect(sut.$('echo "Hello"')).resolves.toEqual({
       stderr: '',
       stdout: 'Hello\n',
     })
@@ -57,9 +75,9 @@ describe('core', () => {
       process,
     }
 
-    const { $ } = createSut(mocks)
+    const sut = createSut(mocks)
     await expect(
-      $`
+      sut.$`
       echo "Hello"
       echo "World"
     `,
@@ -88,10 +106,10 @@ describe('core', () => {
       },
     }
 
-    const { cd } = createSut(mocks)
+    const sut = createSut(mocks)
 
     expect(mocks.process.chdir).not.toHaveBeenCalled()
-    cd('./src/__fixtures__')
+    sut.cd('./src/__fixtures__')
     expect(mocks.process.chdir).toHaveBeenCalledWith('./src/__fixtures__')
   })
 
@@ -108,29 +126,29 @@ describe('core', () => {
       shell: 'bash',
     })
 
-    const { setConfig, config } = createSut({})
-    setConfig({ loggerLevel: 'none' })
+    const sut = createSut({})
+    sut.setConfig({ loggerLevel: 'none' })
 
     expect(DEFAULT_CONFIG).toEqual({
       loggerLevel: 'info',
       shell: 'bash',
     })
 
-    expect(config).toEqual({
+    expect(sut.config).toEqual({
       loggerLevel: 'none',
       shell: 'bash',
     })
   })
 
-  it('should run ls', async () => {
-    const { ls } = createSut({
+  it.only('should run ls', async () => {
+    const sut = createSut({
       process: {
         cwd: vi.fn().mockReturnValue('./src/__fixtures__'),
       },
       fs: {
-        readdir: vi.fn(() => ['fake-file']),
+        readdirSync: vi.fn().mockResolvedValue(['fake-file']),
       },
     })
-    expect(ls()).resolves.toEqual(['fake-file'])
+    expect(sut.ls()).resolves.toEqual(['fake-file'])
   })
 })

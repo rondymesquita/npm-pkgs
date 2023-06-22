@@ -14,14 +14,17 @@ export const prepareCommand = (
   return finalCmd
 }
 
-interface ExportedClassMembers {
-  [k: string]: Function
+type ExportedClassMembers<T> = {
+  [k in keyof T]: Function
 }
 
-export const exportClassMembers = (instance: any): ExportedClassMembers => {
+export const exportClassMembers = <T>(
+  instance: any,
+): ExportedClassMembers<T> => {
   const properties = Reflect.ownKeys(Object.getPrototypeOf(instance)).filter(
     (p) => p !== 'constructor',
   )
+  console.log(properties)
 
   const members: any = {}
   properties.forEach((prop) => {
