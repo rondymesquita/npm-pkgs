@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.13.0](https://github.com/rondymesquita/shell/compare/@rondymesquita/json-patch@0.12.0...@rondymesquita/json-patch@0.13.0) (2023-06-23)
+
+**Note:** Version bump only for package @rondymesquita/json-patch
+
 ## [0.12.0](https://github.com/rondymesquita/shell/compare/@rondymesquita/json-patch@0.11.0...@rondymesquita/json-patch@0.12.0) (2023-06-23)
 
 **Note:** Version bump only for package @rondymesquita/json-patch
