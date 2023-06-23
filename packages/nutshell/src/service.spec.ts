@@ -1,8 +1,7 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest'
-import { ServiceAPI } from './service'
+import { ServiceCore } from './service'
 import { Volume } from 'memfs/lib/index'
 import pathActual from 'path'
-import { mock } from 'node:test'
 
 const createSut = ({
   childProcess = vi.fn(),
@@ -10,7 +9,7 @@ const createSut = ({
   fs = vi.fn(),
   process = vi.fn(),
 }: any) => {
-  class Sut extends ServiceAPI {
+  class Sut extends ServiceCore {
     constructor() {
       super(childProcess as any, path as any, fs as any, process as any)
     }
@@ -18,11 +17,12 @@ const createSut = ({
 
   return new Sut()
 }
-
+const unref = vi.fn()
 const mocks: any = {
   childProcess: {
     spawn: vi.fn(() => ({
       pid: 1,
+      unref,
     })),
   },
 
@@ -84,6 +84,7 @@ describe('service', () => {
       '/var/pid': null,
     })
 
+    expect(unref).not.toHaveBeenCalled()
     service.start()
 
     expect(mocks.fs.toJSON()).toEqual({
@@ -91,6 +92,8 @@ describe('service', () => {
       '/var/log/fake.service.log': '',
       '/var/pid/fake.service.pid': '1',
     })
+
+    expect(unref).toHaveBeenCalled()
   })
   it('should start service and delete pid file and keep log files', async () => {
     const service = createSut(mocks)

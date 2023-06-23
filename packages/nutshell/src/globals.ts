@@ -15,8 +15,9 @@ Object.assign(global, args)
 declare global {
   const core: typeof coreLib.core
   const c: typeof coreLib.c
-  const defineService: typeof serviceLib.defineService
-  const ServiceAPI: typeof serviceLib.ServiceAPI
+  const Service: typeof serviceLib.Service
+  const ServiceCore: typeof serviceLib.ServiceCore
+  // const ServiceAPI: typeof serviceLib.ServiceAPI
   // const core: core.
   // const exec: typeof core.exec
   // const execSync: typeof core.execSync

@@ -24,7 +24,7 @@ export interface IService {
   restart(): void
 }
 
-class Service implements IService {
+export class ServiceCore implements IService {
   private options: ServiceOptions
   private settings: ServiceSettings
   private DEFAULT_OPTIONS: Partial<ServiceOptions>
@@ -63,19 +63,20 @@ class Service implements IService {
     return this
   }
   start() {
-    const { name, command, cwdLog, cwdPid, shell } = this.options as Required<
+    const { command, cwdLog, cwdPid, shell } = this.options as Required<
       ServiceOptions
     >
     const { errLog, outLog, pidPath } = this.settings as Required<
       ServiceSettings
     >
-    const p = this.childProcess.spawn(command, {
+    const subprocess = this.childProcess.spawn(command, {
       shell: 'bash',
       detached: true,
       stdio: ['ignore', outLog, errLog],
     })
 
-    this.fs.writeFileSync(pidPath, String(p.pid), { flag: 'w' })
+    this.fs.writeFileSync(pidPath, String(subprocess.pid), { flag: 'w' })
+    subprocess.unref()
   }
 
   stop() {
@@ -91,15 +92,11 @@ class Service implements IService {
   }
 }
 
-export const defineService = (): ServiceAPI => {
-  return new ServiceAPI(ChildProcess, Path, FS, Process)
-}
-
-export class ServiceAPI implements IService {
+export class Service implements IService {
   private service: IService
 
-  constructor(...params: ConstructorParameters<typeof Service>) {
-    this.service = new Service(...params)
+  constructor() {
+    this.service = new ServiceCore(ChildProcess, Path, FS, Process)
   }
   init(options: ServiceOptions): this {
     this.service.init(options)
