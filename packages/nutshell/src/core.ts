@@ -3,7 +3,6 @@ import { DEFAULT_CONFIG } from './coredefaults'
 import { CmdResult, Config } from './models'
 import { prepareCommand } from './utils'
 import Process from 'process'
-import { ChildProcessExtended } from './child-process-extended'
 import * as ChildProcess from 'child_process'
 import { promisify } from 'util'
 export class Core {
@@ -24,17 +23,18 @@ export class Core {
     cmd: string | Array<string> | TemplateStringsArray,
   ): Promise<CmdResult | CmdResult[]> {
     const finalCmd = prepareCommand(cmd)
+    const execAsync = promisify(this.childProcess.exec)
 
     if (Array.isArray(finalCmd)) {
       const results: Array<CmdResult> = []
       for (const cmd of finalCmd) {
-        const result = await this.childProcess.execAsync(cmd)
+        const result = await execAsync(cmd)
         console.log(result.stdout)
         results.push(result)
       }
       return results
     } else {
-      const result = await this.childProcess.execAsync(finalCmd)
+      const result = await execAsync(finalCmd)
       console.log(result.stdout)
       return result
     }
@@ -106,6 +106,5 @@ export class Core {
   }
 }
 
-// const childProcessExtended = new ChildProcessExtended(ChildProcess)
 export const core = new Core(ChildProcess, Process, FS)
 export const c = core

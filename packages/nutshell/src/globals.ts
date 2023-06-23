@@ -1,20 +1,22 @@
 import * as models from './models'
 import * as libs from './libs'
 import * as coreLib from './core'
-import * as service from './service'
+import * as serviceLib from './service'
 import * as tasks from '@rondymesquita/tasks'
 import * as args from '@rondymesquita/args'
 
 Object.assign(global, models)
 Object.assign(global, libs)
 Object.assign(global, coreLib)
-Object.assign(global, service)
+Object.assign(global, serviceLib)
 Object.assign(global, tasks)
 Object.assign(global, args)
 
 declare global {
   const core: typeof coreLib.core
-  const c: typeof coreLib.core
+  const c: typeof coreLib.c
+  const defineService: typeof serviceLib.defineService
+  const ServiceAPI: typeof serviceLib.ServiceAPI
   // const core: core.
   // const exec: typeof core.exec
   // const execSync: typeof core.execSync

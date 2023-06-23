@@ -1,13 +1,9 @@
 import { DEFAULT_CONFIG } from './coredefaults'
-import { vi, describe, it, expect, Mock, Mocked, MockedClass } from 'vitest'
-import { DeepPartial } from './models'
+import { vi, describe, it, expect, Mock } from 'vitest'
 import { Core } from './core'
-import { exportClassMembers } from './utils'
-import * as ChildProcess from 'child_process'
 import Process from 'process'
 import * as FS from 'fs'
-
-import { ChildProcessExtended } from './child-process-extended'
+import * as ChildProcess from 'child_process'
 
 vi.mock('./logger', () => ({
   createLogger: vi.fn(() => ({
@@ -23,7 +19,7 @@ const createSut = ({
   process = vi.fn(),
   fs = vi.fn(),
 }: {
-  childProcess?: Partial<ChildProcessExtended> | Mock
+  childProcess?: Partial<typeof ChildProcess> | Mock
   process?: Partial<typeof Process> | Mock
   fs?: Partial<typeof FS> | Mock
 }) => {
