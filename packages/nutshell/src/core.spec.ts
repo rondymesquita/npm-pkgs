@@ -18,11 +18,7 @@ const createSut = ({
   childProcess = vi.fn(),
   process = vi.fn(),
   fs = vi.fn(),
-}: {
-  childProcess?: Partial<typeof ChildProcess> | Mock
-  process?: Partial<typeof Process> | Mock
-  fs?: Partial<typeof FS> | Mock
-}) => {
+}: any) => {
   class Sut extends Core {
     constructor() {
       super(childProcess as any, process as any, fs as any)
@@ -36,9 +32,11 @@ describe('core', () => {
   it('should execute a single line command', async () => {
     const mocks = {
       childProcess: {
-        execAsync: vi
+        exec: vi
           .fn()
-          .mockResolvedValueOnce({ stderr: '', stdout: 'Hello\n' }),
+          .mockImplementationOnce((a, callback) =>
+            callback(null, { stderr: '', stdout: 'Hello\n' }),
+          ),
       },
     }
 
@@ -48,25 +46,24 @@ describe('core', () => {
       stdout: 'Hello\n',
     })
 
-    expect(mocks.childProcess.execAsync).toHaveBeenNthCalledWith(
+    expect(mocks.childProcess.exec).toHaveBeenNthCalledWith(
       1,
       'echo "Hello"',
+      expect.any(Function),
     )
   })
 
   it('should execute a multiple line command', async () => {
     const mocks = {
       childProcess: {
-        execAsync: vi
+        exec: vi
           .fn()
-          .mockResolvedValueOnce({
-            stderr: '',
-            stdout: 'Hello\n',
-          })
-          .mockResolvedValueOnce({
-            stderr: '',
-            stdout: 'World\n',
-          }),
+          .mockImplementationOnce((a, callback) =>
+            callback(null, { stderr: '', stdout: 'Hello\n' }),
+          )
+          .mockImplementationOnce((a, callback) =>
+            callback(null, { stderr: '', stdout: 'World\n' }),
+          ),
       },
       process,
     }
@@ -82,13 +79,15 @@ describe('core', () => {
       { stderr: '', stdout: 'World\n' },
     ])
 
-    expect(mocks.childProcess.execAsync).toHaveBeenNthCalledWith(
+    expect(mocks.childProcess.exec).toHaveBeenNthCalledWith(
       1,
       'echo "Hello"',
+      expect.any(Function),
     )
-    expect(mocks.childProcess.execAsync).toHaveBeenNthCalledWith(
+    expect(mocks.childProcess.exec).toHaveBeenNthCalledWith(
       2,
       'echo "World"',
+      expect.any(Function),
     )
   })
 
@@ -136,7 +135,7 @@ describe('core', () => {
     })
   })
 
-  it.only('should run ls', async () => {
+  it('should run ls', async () => {
     const sut = createSut({
       process: {
         cwd: vi.fn().mockReturnValue('./src/__fixtures__'),

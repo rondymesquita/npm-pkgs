@@ -23,18 +23,17 @@ export class Core {
     cmd: string | Array<string> | TemplateStringsArray,
   ): Promise<CmdResult | CmdResult[]> {
     const finalCmd = prepareCommand(cmd)
-    const execAsync = promisify(this.childProcess.exec)
 
     if (Array.isArray(finalCmd)) {
       const results: Array<CmdResult> = []
       for (const cmd of finalCmd) {
-        const result = await execAsync(cmd)
+        const result = await this.execAsync(cmd)
         console.log(result.stdout)
         results.push(result)
       }
       return results
     } else {
-      const result = await execAsync(finalCmd)
+      const result = await this.execAsync(finalCmd)
       console.log(result.stdout)
       return result
     }
