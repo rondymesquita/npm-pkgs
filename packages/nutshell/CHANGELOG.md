@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.15.0](https://github.com/rondymesquita/nutshell/compare/@rondymesquita/nutshell@0.14.0...@rondymesquita/nutshell@0.15.0) (2023-06-23)
+
+### Features
+
+- add new functions ([9207b10](https://github.com/rondymesquita/nutshell/commit/9207b1098973e2eb28b4130a80db3f3c4e61afc8))
+
 ## [0.14.0](https://github.com/rondymesquita/nutshell/compare/@rondymesquita/nutshell@0.13.0...@rondymesquita/nutshell@0.14.0) (2023-06-22)
 
 **Note:** Version bump only for package @rondymesquita/nutshell

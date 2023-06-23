@@ -1,6 +1,6 @@
 {
   "name": "example",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "description": "",
   "main": "example.js",
   "types": "example.ts",
@@ -16,6 +16,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@rondymesquita/nutshell": "^0.14.0"
+    "@rondymesquita/nutshell": "^0.15.0"
   }
 }
