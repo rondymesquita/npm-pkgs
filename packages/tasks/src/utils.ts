@@ -1,5 +1,5 @@
 import { defaultValue, help, type } from '@rondymesquita/args'
-import { Definition, PlainDefinition, Task, TasksDefinition } from '.'
+import { Tasks, PlainTasksObject, Task, TasksDefinition } from '.'
 
 export const buildTaskName = (namespace: string, fnName: string) => {
   let name: string = namespace ? `${namespace}:${fnName}` : fnName
@@ -27,15 +27,13 @@ export function deepFlattenTask(obj: any, namespace = '', result: any = {}) {
 export function defineTasksFunction(namespace: string = '') {
   const name = namespace
 
-  const createTasks = (
-    taskDef: Definition | Task | Task[],
-  ): PlainDefinition => {
+  const createTasks = (taskDef: Tasks | Task | Task[]): PlainTasksObject => {
     return deepFlattenTask(taskDef, name)
   }
   return createTasks
 }
 
-export const generateBasicDefinition = (tasks: PlainDefinition) => {
+export const generateBasicDefinition = (tasks: PlainTasksObject) => {
   let definition: TasksDefinition = {}
 
   for (const name in tasks) {

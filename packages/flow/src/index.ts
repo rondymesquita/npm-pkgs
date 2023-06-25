@@ -4,7 +4,7 @@ import {
   Option,
   ProvideArgsFn,
   Result,
-  Stage,
+  Task,
   StageMap,
   StageObject,
   Stages,
@@ -53,7 +53,7 @@ export const flow = (stages: Stages = []): Flow => {
     provideArgsFn: null,
   }
 
-  const runStage = (name: string, stage: Stage): Result | Promise<Result> => {
+  const runStage = (name: string, stage: Task): Result | Promise<Result> => {
     try {
       const args = state.provideArgsFn
         ? state.provideArgsFn!(state.context)

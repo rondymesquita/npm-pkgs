@@ -1,8 +1,14 @@
-import './globals'
-// import { core } from './core'
+import { tasks } from '.'
+// import './globals'
+// import { defineService } from './service'
 
-c.$('echo hello').then((r) => {
-  // console.log(r)
+// c.$('echo hello').then((r) => {
+//   // console.log(r)
+// })
+
+// c.spawn
+const service = new Service({
+  name: 'fulano',
+  command: 'echo 1',
 })
-
-c.spawn
+tasks(service.toTasks())

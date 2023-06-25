@@ -19,11 +19,11 @@ export * from '@rondymesquita/flow'
 
 export type Task = Stage
 
-export interface Definition {
-  [key: string]: Task | Definition | Task[]
+export interface TasksObject {
+  [key: string]: Task | TasksObject | Task[]
 }
 
-export interface PlainDefinition {
+export interface PlainTasksObject {
   [key: string]: Task
 }
 
@@ -42,13 +42,13 @@ export type TasksDefinition = Record<
 
 export interface DefineTasks {
   getDefinition: () => TasksDefinition
-  tasks: (taskDef: Definition) => Promise<void>
+  tasks: (taskDef: TasksObject) => Promise<void>
 }
 
 export const defineTasks = (defineArgs: typeof ArgsDefineArgs): DefineTasks => {
   let definition: TasksDefinition = {}
 
-  const tasks = async (taskDef: Definition) => {
+  const tasks = async (taskDef: TasksObject) => {
     const { parseArgs, showHelp, showErrors } = defineArgs({
       name: 'tasks',
       usage: 'tasks [task name] [task options]\nUsage: tasks [options]',
@@ -66,7 +66,7 @@ export const defineTasks = (defineArgs: typeof ArgsDefineArgs): DefineTasks => {
     const name = argv.params[0]
 
     const createTasks = defineTasksFunction()
-    const tasks: PlainDefinition = createTasks(taskDef)
+    const tasks: PlainTasksObject = createTasks(taskDef)
     const task: Task = name ? tasks[name] : tasks.default
 
     definition = generateBasicDefinition(tasks)

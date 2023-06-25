@@ -26,7 +26,7 @@
   "scripts": {
     "test": "vitest --watch=false --coverage",
     "test:watch": "vitest --threads=false",
-    "dev": "tsx --watch ./src/dev.ts --alpha=value",
+    "dev": "tsx --watch ./src/dev.ts start",
     "build:dev": "esbuild  --platform=node --format=cjs --outdir=dist --watch ./src/**/*.ts ./src/*.ts",
     "build": "rimraf ./dist && tsc",
     "release": "release-it --ci",

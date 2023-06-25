@@ -14,14 +14,14 @@ export const prepareCommand = (
   return finalCmd
 }
 
-type ExportedClassMembers<T> = {
-  [k in keyof T]: Function
+export type ExportedClassMembers<T, C> = {
+  [k in keyof T]: C
 }
 
-export const exportClassMembers = <T>(
+export const exportClassMembers = <T, C>(
   instance: any,
   filteredPropeties: string[] = [],
-): ExportedClassMembers<T> => {
+): ExportedClassMembers<T, C> => {
   const properties = Reflect.ownKeys(Object.getPrototypeOf(instance)).filter(
     (p) => {
       const prop = p as string
@@ -31,7 +31,7 @@ export const exportClassMembers = <T>(
 
   const members: any = {}
   properties.forEach((prop) => {
-    members[prop] = instance[prop].bind(instance)
+    members[prop] = instance[prop].bind(instance) as C
   })
   return members
 }
