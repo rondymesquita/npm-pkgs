@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.17.0](https://github.com/rondymesquita/nutshell/compare/@rondymesquita/nutshell@0.16.0...@rondymesquita/nutshell@0.17.0) (2023-06-25)
+
+### Features
+
+- rename props ([41e9b9d](https://github.com/rondymesquita/nutshell/commit/41e9b9d604aef4b1e292a213b7e2868da8c03b96))
+
 ## [0.16.0](https://github.com/rondymesquita/nutshell/compare/@rondymesquita/nutshell@0.15.0...@rondymesquita/nutshell@0.16.0) (2023-06-23)
 
 **Note:** Version bump only for package @rondymesquita/nutshell

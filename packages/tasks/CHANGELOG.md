@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.14.0](https://github.com/rondymesquita/shell/compare/@rondymesquita/tasks@0.13.0...@rondymesquita/tasks@0.14.0) (2023-06-25)
+
+### Features
+
+- rename props ([41e9b9d](https://github.com/rondymesquita/shell/commit/41e9b9d604aef4b1e292a213b7e2868da8c03b96))
+
+### Bug Fixes
+
+- fix exported types ([aa1ebb6](https://github.com/rondymesquita/shell/commit/aa1ebb616f5dc38eff7f7eb5757c60595cc00f9f))
+
 ## [0.13.0](https://github.com/rondymesquita/shell/compare/@rondymesquita/tasks@0.12.0...@rondymesquita/tasks@0.13.0) (2023-06-23)
 
 **Note:** Version bump only for package @rondymesquita/tasks

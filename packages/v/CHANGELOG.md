@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.0](https://github.com/rondymesquita/shell/compare/@rondymesquita/v@0.7.0...@rondymesquita/v@0.8.0) (2023-06-25)
+
+**Note:** Version bump only for package @rondymesquita/v
+
 ## [0.7.0](https://github.com/rondymesquita/shell/compare/@rondymesquita/v@0.6.0...@rondymesquita/v@0.7.0) (2023-06-23)
 
 **Note:** Version bump only for package @rondymesquita/v
