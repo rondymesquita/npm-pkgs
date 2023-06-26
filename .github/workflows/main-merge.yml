@@ -18,6 +18,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+      # - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
@@ -34,4 +35,4 @@ jobs:
       - run: |
           echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
           VERSION_BUMP=$(node scripts/conventional-recommended-bump.js)
-          npx lerna publish $VERSION_BUMP --no-verify-access --conventional-commits --changelog-preset conventionalcommits --create-release=github --yes
+          npx lerna publish $VERSION_BUMP --include-merged-tags --no-verify-access --conventional-commits --changelog-preset conventionalcommits --create-release=github --yes
