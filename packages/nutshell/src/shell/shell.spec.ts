@@ -1,9 +1,5 @@
-import { DEFAULT_CONFIG } from './coredefaults'
 import { vi, describe, it, expect, Mock } from 'vitest'
-import { Core } from './core'
-import Process from 'process'
-import * as FS from 'fs'
-import * as ChildProcess from 'child_process'
+import { Shell, DEFAULT_OPTIONS } from './shell'
 
 vi.mock('./logger', () => ({
   createLogger: vi.fn(() => ({
@@ -19,7 +15,7 @@ const createSut = ({
   process = vi.fn(),
   fs = vi.fn(),
 }: any) => {
-  class Sut extends Core {
+  class Sut extends Shell {
     constructor() {
       super(childProcess as any, process as any, fs as any)
     }
@@ -109,27 +105,27 @@ describe('core', () => {
   })
 
   it('should have default configuration', () => {
-    expect(DEFAULT_CONFIG).toEqual({
+    expect(DEFAULT_OPTIONS).toEqual({
       loggerLevel: 'info',
       shell: 'bash',
     })
   })
 
   it('should set configuration', () => {
-    expect(DEFAULT_CONFIG).toEqual({
+    expect(DEFAULT_OPTIONS).toEqual({
       loggerLevel: 'info',
       shell: 'bash',
     })
 
     const sut = createSut({})
-    sut.setConfig({ loggerLevel: 'none' })
+    sut.setOptions({ loggerLevel: 'none' })
 
-    expect(DEFAULT_CONFIG).toEqual({
+    expect(DEFAULT_OPTIONS).toEqual({
       loggerLevel: 'info',
       shell: 'bash',
     })
 
-    expect(sut.config).toEqual({
+    expect(sut.options).toEqual({
       loggerLevel: 'none',
       shell: 'bash',
     })

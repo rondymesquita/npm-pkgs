@@ -1,18 +1,19 @@
-export interface ShellOptions {
-  shell: 'bash' | 'powershell' | 'cmd' | 'sh' | string
+import { exportClassMembers } from '../utils'
+import { Shell } from './shell'
 
-  /**
-   * Sets log level.
-   *
-   * - none: Disable logs.
-   * - error: Logs only when errors occur.
-   * - info: Logs only the outputs of the commands.
-   * - verbose: Logs the commands being executed.
-   * - debug: Logs extra information for helping with debugs.
-   */
-  loggerLevel: 'none' | 'error' | 'info' | 'verbose' | 'debug'
-}
+import * as FS from 'fs'
+import Process from 'process'
+import * as ChildProcess from 'child_process'
 
-export interface IShell {}
-
-export * from './shell.api'
+const shell = new Shell(ChildProcess, Process, FS)
+export const {
+  $,
+  cd,
+  exec,
+  execAsync,
+  fork,
+  ls,
+  setOptions,
+  spawn,
+  withContext,
+} = exportClassMembers<Shell>(shell)

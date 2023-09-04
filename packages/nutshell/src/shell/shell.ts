@@ -1,18 +1,44 @@
 import * as FS from 'fs'
-import { DEFAULT_CONFIG } from './coredefaults'
-import { CmdResult, Config } from './models'
-import { prepareCommand } from './utils'
 import Process from 'process'
 import * as ChildProcess from 'child_process'
+import { CmdResult } from '../models'
+import { merge, prepareCommand } from '../utils'
+
 import { promisify } from 'util'
-export class Core {
-  public config: Config
+import path from 'path'
+
+export interface ShellOptions {
+  shell: 'bash' | 'powershell' | 'cmd' | 'sh' | string
+
+  /**
+   * Sets log level.
+   *
+   * - none: Disable logs.
+   * - error: Logs when errors occur.
+   * - info: Logs the outputs of the commands.
+   * - verbose: Logs the commands being executed.
+   * - debug: Logs extra information for helping with debugs.
+   */
+  loggerLevel: 'none' | 'error' | 'info' | 'verbose' | 'debug'
+}
+
+export const DEFAULT_OPTIONS: ShellOptions = {
+  shell: 'bash',
+  loggerLevel: 'info',
+}
+
+export class Shell {
+  public options: ShellOptions
   constructor(
     private childProcess: typeof ChildProcess,
     private process: typeof Process,
     private fs: typeof FS,
   ) {
-    this.config = { ...DEFAULT_CONFIG }
+    this.options = merge({}, DEFAULT_OPTIONS)
+  }
+
+  setOptions(options: Partial<ShellOptions>) {
+    this.options = merge(options, DEFAULT_OPTIONS)
   }
 
   /**
@@ -53,7 +79,7 @@ export class Core {
    * Run a command in a separated process using child_process.fork.
    */
   async withContext(fn: Function): Promise<number | null> {
-    const childProcess = this.childProcess.fork(`${__dirname}/subprocess`, [
+    const childProcess = this.childProcess.fork(path.join(__dirname, '..', 'subprocess'), [
       'subprocess',
     ])
     childProcess.send({ fn: fn.toString() })
@@ -66,15 +92,6 @@ export class Core {
         reject(error)
       })
     })
-  }
-
-  /**
-   *
-   * Update new configuration.
-   */
-  setConfig(userConfig: Partial<Config>) {
-    Object.assign(this.config, userConfig)
-    // logger = createLogger(config)
   }
 
   /**
@@ -104,6 +121,3 @@ export class Core {
     return this.childProcess.fork(...params)
   }
 }
-
-export const core = new Core(ChildProcess, Process, FS)
-export const c = core

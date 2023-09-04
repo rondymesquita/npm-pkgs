@@ -1,3 +1,5 @@
+import { log } from "console"
+
 export const prepareCommand = (
   cmd: string | Array<string> | TemplateStringsArray,
 ): string | string[] => {
@@ -14,14 +16,14 @@ export const prepareCommand = (
   return finalCmd
 }
 
-export type ExportedClassMembers<T, C> = {
+export type ExportedClassMembers<T, C = any> = {
   [k in keyof T]: C
 }
 
-export const exportClassMembers = <T, C>(
+export const exportClassMembers = <T>(
   instance: any,
   filteredPropeties: string[] = [],
-): ExportedClassMembers<T, C> => {
+): T => {
   const properties = Reflect.ownKeys(Object.getPrototypeOf(instance)).filter(
     (p) => {
       const prop = p as string
@@ -31,27 +33,26 @@ export const exportClassMembers = <T, C>(
 
   const members: any = {}
   properties.forEach((prop) => {
-    members[prop] = instance[prop].bind(instance) as C
+    members[prop] = instance[prop].bind(instance)
   })
   return members
 }
-export function exportClassMembersDeep(
+export function exportClassMembersDeep<T>(
   obj: any,
   depth: number = Infinity,
   filter: string[] = [],
-) {
+): any {
   // const methods = new Set()
   const members: any = {}
-  while (depth-- && obj) {
-    for (const key of Reflect.ownKeys(Object.getPrototypeOf(obj))) {
-      if (!filter.includes(String(key))) {
-        // methods.add(key)
-        members[String(key)] = obj[key].bind(obj)
-      }
+
+    const methods = new Set()
+    while (depth-- && obj) {
+        for (const key of Object.getOwnPropertyNames(obj)) {
+            methods.add(key)
+        }
+        obj = Object.getOwnPropertyNames(obj)
     }
-    obj = Reflect.getPrototypeOf(obj)
-  }
-  return { ...members }
+  return {...methods}
 }
 
 export const copy = (object: any) => {

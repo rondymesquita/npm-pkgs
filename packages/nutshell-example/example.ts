@@ -1,8 +1,13 @@
-import { $, ls, setConfig, tasks, withContext } from '@rondymesquita/nutshell'
+import { $, withContext,ls, tasks } from '@rondymesquita/nutshell'
+import { log } from 'console'
 
-setConfig({
-  loggerLevel: 'debug',
-})
+// const s = new Shell({ loggerLevel: 'debug', shell: 'bash' })
+
+// setConfig({
+//   loggerLevel: 'debug',
+// })
+
+log($)
 
 const unit = async () => {
   await $`echo "Hello"`

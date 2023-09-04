@@ -3,9 +3,10 @@ if (process.argv[2] !== 'subprocess') {
   process.exit(0)
 }
 
-import * as import_nutshell from './'
-import_nutshell
+import  * as import__ from './shell'
+// shell
 import './globals'
+// shell
 
 process.on('message', async (message: any) => {
   const fn = eval(message.fn)
