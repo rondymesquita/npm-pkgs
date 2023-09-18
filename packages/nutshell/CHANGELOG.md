@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.18.0](https://github.com/rondymesquita/nutshell/compare/@rondymesquita/nutshell@0.17.0...@rondymesquita/nutshell@0.18.0) (2023-09-18)
+
+
+### Features
+
+* add run and runAsync methods ([4005536](https://github.com/rondymesquita/nutshell/commit/4005536ad43dd351fda46c6faaa9911ceb1aa88c))
+
+
+
 ## [0.17.0](https://github.com/rondymesquita/nutshell/compare/@rondymesquita/nutshell@0.16.0...@rondymesquita/nutshell@0.17.0) (2023-06-25)
 
 ### Features
