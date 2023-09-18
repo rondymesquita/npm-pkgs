@@ -1,8 +1,5 @@
-import { log } from "console"
 
-export const prepareCommand = (
-  cmd: string | Array<string> | TemplateStringsArray,
-): string | string[] => {
+export const prepareCommand = (cmd: string | Array<string> | TemplateStringsArray,): string | string[] => {
   let finalCmd: string | Array<string>
   if (typeof cmd === 'object') {
     finalCmd = cmd[0]
@@ -24,12 +21,10 @@ export const exportClassMembers = <T>(
   instance: any,
   filteredPropeties: string[] = [],
 ): T => {
-  const properties = Reflect.ownKeys(Object.getPrototypeOf(instance)).filter(
-    (p) => {
-      const prop = p as string
-      return prop !== 'constructor' && !filteredPropeties.includes(prop)
-    },
-  )
+  const properties = Reflect.ownKeys(Object.getPrototypeOf(instance)).filter((p) => {
+    const prop = p as string
+    return prop !== 'constructor' && !filteredPropeties.includes(prop)
+  },)
 
   const members: any = {}
   properties.forEach((prop) => {
@@ -37,22 +32,20 @@ export const exportClassMembers = <T>(
   })
   return members
 }
-export function exportClassMembersDeep<T>(
-  obj: any,
+export function exportClassMembersDeep<T>(obj: any,
   depth: number = Infinity,
-  filter: string[] = [],
-): any {
+  filter: string[] = [],): any {
   // const methods = new Set()
   const members: any = {}
 
-    const methods = new Set()
-    while (depth-- && obj) {
-        for (const key of Object.getOwnPropertyNames(obj)) {
-            methods.add(key)
-        }
-        obj = Object.getOwnPropertyNames(obj)
+  const methods = new Set()
+  while (depth-- && obj) {
+    for (const key of Object.getOwnPropertyNames(obj)) {
+      methods.add(key)
     }
-  return {...methods}
+    obj = Object.getOwnPropertyNames(obj)
+  }
+  return { ...methods }
 }
 
 export const copy = (object: any) => {
@@ -82,7 +75,7 @@ export const copy = (object: any) => {
   return copied
 }
 
-export const merge = (left: any, right: any) => {
+export const merge = <T = any>(left: any, right: any): T => {
   const merged: any = copy(left)
   for (const key in right) {
     if (Object.prototype.hasOwnProperty.call(right, key)) {

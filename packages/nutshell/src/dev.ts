@@ -1,41 +1,11 @@
-import { $, withContext, cd, ls, tasks } from '.'
-// import './globals'
-// import { defineService } from './service'
+// import { service,
+//   tasks } from '.'
 
-// c.$('echo hello').then((r) => {
-//   // console.log(r)
-// })
-
-// c.spawn
-// const service = new Service({
-//   name: 'fulano',
-//   command: 'echo 1',
-// })
-
-// const shell = new Shell()
-// cd()
-// cd()
-// tasks(service.toTasks())
+import { run } from './shell';
 
 
-const unit = async () => {
-  await $`echo "Hello"`
+// const xvfb = service({ name: '123', command: 'serve -l 1234 .', })
 
-  await $`
-    echo "Multiline commands"
-    echo "using template literals"
-  `
-  await withContext(async () => {
-    await $`
-      echo "I am running"
-      echo "in a separated process"
-    `
-  })
+// tasks(xvfb)
 
-  ls()
-}
-
-tasks({
-  default: unit,
-  start: unit
-})
+run('echo hello')

@@ -1,4 +1,4 @@
-import { $, withContext,ls, tasks } from '@rondymesquita/nutshell'
+import { $, ls, tasks, withContext } from '@rondymesquita/nutshell'
 import { log } from 'console'
 
 // const s = new Shell({ loggerLevel: 'debug', shell: 'bash' })
@@ -26,6 +26,4 @@ const unit = async () => {
   ls()
 }
 
-tasks({
-  default: unit,
-})
+tasks({ default: unit, })

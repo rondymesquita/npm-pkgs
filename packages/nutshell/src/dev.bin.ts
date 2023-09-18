@@ -1,3 +1,6 @@
-#!/usr/bin/env -S tsx -r @rondymesquita/nutshell/dist/globals.js
+#!/usr/bin/env -S tsx watch -r @rondymesquita/nutshell/bin-dev
 
-console.log(global)
+// run('echo hello')
+withContext(async () => {
+  // await ls()
+})

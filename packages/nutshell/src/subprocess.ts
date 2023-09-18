@@ -3,10 +3,14 @@ if (process.argv[2] !== 'subprocess') {
   process.exit(0)
 }
 
-import  * as import__ from './shell'
+// eslint-disable-next-line
+import * as import__ from './shell'
 // shell
 import './globals'
-// shell
+// console.log(global)
+
+// import__.ls()
+
 
 process.on('message', async (message: any) => {
   const fn = eval(message.fn)

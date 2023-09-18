@@ -1,5 +1,6 @@
-import { vi, describe, it, expect, Mock } from 'vitest'
-import { Shell, DEFAULT_OPTIONS } from './shell'
+import { describe, expect, it, vi } from 'vitest'
+
+import { DEFAULT_OPTIONS, shell } from './shell'
 
 vi.mock('./logger', () => ({
   createLogger: vi.fn(() => ({
@@ -15,13 +16,7 @@ const createSut = ({
   process = vi.fn(),
   fs = vi.fn(),
 }: any) => {
-  class Sut extends Shell {
-    constructor() {
-      super(childProcess as any, process as any, fs as any)
-    }
-  }
-
-  return new Sut()
+  return shell(childProcess, process, fs)
 }
 
 describe('core', () => {
@@ -31,8 +26,7 @@ describe('core', () => {
         exec: vi
           .fn()
           .mockImplementationOnce((a, callback) =>
-            callback(null, { stderr: '', stdout: 'Hello\n' }),
-          ),
+            callback(null, { stderr: '', stdout: 'Hello\n', })),
       },
     }
 
@@ -42,11 +36,9 @@ describe('core', () => {
       stdout: 'Hello\n',
     })
 
-    expect(mocks.childProcess.exec).toHaveBeenNthCalledWith(
-      1,
+    expect(mocks.childProcess.exec).toHaveBeenNthCalledWith(1,
       'echo "Hello"',
-      expect.any(Function),
-    )
+      expect.any(Function))
   })
 
   it('should execute a multiple line command', async () => {
@@ -55,46 +47,34 @@ describe('core', () => {
         exec: vi
           .fn()
           .mockImplementationOnce((a, callback) =>
-            callback(null, { stderr: '', stdout: 'Hello\n' }),
-          )
+            callback(null, { stderr: '', stdout: 'Hello\n', }))
           .mockImplementationOnce((a, callback) =>
-            callback(null, { stderr: '', stdout: 'World\n' }),
-          ),
+            callback(null, { stderr: '', stdout: 'World\n', })),
       },
       process,
     }
 
     const sut = createSut(mocks)
-    await expect(
-      sut.$`
+    await expect(sut.$`
       echo "Hello"
       echo "World"
-    `,
-    ).resolves.toEqual([
-      { stderr: '', stdout: 'Hello\n' },
-      { stderr: '', stdout: 'World\n' },
+    `).resolves.toEqual([
+      { stderr: '', stdout: 'Hello\n', },
+      { stderr: '', stdout: 'World\n', },
     ])
 
-    expect(mocks.childProcess.exec).toHaveBeenNthCalledWith(
-      1,
+    expect(mocks.childProcess.exec).toHaveBeenNthCalledWith(1,
       'echo "Hello"',
-      expect.any(Function),
-    )
-    expect(mocks.childProcess.exec).toHaveBeenNthCalledWith(
-      2,
+      expect.any(Function))
+    expect(mocks.childProcess.exec).toHaveBeenNthCalledWith(2,
       'echo "World"',
-      expect.any(Function),
-    )
+      expect.any(Function))
   })
 
   it('should enters into folder', async () => {
     const mocks = {
-      childProcess: {
-        exec: vi.fn(),
-      },
-      process: {
-        chdir: vi.fn(),
-      },
+      childProcess: { exec: vi.fn(), },
+      process: { chdir: vi.fn(), },
     }
 
     const sut = createSut(mocks)
@@ -118,7 +98,7 @@ describe('core', () => {
     })
 
     const sut = createSut({})
-    sut.setOptions({ loggerLevel: 'none' })
+    sut.setOptions({ loggerLevel: 'none', })
 
     expect(DEFAULT_OPTIONS).toEqual({
       loggerLevel: 'info',
@@ -133,13 +113,9 @@ describe('core', () => {
 
   it('should run ls', async () => {
     const sut = createSut({
-      process: {
-        cwd: vi.fn().mockReturnValue('./src/__fixtures__'),
-      },
-      fs: {
-        readdirSync: vi.fn().mockResolvedValue(['fake-file']),
-      },
+      process: { cwd: vi.fn().mockReturnValue('./src/__fixtures__'), },
+      fs: { readdirSync: vi.fn().mockReturnValue(['fake-file',]), },
     })
-    expect(sut.ls()).resolves.toEqual(['fake-file'])
+    expect(sut.ls()).toEqual(['fake-file',])
   })
 })

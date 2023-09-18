@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "configure": "npx lerna exec npm install",
+    "build": "npx lerna exec npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -28,12 +29,16 @@
     "@release-it/conventional-changelog": "^5.1.1",
     "@types/conventional-recommended-bump": "^6.1.0",
     "@types/node": "^18.11.18",
+    "@typescript-eslint/eslint-plugin": "^6.7.0",
+    "@typescript-eslint/parser": "^6.7.0",
     "@vitest/coverage-c8": "^0.30.1",
     "beachball": "^2.31.6",
     "conventional-recommended-bump": "^6.1.0",
     "copyfiles": "^2.4.1",
+    "eslint": "^8.49.0",
+    "eslint-plugin-simple-import-sort": "^10.0.0",
+    "eslint-plugin-unused-imports": "^3.0.0",
     "memfs": "^3.5.3",
-    "prettier": "^2.8.2",
     "release-it": "^15.6.0",
     "rimraf": "^3.0.2",
     "tsx": "^3.12.7",

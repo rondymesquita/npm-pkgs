@@ -11,10 +11,4 @@ export interface ServiceSettings {
   outLog: number
   errLog: number
 }
-export interface IService {
-  start(): void
-  stop(): void
-  restart(): void
-}
-
-export * from './service.api'
+export * from './service'
