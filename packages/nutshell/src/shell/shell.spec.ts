@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import { DEFAULT_OPTIONS, shell } from './shell'
+import { DEFAULT_OPTIONS, defineShell } from '.'
+import { useGlobalOptions } from './shared'
 
 vi.mock('./logger', () => ({
   createLogger: vi.fn(() => ({
@@ -16,8 +17,10 @@ const createSut = ({
   process = vi.fn(),
   fs = vi.fn(),
 }: any) => {
-  return shell(childProcess, process, fs)
+  return defineShell(childProcess, process, fs)
 }
+
+const { options, setOptions, } = useGlobalOptions()
 
 describe('core', () => {
   it('should execute a single line command', async () => {
@@ -26,7 +29,10 @@ describe('core', () => {
         exec: vi
           .fn()
           .mockImplementationOnce((a, callback) =>
-            callback(null, { stderr: '', stdout: 'Hello\n', })),
+            callback(null, {
+              stderr: '',
+              stdout: 'Hello\n',
+            })),
       },
     }
 
@@ -47,9 +53,15 @@ describe('core', () => {
         exec: vi
           .fn()
           .mockImplementationOnce((a, callback) =>
-            callback(null, { stderr: '', stdout: 'Hello\n', }))
+            callback(null, {
+              stderr: '',
+              stdout: 'Hello\n',
+            }))
           .mockImplementationOnce((a, callback) =>
-            callback(null, { stderr: '', stdout: 'World\n', })),
+            callback(null, {
+              stderr: '',
+              stdout: 'World\n',
+            })),
       },
       process,
     }
@@ -59,8 +71,14 @@ describe('core', () => {
       echo "Hello"
       echo "World"
     `).resolves.toEqual([
-      { stderr: '', stdout: 'Hello\n', },
-      { stderr: '', stdout: 'World\n', },
+      {
+        stderr: '',
+        stdout: 'Hello\n',
+      },
+      {
+        stderr: '',
+        stdout: 'World\n',
+      },
     ])
 
     expect(mocks.childProcess.exec).toHaveBeenNthCalledWith(1,
@@ -97,15 +115,15 @@ describe('core', () => {
       shell: 'bash',
     })
 
-    const sut = createSut({})
-    sut.setOptions({ loggerLevel: 'none', })
+    // const sut = createSut({})
+    setOptions({ loggerLevel: 'none', })
 
     expect(DEFAULT_OPTIONS).toEqual({
       loggerLevel: 'info',
       shell: 'bash',
     })
 
-    expect(sut.options).toEqual({
+    expect(options).toEqual({
       loggerLevel: 'none',
       shell: 'bash',
     })

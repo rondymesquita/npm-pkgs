@@ -6,8 +6,8 @@ import { defineService } from './service'
 
 const createSut = ({
   childProcess = vi.fn(),
-  path = vi.fn(),
   fs = vi.fn(),
+  path = vi.fn(),
   process = vi.fn(),
 }: any) => {
   return defineService(childProcess, path, fs, process)

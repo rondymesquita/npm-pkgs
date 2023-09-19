@@ -1,4 +1,4 @@
-export interface Config {
+export interface Options {
   shell: 'bash' | 'powershell' | 'cmd' | 'sh' | string
 
   /**

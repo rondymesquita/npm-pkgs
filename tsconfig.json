@@ -11,6 +11,9 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "declaration": false,
+    "lib": [
+      "ES2021"
+    ]
   },
   "exclude": ["**/**.spec*", "**/vitest.config.js", "**/example/**", "**/dist/*", "**/coverage", "**/typedoc"]
 }

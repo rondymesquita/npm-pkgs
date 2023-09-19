@@ -5,37 +5,17 @@ import * as Process from 'process'
 import { promisify } from 'util'
 
 import { CmdResult } from '../models'
-import { merge, prepareCommand } from '../utils'
+import { prepareCommand } from '../utils'
+import { useGlobalOptions } from './shared'
 
-export interface ShellOptions {
-  shell: 'bash' | 'powershell' | 'cmd' | 'sh' | string
 
-  /**
-   * Sets log level.
-   *
-   * - none: Disable logs.
-   * - error: Logs when errors occur.
-   * - info: Logs the outputs of the commands.
-   * - verbose: Logs the commands being executed.
-   * - debug: Logs extra information for helping with debugs.
-   */
-  loggerLevel: 'none' | 'error' | 'info' | 'verbose' | 'debug'
-}
-
-export const DEFAULT_OPTIONS: ShellOptions = {
-  shell: 'bash',
-  loggerLevel: 'info',
-}
-
-export const shell = (
+export const defineShell = (
   childProcess: typeof ChildProcess,
   process: typeof Process,
   fs: typeof FS
 ) => {
-  const options = merge<ShellOptions>({}, DEFAULT_OPTIONS)
-  const setOptions = (_options: Partial<ShellOptions>) => {
-    Object.assign(options, _options)
-  }
+
+  const { options, } = useGlobalOptions()
 
   /**
      *
@@ -52,6 +32,7 @@ export const shell = (
       res = stringOrBuffer.toString('utf8')
     }
     return res
+
   }
 
   const execAsync =  (...params: Parameters<typeof ChildProcess.exec.__promisify__>) => {
@@ -138,10 +119,29 @@ export const shell = (
     return childProcess.fork(...params)
   }
 
-  return { options, setOptions, $, run, runAsync, cd, exec, execAsync, fork, ls, spawn, withContext, }
+  return {
+    $,
+    run,
+    runAsync,
+    cd,
+    exec,
+    execAsync,
+    fork,
+    ls,
+    spawn,
+    withContext,
+  }
 }
 
 export const {
-  options,
-  $, run, runAsync, cd, exec, execAsync, fork, ls, setOptions, spawn,  withContext,
-} = shell(ChildProcess, Process, FS)
+  $,
+  cd,
+  exec,
+  execAsync,
+  fork,
+  ls,
+  run,
+  runAsync,
+  spawn,
+  withContext,
+} = defineShell(ChildProcess, Process, FS)

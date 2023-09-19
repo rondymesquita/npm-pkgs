@@ -1,4 +1,4 @@
-import { Config } from './models'
+import { Options } from './models'
 import { Chalk, blue, green, red } from 'chalk'
 // import {
 //   createLogger as createWinstonLogger,
@@ -96,7 +96,7 @@ const debugLog = (context: any) => {
 //   )
 // }
 
-export const createLogger = (config: Config) => {
+export const createLogger = (config: Options) => {
   // const logger = createWinstonLogger({
   //   levels: {
   //     error: 1,
