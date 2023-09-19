@@ -17,131 +17,119 @@ export const defineShell = (
 
   const { options, } = useGlobalOptions()
 
-  /**
-     *
-     * Changes current directory using process.chdir.
-     */
-  const cd = (dir: string) => {
-    console.log('cd', dir)
-    process.chdir(dir)
-  }
-  const exec = (...params: Parameters<typeof ChildProcess.execSync>) =>{
-    const stringOrBuffer = childProcess.execSync(...params)
-    let res = stringOrBuffer
-    if (stringOrBuffer instanceof Buffer) {
-      res = stringOrBuffer.toString('utf8')
-    }
-    return res
-
-  }
-
-  const execAsync =  (...params: Parameters<typeof ChildProcess.exec.__promisify__>) => {
-    return promisify(childProcess.exec)(...params)
-  }
-
-  const run = (cmd: string | Array<string> | TemplateStringsArray): string | string[] => {
-    const finalCmd = prepareCommand(cmd)
-
-    if (Array.isArray(finalCmd)) {
-      const results: Array<string> = []
-      for (const cmd of finalCmd) {
-        const result = exec(cmd)
-        console.log(result)
-        results.push(result.toString())
-      }
-      return results
-    } else {
-
-      const result = exec(finalCmd)
-      console.log(result)
-      return result.toString()
-    }
-  }
-
-  /**
-     *
-     * Runs a command using child_process.exec.
-     */
-  const runAsync = async (cmd: string | Array<string> | TemplateStringsArray): Promise<CmdResult | CmdResult[]> => {
-    const finalCmd = prepareCommand(cmd)
-
-    if (Array.isArray(finalCmd)) {
-      const results: Array<CmdResult> = []
-      for (const cmd of finalCmd) {
-        // data.exe
-        const result = await execAsync(cmd)
-        console.log(result.stdout)
-        results.push(result)
-      }
-      return results
-    } else {
-
-      const result = await execAsync(finalCmd)
-      console.log(result.stdout)
-      return result
-    }
-  }
-  const $ = runAsync
-
-
-
-  /**
-     *
-     * Run a command in a separated process using child_process.fork.
-     */
-  const withContext = async(fn: () => void): Promise<number | null> => {
-    const child = childProcess.fork(path.join(__dirname, '..', 'subprocess'), ['subprocess',])
-    child.send({ fn: fn.toString(), })
-
-    return new Promise((resolve, reject) => {
-      child.on('close', (exitCode: any) => {
-        resolve(exitCode)
-      })
-      child.on('error', (error: Error) => {
-        reject(error)
-      })
-    })
-  }
-  /**
-   *
-   * Lists file and directories from current working directory.
-   */
-  const ls = () => {
-    const stdout = fs.readdirSync(process.cwd())
-    console.log(stdout)
-    return stdout
-  }
-
-  const spawn = (...params: Parameters<typeof ChildProcess.spawn>) =>{
-    return childProcess.spawn(...params)
-  }
-  const fork = (...params: Parameters<typeof ChildProcess.fork>) => {
-    return childProcess.fork(...params)
-  }
-
   return {
-    $,
-    run,
-    runAsync,
-    cd,
-    exec,
-    execAsync,
-    fork,
-    ls,
-    spawn,
-    withContext,
-  }
-}
+    cd(dir: string) {
+      console.log('cd', dir)
+      process.chdir(dir)
+    },
+    exec(...params: Parameters<typeof ChildProcess.execSync>){
+      const stringOrBuffer = childProcess.execSync(...params)
+      let res = stringOrBuffer
+      if (stringOrBuffer instanceof Buffer) {
+        res = stringOrBuffer.toString('utf8')
+      }
+      return res
 
-export const {
-  $,
-  cd,
-  exec,
-  execAsync,
-  fork,
-  ls,
-  run,
-  runAsync,
-  spawn,
-  withContext,
-} = defineShell(ChildProcess, Process, FS)
+    },
+    execAsync(...params: Parameters<typeof ChildProcess.exec.__promisify__>){
+      return promisify(childProcess.exec)(...params)
+    },
+    run(cmd: string | Array<string> | TemplateStringsArray): string | string[] {
+      const finalCmd = prepareCommand(cmd)
+
+      if (Array.isArray(finalCmd)) {
+        const results: Array<string> = []
+        for (const cmd of finalCmd) {
+          const result = this.exec(cmd)
+          console.log(result)
+          results.push(result.toString())
+        }
+        return results
+      } else {
+
+        const result = this.exec(finalCmd)
+        console.log(result)
+        return result.toString()
+      }
+    },
+    async runAsync(cmd: string | Array<string> | TemplateStringsArray): Promise<CmdResult | CmdResult[]> {
+      const finalCmd = prepareCommand(cmd)
+
+      if (Array.isArray(finalCmd)) {
+        const results: Array<CmdResult> = []
+        for (const cmd of finalCmd) {
+          const result = await execAsync(cmd)
+          console.log(result.stdout)
+          results.push(result)
+        }
+        return results
+      } else {
+
+        const result = await execAsync(finalCmd)
+        console.log(result.stdout)
+        return result
+      }
+    },
+    copy(source: string, destination: string){
+
+      const src = source
+      let dest = destination
+
+      const { base, ext, } = path.parse(destination)
+      const isFileDest = !!base && !!ext
+
+      //convert relative path to absolute
+      const isRelative = !path.isAbsolute(dest)
+      dest = isRelative ? path.join(process.cwd(), dest) : dest
+
+      if (isFileDest) {
+        fs.copyFileSync(src, dest)
+      } else {
+        // if (fs.lstatSync(dest).isDirectory()) {
+        const fileNameSource = path.parse(source).base
+        dest = path.normalize(path.join(dest, fileNameSource))
+        fs.copyFileSync(src, dest)
+        // }
+      }
+
+    },
+    async withContext(fn: () => void): Promise<number | null> {
+      const child = childProcess.fork(path.join(__dirname, '..', 'subprocess'), ['subprocess',])
+      child.send({ fn: fn.toString(), })
+
+      return new Promise((resolve, reject) => {
+        child.on('close', (exitCode: any) => {
+          resolve(exitCode)
+        })
+        child.on('error', (error: Error) => {
+          reject(error)
+        })
+      })
+    },
+    ls() {
+      const stdout = fs.readdirSync(process.cwd())
+      console.log(stdout)
+      return stdout
+    },
+
+    spawn(...params: Parameters<typeof ChildProcess.spawn>){
+      return childProcess.spawn(...params)
+    },
+    fork(...params: Parameters<typeof ChildProcess.fork>) {
+      return childProcess.fork(...params)
+    },
+  }
+
+  // return {
+  //   $,
+  //   run,
+  //   runAsync,
+  //   cd,
+  //   exec,
+  //   execAsync,
+  //   fork,
+  //   ls,
+  //   spawn,
+  //   withContext,
+  // }
+}

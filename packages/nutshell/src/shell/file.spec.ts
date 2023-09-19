@@ -16,18 +16,17 @@ vi.mock('./logger', () => ({
 }))
 
 const createSut = ({
-  childProcess = vi.fn(),
   fs = vi.fn(),
   path = vi.fn(),
   process = vi.fn(),
 }: any) => {
-  return defineFile(childProcess, process, fs, path)
+  return defineFile(process, fs, path)
 }
 
 const mocks = {
   process: { cwd: vi.fn(() => '/var/www'), },
   path: { resolve: Path.resolve, },
-  fs: {},
+  fs: {} as any,
 }
 
 const { options, setOptions, } = useGlobalOptions()
@@ -54,6 +53,7 @@ describe('file', () => {
     const content = file('fake-file.txt').read()
     expect(content).toEqual('fake file content')
   })
+
   it('touch file', async () => {
     mocks.fs = Volume.fromNestedJSON({ '/var/www': {}, })
     const { file, } = createSut(mocks)

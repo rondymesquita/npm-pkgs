@@ -1,4 +1,3 @@
-import * as ChildProcess from 'child_process'
 import * as FS from 'fs'
 import * as Path from 'path'
 import * as Process from 'process'
@@ -14,7 +13,6 @@ interface File {
 
 
 export const defineFile = (
-  childProcess: typeof ChildProcess,
   process: typeof Process,
   fs: typeof FS,
   path: typeof Path
@@ -47,5 +45,3 @@ export const defineFile = (
 
   return { file, }
 }
-
-export const { file, } = defineFile(ChildProcess, Process, FS, Path)

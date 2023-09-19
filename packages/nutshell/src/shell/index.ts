@@ -23,4 +23,4 @@ export const {
 } = defineShell(ChildProcess, Process, FS)
 
 
-export const { file, } = defineFile(ChildProcess, Process, FS, Path)
+export const { file, } = defineFile(Process, FS, Path)

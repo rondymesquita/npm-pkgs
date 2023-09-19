@@ -1,7 +1,11 @@
+import { log } from 'console'
+import { Volume } from 'memfs/lib/index'
+import { Volume } from 'memfs/lib/volume'
+import * as Path from 'path'
 import { describe, expect, it, vi } from 'vitest'
 
-import { DEFAULT_OPTIONS, defineShell } from '.'
-import { useGlobalOptions } from './shared'
+import { DEFAULT_OPTIONS, useGlobalOptions } from './shared'
+import { defineShell } from './shell'
 
 vi.mock('./logger', () => ({
   createLogger: vi.fn(() => ({
@@ -14,82 +18,68 @@ vi.mock('./logger', () => ({
 
 const createSut = ({
   childProcess = vi.fn(),
-  process = vi.fn(),
   fs = vi.fn(),
+  process = vi.fn(),
 }: any) => {
+  log(typeof fs)
   return defineShell(childProcess, process, fs)
 }
 
+const mocks: any = {
+  process: { cwd: vi.fn(() => '/var/www'), },
+  path: { resolve: Path.resolve, },
+  fs: {},
+}
+
+
 const { options, setOptions, } = useGlobalOptions()
 
-describe('core', () => {
-  it('should execute a single line command', async () => {
+describe('shell', () => {
+  it('should execute a single line command', async() => {
     const mocks = {
       childProcess: {
-        exec: vi
+        execSync: vi
           .fn()
-          .mockImplementationOnce((a, callback) =>
-            callback(null, {
-              stderr: '',
-              stdout: 'Hello\n',
-            })),
+          .mockImplementationOnce(() => 'Hello\n'),
       },
     }
 
     const sut = createSut(mocks)
-    await expect(sut.$('echo "Hello"')).resolves.toEqual({
-      stderr: '',
-      stdout: 'Hello\n',
-    })
+    expect(sut.run('echo "Hello"')).toEqual(
+      'Hello\n'
+    )
 
-    expect(mocks.childProcess.exec).toHaveBeenNthCalledWith(1,
-      'echo "Hello"',
-      expect.any(Function))
+    expect(mocks.childProcess.execSync).toHaveBeenNthCalledWith(1, 'echo "Hello"')
+
   })
 
-  it('should execute a multiple line command', async () => {
+  it('should execute a multiple line command', async() => {
     const mocks = {
       childProcess: {
-        exec: vi
+        execSync: vi
           .fn()
-          .mockImplementationOnce((a, callback) =>
-            callback(null, {
-              stderr: '',
-              stdout: 'Hello\n',
-            }))
-          .mockImplementationOnce((a, callback) =>
-            callback(null, {
-              stderr: '',
-              stdout: 'World\n',
-            })),
+          .mockImplementationOnce(() => 'Hello\n')
+          .mockImplementationOnce(() => 'World\n'),
       },
       process,
     }
 
     const sut = createSut(mocks)
-    await expect(sut.$`
+    expect(sut.run`
       echo "Hello"
       echo "World"
-    `).resolves.toEqual([
-      {
-        stderr: '',
-        stdout: 'Hello\n',
-      },
-      {
-        stderr: '',
-        stdout: 'World\n',
-      },
+    `).toEqual([
+      'Hello\n',
+      'World\n',
     ])
 
-    expect(mocks.childProcess.exec).toHaveBeenNthCalledWith(1,
-      'echo "Hello"',
-      expect.any(Function))
-    expect(mocks.childProcess.exec).toHaveBeenNthCalledWith(2,
-      'echo "World"',
-      expect.any(Function))
+    expect(mocks.childProcess.execSync).toHaveBeenNthCalledWith(1,
+      'echo "Hello"')
+    expect(mocks.childProcess.execSync).toHaveBeenNthCalledWith(2,
+      'echo "World"')
   })
 
-  it('should enters into folder', async () => {
+  it('should enters into folder', async() => {
     const mocks = {
       childProcess: { exec: vi.fn(), },
       process: { chdir: vi.fn(), },
@@ -129,11 +119,56 @@ describe('core', () => {
     })
   })
 
-  it('should run ls', async () => {
+  it('should run ls', async() => {
     const sut = createSut({
       process: { cwd: vi.fn().mockReturnValue('./src/__fixtures__'), },
       fs: { readdirSync: vi.fn().mockReturnValue(['fake-file',]), },
     })
     expect(sut.ls()).toEqual(['fake-file',])
+  })
+  it('copy file to file', async() => {
+    mocks.fs = Volume.fromNestedJSON({
+      '/var/www/file.txt': 'fake',
+      '/var/temp': {},
+    })
+    const { copy, } = createSut(mocks)
+    // copy('/var/www/file.txt', '/var/temp/file.txt')
+    // copy('/var/www/file.txt', '/var/temp')
+  })
+  it.only('copy file to file', async() => {
+    mocks.fs = Volume.fromNestedJSON({
+      '/var/www/file.txt': 'fake',
+      '/var/temp': {},
+    })
+    const { copy, } = createSut(mocks)
+    copy('/var/www/file.txt', '/var/temp/file.txt')
+    expect(mocks.fs.toJSON()).toEqual({
+      '/var/www/file.txt': 'fake',
+      '/var/temp/file.txt': 'fake',
+    })
+  })
+  it.only('copy file to dir', async() => {
+    mocks.fs = Volume.fromNestedJSON({
+      '/var/www/file.txt': 'fake',
+      '/var/temp': {},
+    })
+    const { copy, } = createSut(mocks)
+    copy('/var/www/file.txt', '/var/temp')
+    expect(mocks.fs.toJSON()).toEqual({
+      '/var/www/file.txt': 'fake',
+      '/var/temp/file.txt': 'fake',
+    })
+  })
+  it.only('copy file to relative dir', async() => {
+    mocks.fs = Volume.fromNestedJSON({
+      '/var/www/file.txt': 'fake',
+      '/var/temp': {},
+    })
+    const { copy, } = createSut(mocks)
+    copy('/var/www/file.txt', '../temp')
+    expect(mocks.fs.toJSON()).toEqual({
+      '/var/www/file.txt': 'fake',
+      '/var/temp/file.txt': 'fake',
+    })
   })
 })
