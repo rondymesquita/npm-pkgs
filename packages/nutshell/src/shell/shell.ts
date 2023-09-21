@@ -1,4 +1,5 @@
 import * as ChildProcess from 'child_process'
+import { sync } from 'fast-glob'
 import * as FS from 'fs'
 import path from 'path'
 import * as Process from 'process'
@@ -7,7 +8,6 @@ import { promisify } from 'util'
 import { CmdResult } from '../models'
 import { prepareCommand } from '../utils'
 import { useGlobalOptions } from './shared'
-
 
 export const defineShell = (
   childProcess: typeof ChildProcess,
@@ -72,25 +72,46 @@ export const defineShell = (
     },
     copy(source: string, destination: string){
 
-      const src = source
-      let dest = destination
-
       const { base, ext, } = path.parse(destination)
-      const isFileDest = !!base && !!ext
+      const isFileDestination = !!base && !!ext
 
-      //convert relative path to absolute
-      const isRelative = !path.isAbsolute(dest)
-      dest = isRelative ? path.join(process.cwd(), dest) : dest
+      const sourcePaths = sync(source)
+      sourcePaths.map((sourcePath: string) => {
 
-      if (isFileDest) {
-        fs.copyFileSync(src, dest)
-      } else {
-        // if (fs.lstatSync(dest).isDirectory()) {
-        const fileNameSource = path.parse(source).base
-        dest = path.normalize(path.join(dest, fileNameSource))
-        fs.copyFileSync(src, dest)
-        // }
-      }
+        // convert relative path to absolute
+        const isDestinationRelative = !path.isAbsolute(destination)
+        const destinationPath = isDestinationRelative ? path.join(process.cwd(), destination) : destination
+
+        const {
+          base: baseSrc,
+          dir: dirSrc,
+          ext: extSrc,
+          root: rootSrc,
+        } = path.parse(sourcePath)
+        const isFileSource = !!baseSrc && !!extSrc
+
+        if(isFileSource && isFileDestination) {
+          fs.copyFileSync(sourcePath, destinationPath)
+        } else if (isFileSource && !isFileDestination) {
+          const fileName = baseSrc
+
+          const completeDestinationPath = path.join(destinationPath, fileName)
+          // console.log({
+          //   isFileSource,
+          //   isFileDestination,
+          //   destination,
+          //   destinationPath,
+          //   baseSrc,
+          //   dirSrc,
+          //   extSrc,
+          //   rootSrc,
+          //   sourcePath,
+          //   fileName,
+          //   completeDestinationPath,
+          // });
+          fs.copyFileSync(sourcePath, completeDestinationPath)
+        }
+      })
 
     },
     async withContext(fn: () => void): Promise<number | null> {

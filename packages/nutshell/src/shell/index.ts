@@ -10,7 +10,6 @@ import { defineShell } from './shell'
 export { DEFAULT_OPTIONS } from './shared'
 export const { options, setOptions, } = useGlobalOptions()
 export const {
-  $,
   cd,
   exec,
   execAsync,

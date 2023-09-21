@@ -1,27 +1,16 @@
-import { log } from 'console'
-import { Volume } from 'memfs/lib/index'
 import { Volume } from 'memfs/lib/volume'
+import mockFs from 'mock-fs'
 import * as Path from 'path'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { DEFAULT_OPTIONS, useGlobalOptions } from './shared'
 import { defineShell } from './shell'
-
-vi.mock('./logger', () => ({
-  createLogger: vi.fn(() => ({
-    debug: vi.fn(),
-    info: vi.fn(),
-    error: vi.fn(),
-    verbose: vi.fn(),
-  })),
-}))
 
 const createSut = ({
   childProcess = vi.fn(),
   fs = vi.fn(),
   process = vi.fn(),
 }: any) => {
-  log(typeof fs)
   return defineShell(childProcess, process, fs)
 }
 
@@ -35,6 +24,9 @@ const mocks: any = {
 const { options, setOptions, } = useGlobalOptions()
 
 describe('shell', () => {
+  beforeEach(() => {
+    mockFs.restore()
+  })
   it('should execute a single line command', async() => {
     const mocks = {
       childProcess: {
@@ -127,48 +119,90 @@ describe('shell', () => {
     expect(sut.ls()).toEqual(['fake-file',])
   })
   it('copy file to file', async() => {
-    mocks.fs = Volume.fromNestedJSON({
+    const volume = Volume.fromNestedJSON({
       '/var/www/file.txt': 'fake',
       '/var/temp': {},
     })
-    const { copy, } = createSut(mocks)
-    // copy('/var/www/file.txt', '/var/temp/file.txt')
-    // copy('/var/www/file.txt', '/var/temp')
-  })
-  it.only('copy file to file', async() => {
-    mocks.fs = Volume.fromNestedJSON({
-      '/var/www/file.txt': 'fake',
-      '/var/temp': {},
-    })
+    mocks.fs = volume
+    mockFs(volume.toJSON())
+
     const { copy, } = createSut(mocks)
     copy('/var/www/file.txt', '/var/temp/file.txt')
-    expect(mocks.fs.toJSON()).toEqual({
+    expect(volume.toJSON()).toEqual({
       '/var/www/file.txt': 'fake',
       '/var/temp/file.txt': 'fake',
     })
   })
-  it.only('copy file to dir', async() => {
-    mocks.fs = Volume.fromNestedJSON({
+  it('copy file to dir', async() => {
+    const volume = Volume.fromNestedJSON({
       '/var/www/file.txt': 'fake',
       '/var/temp': {},
     })
+    mocks.fs = volume
+    mockFs(volume.toJSON())
+
     const { copy, } = createSut(mocks)
     copy('/var/www/file.txt', '/var/temp')
-    expect(mocks.fs.toJSON()).toEqual({
+    expect(volume.toJSON()).toEqual({
       '/var/www/file.txt': 'fake',
       '/var/temp/file.txt': 'fake',
     })
   })
-  it.only('copy file to relative dir', async() => {
-    mocks.fs = Volume.fromNestedJSON({
+  it('copy file to relative dir', async() => {
+    const volume = Volume.fromNestedJSON({
       '/var/www/file.txt': 'fake',
       '/var/temp': {},
     })
+    mocks.fs = volume
+    mockFs(volume.toJSON())
     const { copy, } = createSut(mocks)
     copy('/var/www/file.txt', '../temp')
     expect(mocks.fs.toJSON()).toEqual({
       '/var/www/file.txt': 'fake',
       '/var/temp/file.txt': 'fake',
+    })
+  })
+  it('copy dir to dir using globs (wildcards)', async() => {
+
+    const volume = Volume.fromNestedJSON({
+      '/var/www/deep': {
+        'file.txt': 'fake',
+        'another.txt': 'fake',
+      },
+      '/var/temp': {},
+    })
+    mocks.fs = volume
+    mockFs(volume.toJSON())
+    const { copy, } = createSut(mocks)
+    copy('/var/**/*', '/var/temp')
+    expect(volume.toJSON()).toEqual({
+      '/var/www/deep/file.txt': 'fake',
+      '/var/www/deep/another.txt': 'fake',
+      '/var/temp/file.txt': 'fake',
+      '/var/temp/another.txt': 'fake',
+    })
+  })
+  it('copy files to dir using globs (wildcards)', async() => {
+
+    const volume = Volume.fromNestedJSON({
+      '/var/www': {
+        'file.txt': 'fake',
+        'another.js': 'fake js',
+        'another.spec.js': 'fake spec js',
+      },
+      '/var/temp': {},
+    })
+    mocks.fs = volume
+    mockFs(volume.toJSON())
+    const { copy, } = createSut(mocks)
+    copy('/var/**/*.js', '/var/temp')
+    console.log(volume.toJSON())
+    expect(volume.toJSON()).toEqual({
+      '/var/www/file.txt': 'fake',
+      '/var/www/another.js': 'fake js',
+      '/var/www/another.spec.js': 'fake spec js',
+      '/var/temp/another.js': 'fake js',
+      '/var/temp/another.spec.js': 'fake spec js',
     })
   })
 })

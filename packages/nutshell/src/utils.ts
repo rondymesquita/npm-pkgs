@@ -1,5 +1,5 @@
 
-export const prepareCommand = (cmd: string | Array<string> | TemplateStringsArray,): string | string[] => {
+export const prepareCommand = (cmd: string | Array<string> | TemplateStringsArray): string | string[] => {
   let finalCmd: string | Array<string>
   if (typeof cmd === 'object') {
     finalCmd = cmd[0]
@@ -19,12 +19,12 @@ export type ExportedClassMembers<T, C = any> = {
 
 export const exportClassMembers = <T>(
   instance: any,
-  filteredPropeties: string[] = [],
+  filteredPropeties: string[] = []
 ): T => {
   const properties = Reflect.ownKeys(Object.getPrototypeOf(instance)).filter((p) => {
     const prop = p as string
     return prop !== 'constructor' && !filteredPropeties.includes(prop)
-  },)
+  })
 
   const members: any = {}
   properties.forEach((prop) => {
@@ -34,7 +34,7 @@ export const exportClassMembers = <T>(
 }
 export function exportClassMembersDeep<T>(obj: any,
   depth: number = Infinity,
-  filter: string[] = [],): any {
+  filter: string[] = []): any {
   // const methods = new Set()
   const members: any = {}
 
@@ -45,7 +45,7 @@ export function exportClassMembersDeep<T>(obj: any,
     }
     obj = Object.getOwnPropertyNames(obj)
   }
-  return { ...methods }
+  return { ...methods, }
 }
 
 export const copy = (object: any) => {
