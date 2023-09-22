@@ -1,5 +1,4 @@
 import { Volume } from 'memfs/lib/volume'
-import mockFs from 'mock-fs'
 import * as Path from 'path'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -10,8 +9,9 @@ const createSut = ({
   childProcess = vi.fn(),
   fs = vi.fn(),
   process = vi.fn(),
+  sync = vi.fn(),
 }: any) => {
-  return defineShell(childProcess, process, fs)
+  return defineShell(childProcess, process, fs, sync)
 }
 
 const mocks: any = {
@@ -20,12 +20,12 @@ const mocks: any = {
   fs: {},
 }
 
-
 const { options, setOptions, } = useGlobalOptions()
 
+let mockFs;
 describe('shell', () => {
   beforeEach(() => {
-    mockFs.restore()
+    mockFs && mockFs.restore()
   })
   it('should execute a single line command', async() => {
     const mocks = {
@@ -124,7 +124,7 @@ describe('shell', () => {
       '/var/temp': {},
     })
     mocks.fs = volume
-    mockFs(volume.toJSON())
+    mocks.sync = vi.fn(() => ['/var/www/file.txt',])
 
     const { copy, } = createSut(mocks)
     copy('/var/www/file.txt', '/var/temp/file.txt')
@@ -140,7 +140,7 @@ describe('shell', () => {
       '/var/temp': {},
     })
     mocks.fs = volume
-    mockFs(volume.toJSON())
+    mocks.sync = vi.fn(() => ['/var/www/file.txt',])
 
     const { copy, } = createSut(mocks)
     copy('/var/www/file.txt', '/var/temp')
@@ -155,7 +155,7 @@ describe('shell', () => {
       '/var/temp': {},
     })
     mocks.fs = volume
-    mockFs(volume.toJSON())
+    mocks.sync = vi.fn(() => ['/var/www/file.txt',])
     const { copy, } = createSut(mocks)
     copy('/var/www/file.txt', '../temp')
     expect(mocks.fs.toJSON()).toEqual({
@@ -173,7 +173,7 @@ describe('shell', () => {
       '/var/temp': {},
     })
     mocks.fs = volume
-    mockFs(volume.toJSON())
+    mocks.sync = vi.fn(() => ['/var/www/deep/file.txt', '/var/www/deep/another.txt',])
     const { copy, } = createSut(mocks)
     copy('/var/**/*', '/var/temp')
     expect(volume.toJSON()).toEqual({
@@ -184,7 +184,6 @@ describe('shell', () => {
     })
   })
   it('copy files to dir using globs (wildcards)', async() => {
-
     const volume = Volume.fromNestedJSON({
       '/var': {
         'file.js': 'fake js',
@@ -196,10 +195,9 @@ describe('shell', () => {
       '/var/temp': {},
     })
     mocks.fs = volume
-    mockFs(volume.toJSON())
+    mocks.sync = vi.fn(() => ['/var/file.js', '/var/www/another.js',])
     const { copy, } = createSut(mocks)
     copy('/var/**/*.js', '/var/temp')
-    console.log(volume.toJSON())
     expect(volume.toJSON()).toEqual({
       '/var/file.js': 'fake js',
       '/var/www/file.txt': 'fake',
@@ -215,7 +213,7 @@ describe('shell', () => {
       '/var/temp': {},
     })
     mocks.fs = volume
-    mockFs(volume.toJSON())
+    mocks.sync = vi.fn(() => ['/var/www/file.txt', '/var/www/another.txt',])
 
     const { move, } = createSut(mocks)
     move('/var/**/*.txt', '/var/temp')
@@ -225,7 +223,7 @@ describe('shell', () => {
       '/var/temp/another.txt': 'fake',
     })
   })
-  it.only('replicate folder structure', async() => {
+  it('replicate folder structure', async() => {
     const volume = Volume.fromNestedJSON({
       '/var': {
         '/www/deep': {
@@ -236,7 +234,7 @@ describe('shell', () => {
       '/etc/temp': {},
     })
     mocks.fs = volume
-    mockFs(volume.toJSON())
+    mocks.sync = vi.fn(() => ['/var/www/deep/file.txt', '/var/www/deep/another.txt',])
 
     const { replicate, } = createSut(mocks)
     replicate('/var', '/etc/temp')

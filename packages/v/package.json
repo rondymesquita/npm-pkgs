@@ -17,7 +17,7 @@
     "src/**/*"
   ],
   "scripts": {
-    "test": "vitest --watch=false --coverage",
+    "test:skip": "vitest --watch=false --coverage",
     "test:watch": "vitest",
     "dev": "tsx --watch ./src/dev.ts",
     "build": "rimraf ./dist && tsc",

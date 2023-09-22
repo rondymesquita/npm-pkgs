@@ -1,5 +1,5 @@
 import * as ChildProcess from 'child_process'
-import { sync } from 'fast-glob'
+import * as FastGlob from 'fast-glob'
 import * as FS from 'fs'
 import path from 'path'
 import * as Process from 'process'
@@ -12,7 +12,8 @@ import { useGlobalOptions } from './shared'
 export const defineShell = (
   childProcess: typeof ChildProcess,
   process: typeof Process,
-  fs: typeof FS
+  fs: typeof FS,
+  sync: typeof FastGlob.sync
 ) => {
 
   const { options, } = useGlobalOptions()
@@ -22,7 +23,6 @@ export const defineShell = (
     const isFileDestination = !!base && !!ext
 
     const sourcePaths = sync(source)
-    console.log({ sourcePaths, });
 
     sourcePaths.map((sourcePath: string) => {
 

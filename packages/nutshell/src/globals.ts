@@ -16,11 +16,11 @@ Object.assign(global, t)
 // console.log(global)
 
 declare global {
-	const $: typeof shell.$
 	const run: typeof shell.run
 	const runAsync: typeof shell.runAsync
 	const tasks: typeof t.tasks
 	const cd: typeof shell.cd
+	const options: typeof shell.options
 	const setOptions: typeof shell.setOptions
 	const exec: typeof shell.exec
 	const execAsync: typeof shell.execAsync

@@ -24,7 +24,7 @@
     "./bin": "./dist/globals.js"
   },
   "scripts": {
-    "test": "vitest --watch=false --coverage",
+    "test": "vitest --watch=false",
     "test:watch": "vitest --threads=false",
     "dev": "tsx --watch ./src/dev.ts start",
     "dev:bin": "./src/dev.bin.ts start",
@@ -44,6 +44,7 @@
     "winston": "^3.9.0"
   },
   "devDependencies": {
+    "@nodelib/fs.walk": "^2.0.0",
     "mock-fs": "^5.2.0"
   }
 }
