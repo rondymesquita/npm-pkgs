@@ -8,7 +8,7 @@ import {
   ModifierType,
   ValidatorModifier,
 } from '.'
-import { Options } from './options'
+import { ArgOptions } from './options'
 
 const ui = cliui({} as any)
 

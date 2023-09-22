@@ -1,20 +1,17 @@
-import { printErrors } from './errors'
-import {
-  Modifier,
-  ValidatorModifier,
-  ConfigModifier,
-  ModifierType,
-} from './modifiers'
-import { fillOptionsDefaultValues, parseValue } from './utils'
-import { printHelp } from './help'
 import { flow, Result, Status } from '@rondymesquita/flow'
-import { checkType, checkValidator, checkValue } from './argcheck'
-import { Options } from './options'
 
+import { checkType, checkValidator, checkValue } from './argcheck'
+import { printErrors } from './errors'
+import { printHelp } from './help'
+import { Modifier,
+  ModifierType } from './modifiers'
+import { ArgOptions } from './options'
+import { fillOptionsDefaultValues, parseValue } from './utils'
+
+export * from './help'
 export * from './modifiers'
 export * from './options'
 export * from './validator'
-export * from './help'
 
 export interface ArgvOptions {
   [k: string]: any
@@ -28,7 +25,7 @@ export interface Argv {
 export interface ArgsDefinition {
   name?: string
   usage?: string
-  options: Options
+  options: ArgOptions
 }
 
 export interface DefineArgs {
@@ -52,12 +49,12 @@ export const defineArgs = (definition: ArgsDefinition): DefineArgs => {
     const argv = parseArgs(args)
 
     /**Fill default values */
-    Object.entries(definition.options).forEach(([name, modifiers]) => {
+    Object.entries(definition.options).forEach(([name, modifiers,]) => {
       const value = argv.options[name]
       argv.options = fillOptionsDefaultValues(name, modifiers, value, argv)
     })
 
-    Object.entries(definition.options).forEach(([name, modifiers]) => {
+    Object.entries(definition.options).forEach(([name, modifiers,]) => {
       const value = argv.options[name]
 
       const modifierFunctions = modifiers
@@ -91,7 +88,11 @@ export const defineArgs = (definition: ArgsDefinition): DefineArgs => {
     return argv
   }
 
-  return { parseArgs: parseArgsWithDefinition, showHelp, showErrors }
+  return {
+    parseArgs: parseArgsWithDefinition,
+    showHelp,
+    showErrors,
+  }
 }
 
 export const parseArgs = (args: string[]): Argv => {
@@ -101,7 +102,7 @@ export const parseArgs = (args: string[]): Argv => {
   const DOUBLE_DASH_REGEX = /^--(\w*)(=(.*))?$/
 
   args.map((arg: string) => {
-    const regex = [SINGLE_DASH_REGEX, DOUBLE_DASH_REGEX].find((regex) => {
+    const regex = [SINGLE_DASH_REGEX, DOUBLE_DASH_REGEX,].find((regex) => {
       return !!arg.match(regex)
     })
 
@@ -117,5 +118,9 @@ export const parseArgs = (args: string[]): Argv => {
     params.push(arg)
   })
 
-  return { options, params, errors: [] }
+  return {
+    options,
+    params,
+    errors: [],
+  }
 }

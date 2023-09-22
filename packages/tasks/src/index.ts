@@ -4,7 +4,7 @@ import {
   type,
   defaultValue,
   help as helpArgs,
-  Options,
+  ArgOptions,
   Modifier,
   ArgvOptions,
 } from '@rondymesquita/args'
@@ -28,7 +28,7 @@ export interface PlainTasksObject {
 }
 
 export interface TaskArgDefinition {
-  options: Options
+  options: ArgOptions
 }
 
 export type TasksDefinition = Record<
