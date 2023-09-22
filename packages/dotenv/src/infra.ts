@@ -1,7 +1,8 @@
-import { exportClassMembers } from './utils'
 import { PathLike } from 'fs'
 import fs from 'fs'
 import path from 'path'
+
+import { exportClassMembers } from './utils'
 
 export interface IFS {
   readFileSync: (path: PathLike) => Buffer

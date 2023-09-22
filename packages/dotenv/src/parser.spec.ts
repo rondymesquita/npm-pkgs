@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest'
-import { parseValue, isBoolean, parseDotenvFile } from './parser'
+import { describe, expect, it } from 'vitest'
+
+import { isBoolean, parseDotenvFile, parseValue } from './parser'
 
 describe('utils', () => {
   it('should parse values', () => {
@@ -34,7 +35,7 @@ describe('utils', () => {
 		EPS=1,2,3
 		ZETA=0
 		ETA=
-		`),
+		`)
     ).toEqual({
       ALPHA: 1,
       BETA: 2,

@@ -1,8 +1,9 @@
-import { describe, it, expect, vi, Mock } from 'vitest'
-import { CoreFactory } from './core'
-import { IFS, IPath, Path } from './infra'
 import path from 'path'
+import { describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
+
+import { defineDotenv } from './core'
+import { IFS, IPath, Path } from './infra'
 
 describe('core', () => {
   it('should read env to variable', () => {
@@ -14,15 +15,15 @@ describe('core', () => {
       DELTA="false"
       EPS=1,2,3
       ZETA=0
-      ETA=`),
-      ),
+      ETA=`)),
     }
 
-    const pathMock: IPath = {
-      resolve: vi.fn(),
-    }
+    const pathMock: IPath = { resolve: vi.fn(), }
 
-    const { parseDotenv } = CoreFactory({ fs: fsMock, path: pathMock })
+    const { parseDotenv, } = defineDotenv({
+      fs: fsMock,
+      path: pathMock,
+    })
 
     const env = parseDotenv()
     expect(env).toEqual({
@@ -36,15 +37,14 @@ describe('core', () => {
   })
 
   it('should have defaults', () => {
-    const pathMock: any = {
-      resolve: vi.fn(() => 'fake-folder-path'),
-    }
+    const pathMock: any = { resolve: vi.fn(() => 'fake-folder-path'), }
 
-    const fsMock: IFS = {
-      readFileSync: vi.fn(() => Buffer.from('')),
-    }
+    const fsMock: IFS = { readFileSync: vi.fn(() => Buffer.from('')), }
 
-    const { parseDotenv } = CoreFactory({ fs: fsMock, path: pathMock })
+    const { parseDotenv, } = defineDotenv({
+      fs: fsMock,
+      path: pathMock,
+    })
 
     parseDotenv()
 
@@ -57,22 +57,16 @@ describe('core', () => {
     expect(fsMock.readFileSync).toHaveBeenCalledWith('fake-folder-path')
   })
   it('should inform custom .env file', () => {
-    const pathMock: any = {
-      resolve: vi.fn(() => 'fake-folder-path'),
-    }
+    const pathMock: any = { resolve: vi.fn(() => 'fake-folder-path'), }
 
-    const fsMock: IFS = {
-      readFileSync: vi.fn(() => Buffer.from('')),
-    }
+    const fsMock: IFS = { readFileSync: vi.fn(() => Buffer.from('')), }
 
-    const { parseDotenv } = CoreFactory({
+    const { parseDotenv, } = defineDotenv({
       fs: fsMock,
       path: pathMock,
     })
 
-    parseDotenv({
-      filename: '.env-development',
-    })
+    parseDotenv({ filename: '.env-development', })
 
     expect(pathMock.resolve).toHaveBeenCalledOnce()
     expect(pathMock.resolve.mock.lastCall).toMatchObject([
@@ -83,22 +77,16 @@ describe('core', () => {
     expect(fsMock.readFileSync).toHaveBeenCalledWith('fake-folder-path')
   })
   it('should inform custom directory', () => {
-    const pathMock: any = {
-      resolve: vi.fn((...args) => Path.resolve(...args)),
-    }
+    const pathMock: any = { resolve: vi.fn((...args) => Path.resolve(...args)), }
 
-    const fsMock: IFS = {
-      readFileSync: vi.fn(() => Buffer.from('')),
-    }
+    const fsMock: IFS = { readFileSync: vi.fn(() => Buffer.from('')), }
 
-    const { parseDotenv } = CoreFactory({
+    const { parseDotenv, } = defineDotenv({
       fs: fsMock,
       path: pathMock,
     })
 
-    parseDotenv({
-      cwd: 'fake-folder-path',
-    })
+    parseDotenv({ cwd: 'fake-folder-path', })
 
     expect(pathMock.resolve).toHaveBeenCalledOnce()
     expect(pathMock.resolve.mock.lastCall).toMatchObject([
@@ -107,7 +95,7 @@ describe('core', () => {
     ])
     expect(fsMock.readFileSync).toHaveBeenCalledOnce()
     expect(fsMock.readFileSync).toHaveBeenCalledWith(
-      path.resolve('fake-folder-path', '.env'),
+      path.resolve('fake-folder-path', '.env')
     )
   })
 
@@ -117,15 +105,15 @@ describe('core', () => {
         Buffer.from(`ALPHA=1
       BETA="value"
       GAMMA=true
-      ETA=`),
-      ),
+      ETA=`)),
     }
 
-    const pathMock: IPath = {
-      resolve: vi.fn(),
-    }
+    const pathMock: IPath = { resolve: vi.fn(), }
 
-    const { parseDotenv } = CoreFactory({ fs: fsMock, path: pathMock })
+    const { parseDotenv, } = defineDotenv({
+      fs: fsMock,
+      path: pathMock,
+    })
 
     const env = parseDotenv({
       schema: z.object({
@@ -148,16 +136,16 @@ describe('core', () => {
           `ALPHA=1
       BETA="value"
       GAMMA=true
-      ETA=`,
-        ),
-      ),
+      ETA=`
+        )),
     }
 
-    const pathMock: IPath = {
-      resolve: vi.fn(),
-    }
+    const pathMock: IPath = { resolve: vi.fn(), }
 
-    const { parseDotenv } = CoreFactory({ fs: fsMock, path: pathMock })
+    const { parseDotenv, } = defineDotenv({
+      fs: fsMock,
+      path: pathMock,
+    })
 
     expect(() =>
       parseDotenv({
@@ -167,7 +155,6 @@ describe('core', () => {
           GAMMA: z.boolean(),
           ETA: z.undefined(),
         }),
-      }),
-    ).toThrowError()
+      })).toThrowError()
   })
 })

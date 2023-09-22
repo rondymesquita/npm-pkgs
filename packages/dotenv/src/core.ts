@@ -1,6 +1,7 @@
-import { parseDotenvFile } from './parser'
-import * as infra from './infra'
 import { z } from 'zod'
+
+import * as infra from './infra'
+import { parseDotenvFile } from './parser'
 
 export interface CoreInput {
   fs: infra.IFS
@@ -25,7 +26,11 @@ export interface Env {
 
 const createParser = (fs: infra.IFS, path: infra.IPath) => {
   return (definition: Required<Definition>) => {
-    const { cwd, filename, schema } = definition
+    const {
+      cwd,
+      filename,
+      schema,
+    } = definition
     const filePath = path.resolve(cwd, filename)
     const file = fs.readFileSync(filePath).toString()
     let env = parseDotenvFile(file)
@@ -38,18 +43,19 @@ const createParser = (fs: infra.IFS, path: infra.IPath) => {
   }
 }
 
-export const CoreFactory = ({ fs, path }: CoreInput) => {
+export const defineDotenv = ({ fs, path, }: CoreInput) => {
   const parseDotenv = <T>(definition?: Definition): T => {
     const parser = createParser(fs, path)
-    const finalDefinition = definition ? { ...DEFAULT, ...definition } : DEFAULT
+    const finalDefinition = definition ? {
+      ...DEFAULT,
+      ...definition,
+    } : DEFAULT
     return parser(finalDefinition)
   }
-  return {
-    parseDotenv,
-  }
+  return { parseDotenv, }
 }
 
-export const { parseDotenv } = CoreFactory({
+export const { parseDotenv, } = defineDotenv({
   fs: infra.FS,
   path: infra.Path,
 })
