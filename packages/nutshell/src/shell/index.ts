@@ -1,4 +1,5 @@
 import * as ChildProcess from 'child_process'
+import * as FastGlob from 'fast-glob'
 import * as FS from 'fs'
 import * as Path from 'path'
 import * as Process from 'process'
@@ -22,7 +23,7 @@ export const {
   runAsync,
   spawn,
   withContext,
-} = defineShell(ChildProcess, Process, FS)
+} = defineShell(ChildProcess, Process, FS, FastGlob.sync)
 
 
 export const { file, } = defineFile(Process, FS, Path)
