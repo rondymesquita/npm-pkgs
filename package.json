@@ -23,7 +23,11 @@
     "lerna": "^6.4.1"
   },
   "workspaces": [
-    "packages/*"
+    "packages/args",
+    "packages/dotenv",
+    "packages/flow",
+    "packages/nutshell",
+    "packages/tasks"
   ],
   "devDependencies": {
     "@release-it/conventional-changelog": "^5.1.1",
