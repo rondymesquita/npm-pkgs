@@ -1,11 +1,17 @@
 // import { service,
 //   tasks } from '.'
 
-import { run } from './shell';
+import { copy,  file,  ls } from './';
 
 
 // const xvfb = service({ name: '123', command: 'serve -l 1234 .', })
 
 // tasks(xvfb)
 
-run('echo hello')
+// run('echo hello')
+ls()
+copy('./typedoc.json', './')
+// run()
+file('fulano.json').content('rondy').write()
+const data = file('fulano.json').read()
+console.log({ data, });

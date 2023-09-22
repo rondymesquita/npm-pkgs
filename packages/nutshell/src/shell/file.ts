@@ -20,15 +20,18 @@ export const defineFile = (
 
   const { options, } = useGlobalOptions()
 
-  const file = function (name:string) {
+  const file = function(name:string) {
     const self = {
       data: '',
-      content (data: string) {
+      content(data: string) {
         this.data = data
         return self
       },
       write() {
         fs.writeFileSync(path.resolve(process.cwd(), name), this.data, { encoding:'utf8', })
+      },
+      touch() {
+        this.write()
       },
       read() {
         const content = fs.readFileSync(path.resolve(process.cwd(), name), { encoding: 'utf8', })

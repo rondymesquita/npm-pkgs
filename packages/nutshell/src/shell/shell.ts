@@ -17,6 +17,33 @@ export const defineShell = (
 
   const { options, } = useGlobalOptions()
 
+  const processSourceDestination = (source: string, destination: string, foreachSourceCallback: (sourcePath: string, destinationPath: string) => void) => {
+    const { base, ext, } = path.parse(destination)
+    const isFileDestination = !!base && !!ext
+
+    const sourcePaths = sync(source)
+    console.log({ sourcePaths, });
+
+    sourcePaths.map((sourcePath: string) => {
+
+      // convert relative path to absolute
+      const isDestinationRelative = !path.isAbsolute(destination)
+      const destinationPath = isDestinationRelative ? path.join(process.cwd(), destination) : destination
+
+      const { base: baseSrc, ext: extSrc, } = path.parse(sourcePath)
+      const isFileSource = !!baseSrc && !!extSrc
+
+      if(isFileSource && isFileDestination) {
+        foreachSourceCallback(sourcePath, destinationPath)
+      } else if (isFileSource && !isFileDestination) {
+        const fileName = baseSrc
+
+        const completeDestinationPath = path.join(destinationPath, fileName)
+        foreachSourceCallback(sourcePath, completeDestinationPath)
+      }
+    })
+  }
+
   return {
     cd(dir: string) {
       console.log('cd', dir)
@@ -71,44 +98,35 @@ export const defineShell = (
       }
     },
     copy(source: string, destination: string){
-
+      processSourceDestination(source, destination, (sourcePath, destPath) => fs.copyFileSync(sourcePath, destPath))
+    },
+    move(source: string, destination: string){
+      processSourceDestination(source, destination, (sourcePath, destPath) => fs.renameSync(sourcePath, destPath))
+    },
+    replicate(source: string, destination: string){
       const { base, ext, } = path.parse(destination)
       const isFileDestination = !!base && !!ext
 
-      const sourcePaths = sync(source)
+      const sourcePaths = sync(`${source}/**/*`)
+
       sourcePaths.map((sourcePath: string) => {
 
         // convert relative path to absolute
         const isDestinationRelative = !path.isAbsolute(destination)
         const destinationPath = isDestinationRelative ? path.join(process.cwd(), destination) : destination
 
-        const {
-          base: baseSrc,
-          dir: dirSrc,
-          ext: extSrc,
-          root: rootSrc,
-        } = path.parse(sourcePath)
-        const isFileSource = !!baseSrc && !!extSrc
+        const { base: baseSrc, dir: dirSrc, } = path.parse(sourcePath)
+        const replicationDestinationPath = path.join(destinationPath, dirSrc.replace(source, ''))
 
-        if(isFileSource && isFileDestination) {
-          fs.copyFileSync(sourcePath, destinationPath)
-        } else if (isFileSource && !isFileDestination) {
+        if (!fs.existsSync(replicationDestinationPath)) {
+          fs.mkdirSync(replicationDestinationPath, { recursive: true, })
+        }
+
+        if(isFileDestination) {
+          fs.copyFileSync(sourcePath, replicationDestinationPath)
+        } else {
           const fileName = baseSrc
-
-          const completeDestinationPath = path.join(destinationPath, fileName)
-          // console.log({
-          //   isFileSource,
-          //   isFileDestination,
-          //   destination,
-          //   destinationPath,
-          //   baseSrc,
-          //   dirSrc,
-          //   extSrc,
-          //   rootSrc,
-          //   sourcePath,
-          //   fileName,
-          //   completeDestinationPath,
-          // });
+          const completeDestinationPath = path.join(replicationDestinationPath, fileName)
           fs.copyFileSync(sourcePath, completeDestinationPath)
         }
       })
@@ -132,7 +150,6 @@ export const defineShell = (
       console.log(stdout)
       return stdout
     },
-
     spawn(...params: Parameters<typeof ChildProcess.spawn>){
       return childProcess.spawn(...params)
     },
@@ -140,17 +157,4 @@ export const defineShell = (
       return childProcess.fork(...params)
     },
   }
-
-  // return {
-  //   $,
-  //   run,
-  //   runAsync,
-  //   cd,
-  //   exec,
-  //   execAsync,
-  //   fork,
-  //   ls,
-  //   spawn,
-  //   withContext,
-  // }
 }

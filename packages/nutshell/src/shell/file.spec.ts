@@ -1,10 +1,8 @@
-import { Volume } from 'memfs/lib/index'
+import { memfs } from 'memfs/lib/index'
 import Path from 'path'
 import { describe, expect, it, vi } from 'vitest'
 
 import { defineFile } from './file'
-import { useGlobalOptions } from './shared'
-
 
 vi.mock('./logger', () => ({
   createLogger: vi.fn(() => ({
@@ -29,11 +27,9 @@ const mocks = {
   fs: {} as any,
 }
 
-const { options, setOptions, } = useGlobalOptions()
-
 describe('file', () => {
-  it('write file', async () => {
-    mocks.fs = Volume.fromNestedJSON({ '/var/www': {}, })
+  it('write file', async() => {
+    mocks.fs = memfs({ '/var/www': {}, }).vol
     const { file, } = createSut(mocks)
 
     file('fake-file.txt')
@@ -46,16 +42,16 @@ describe('file', () => {
     expect(mocks.fs.toJSON()).toEqual({ '/var/www/fake-file.txt': 'fake-content', })
   })
 
-  it('read file', async () => {
-    mocks.fs = Volume.fromNestedJSON({ '/var/www/fake-file.txt': 'fake file content', })
+  it('read file', async() => {
+    mocks.fs = memfs({ '/var/www/fake-file.txt': 'fake file content', }).vol
     const { file, } = createSut(mocks)
 
     const content = file('fake-file.txt').read()
     expect(content).toEqual('fake file content')
   })
 
-  it('touch file', async () => {
-    mocks.fs = Volume.fromNestedJSON({ '/var/www': {}, })
+  it('touch file', async() => {
+    mocks.fs = memfs({ '/var/www': {}, }).vol
     const { file, } = createSut(mocks)
 
     file('fake-file.txt').write()
@@ -65,8 +61,8 @@ describe('file', () => {
     expect(content).toEqual('')
   })
 
-  it('replace file content', async () => {
-    mocks.fs = Volume.fromNestedJSON({ '/var/www/fake-file.txt': 'The lightsaber is blue', })
+  it('replace file content', async() => {
+    mocks.fs = memfs({ '/var/www/fake-file.txt': 'The lightsaber is blue', }).vol
     const { file, } = createSut(mocks)
 
     file('fake-file.txt').replace('blue', 'red')

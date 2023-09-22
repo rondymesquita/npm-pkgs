@@ -133,6 +133,7 @@ describe('shell', () => {
       '/var/temp/file.txt': 'fake',
     })
   })
+
   it('copy file to dir', async() => {
     const volume = Volume.fromNestedJSON({
       '/var/www/file.txt': 'fake',
@@ -162,7 +163,7 @@ describe('shell', () => {
       '/var/temp/file.txt': 'fake',
     })
   })
-  it('copy dir to dir using globs (wildcards)', async() => {
+  it('copy files to dir using globs (wildcards)', async() => {
 
     const volume = Volume.fromNestedJSON({
       '/var/www/deep': {
@@ -185,10 +186,12 @@ describe('shell', () => {
   it('copy files to dir using globs (wildcards)', async() => {
 
     const volume = Volume.fromNestedJSON({
-      '/var/www': {
-        'file.txt': 'fake',
-        'another.js': 'fake js',
-        'another.spec.js': 'fake spec js',
+      '/var': {
+        'file.js': 'fake js',
+        '/www': {
+          'file.txt': 'fake',
+          'another.js': 'fake js',
+        },
       },
       '/var/temp': {},
     })
@@ -198,11 +201,50 @@ describe('shell', () => {
     copy('/var/**/*.js', '/var/temp')
     console.log(volume.toJSON())
     expect(volume.toJSON()).toEqual({
+      '/var/file.js': 'fake js',
       '/var/www/file.txt': 'fake',
       '/var/www/another.js': 'fake js',
-      '/var/www/another.spec.js': 'fake spec js',
+      '/var/temp/file.js': 'fake js',
       '/var/temp/another.js': 'fake js',
-      '/var/temp/another.spec.js': 'fake spec js',
+    })
+  })
+  it('move files', async() => {
+    const volume = Volume.fromNestedJSON({
+      '/var/www/file.txt': 'fake',
+      '/var/www/another.txt': 'fake',
+      '/var/temp': {},
+    })
+    mocks.fs = volume
+    mockFs(volume.toJSON())
+
+    const { move, } = createSut(mocks)
+    move('/var/**/*.txt', '/var/temp')
+    expect(volume.toJSON()).toEqual({
+      '/var/www': null,
+      '/var/temp/file.txt': 'fake',
+      '/var/temp/another.txt': 'fake',
+    })
+  })
+  it.only('replicate folder structure', async() => {
+    const volume = Volume.fromNestedJSON({
+      '/var': {
+        '/www/deep': {
+          'file.txt': 'fake',
+          'another.txt': 'fake',
+        },
+      },
+      '/etc/temp': {},
+    })
+    mocks.fs = volume
+    mockFs(volume.toJSON())
+
+    const { replicate, } = createSut(mocks)
+    replicate('/var', '/etc/temp')
+    expect(volume.toJSON()).toEqual({
+      '/var/www/deep/file.txt': 'fake',
+      '/var/www/deep/another.txt': 'fake',
+      '/etc/temp/www/deep/file.txt': 'fake',
+      '/etc/temp/www/deep/another.txt': 'fake',
     })
   })
 })

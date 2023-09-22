@@ -11,10 +11,13 @@ export { DEFAULT_OPTIONS } from './shared'
 export const { options, setOptions, } = useGlobalOptions()
 export const {
   cd,
+  copy,
   exec,
   execAsync,
   fork,
   ls,
+  move,
+  replicate,
   run,
   runAsync,
   spawn,

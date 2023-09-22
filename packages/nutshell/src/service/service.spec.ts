@@ -1,4 +1,4 @@
-import { Volume } from 'memfs/lib/index'
+import { memfs } from 'memfs/lib'
 import pathActual from 'path'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -28,9 +28,9 @@ const mocks: any = {
 
 describe.skip('service', () => {
   beforeEach(() => {
-    mocks.fs = Volume.fromNestedJSON({ '/var/log': {}, })
+    mocks.fs = memfs({ '/var/log': {}, }).vol
   })
-  it('should have default configurations when some option are not informed', async () => {
+  it('should have default configurations when some option are not informed', async() => {
     const options = {
       name: 'fake.service',
       command: 'fakebin fakeparam --fakearg=1',
@@ -53,7 +53,7 @@ describe.skip('service', () => {
       '/var/log': null,
     })
   })
-  it('should start service and create logs and pid files', async () => {
+  it('should start service and create logs and pid files', async() => {
     mocks.childProcess.execSync = vi.fn()
     const options = {
       name: 'fake.service',
@@ -81,7 +81,7 @@ describe.skip('service', () => {
 
     expect(unref).toHaveBeenCalled()
   })
-  it('should start service and delete pid file and keep log files', async () => {
+  it('should start service and delete pid file and keep log files', async() => {
     const options = {
       name: 'fake.service',
       command: 'fakebin fakeparam --fakearg=1',
@@ -100,7 +100,7 @@ describe.skip('service', () => {
       '/var/pid': null,
     })
   })
-  it('should restart service', async () => {
+  it('should restart service', async() => {
     const options = {
       name: 'fake.service',
       command: 'fakebin fakeparam --fakearg=1',
