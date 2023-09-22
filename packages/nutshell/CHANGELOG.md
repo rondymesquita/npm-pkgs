@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.19.0](https://github.com/rondymesquita/nutshell/compare/@rondymesquita/nutshell@0.18.0...@rondymesquita/nutshell@0.19.0) (2023-09-22)
+
+
+### Features
+
+* add copy feature ([7a92967](https://github.com/rondymesquita/nutshell/commit/7a929675760cd669be371a2df45d5d9fd93e9d25))
+* add replicate method ([3b48e54](https://github.com/rondymesquita/nutshell/commit/3b48e545cdcb0a8819bc05fb5318213e666d2190))
+* nutshell file api ([8662f2c](https://github.com/rondymesquita/nutshell/commit/8662f2c946e444d83b254aabbd7651ec88e65fff))
+
+
+
 ## [0.18.0](https://github.com/rondymesquita/nutshell/compare/@rondymesquita/nutshell@0.17.0...@rondymesquita/nutshell@0.18.0) (2023-09-18)
 
 

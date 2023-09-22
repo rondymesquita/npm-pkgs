@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.10.0](https://github.com/rondymesquita/shell/compare/@rondymesquita/dotenv@0.9.0...@rondymesquita/dotenv@0.10.0) (2023-09-22)
+
+
+### Bug Fixes
+
+* add missing dep ([0581daa](https://github.com/rondymesquita/shell/commit/0581daa70c36b5bede05204682867d1bcf393cec))
+
+
+
 ## [0.9.0](https://github.com/rondymesquita/shell/compare/@rondymesquita/dotenv@0.8.0...@rondymesquita/dotenv@0.9.0) (2023-06-25)
 
 **Note:** Version bump only for package @rondymesquita/dotenv
