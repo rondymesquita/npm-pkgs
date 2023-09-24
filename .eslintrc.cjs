@@ -69,6 +69,6 @@ module.exports = {
     'simple-import-sort/exports': 'error',
     'unused-imports/no-unused-imports': ['error',],
     'space-before-function-paren': ['error', 'never',],
-
+    '@typescript-eslint/no-var-requires': 'off',
   },
 };
