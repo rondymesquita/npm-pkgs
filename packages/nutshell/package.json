@@ -14,13 +14,15 @@
     "nutshell": "./dist/bin.js"
   },
   "types": "./src/index.ts",
-  "main": "./src/index.ts",
+  "main": "./dist/index.js",
   "files": [
     "dist/**/*",
     "src/**/*"
   ],
   "exports": {
+    ".": "./dist/index.js",
     "./bin-dev": "./src/globals.ts",
+    "./src/globals": "./src/globals.ts",
     "./bin": "./dist/globals.js"
   },
   "scripts": {

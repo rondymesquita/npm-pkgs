@@ -44,7 +44,7 @@ export const defineShell = (
     })
   }
 
-  return {
+  const shell = {
     cd(dir: string) {
       console.log('cd', dir)
       process.chdir(dir)
@@ -67,14 +67,14 @@ export const defineShell = (
       if (Array.isArray(finalCmd)) {
         const results: Array<string> = []
         for (const cmd of finalCmd) {
-          const result = this.exec(cmd)
+          const result = shell.exec(cmd)
           console.log(result)
           results.push(result.toString())
         }
         return results
       } else {
 
-        const result = this.exec(finalCmd)
+        const result = shell.exec(finalCmd)
         console.log(result)
         return result.toString()
       }
@@ -85,14 +85,14 @@ export const defineShell = (
       if (Array.isArray(finalCmd)) {
         const results: Array<CmdResult> = []
         for (const cmd of finalCmd) {
-          const result = await execAsync(cmd)
+          const result = await shell.execAsync(cmd)
           console.log(result.stdout)
           results.push(result)
         }
         return results
       } else {
 
-        const result = await execAsync(finalCmd)
+        const result = await shell.execAsync(finalCmd)
         console.log(result.stdout)
         return result
       }
@@ -157,4 +157,6 @@ export const defineShell = (
       return childProcess.fork(...params)
     },
   }
+
+  return shell
 }

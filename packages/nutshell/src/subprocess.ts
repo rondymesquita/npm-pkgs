@@ -4,15 +4,11 @@ if (process.argv[2] !== 'subprocess') {
 }
 
 // eslint-disable-next-line
-import * as import__ from './shell'
-// shell
+import * as import_nutshell from './'
+import_nutshell
 import './globals'
-// console.log(global)
 
-// import__.ls()
-
-
-process.on('message', async (message: any) => {
+process.on('message', async(message: any) => {
   const fn = eval(message.fn)
   await fn()
   process.exit()

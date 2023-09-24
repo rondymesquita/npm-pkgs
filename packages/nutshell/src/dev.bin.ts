@@ -1,16 +1,17 @@
-#!/usr/bin/env -S tsx watch -r @rondymesquita/nutshell/bin-dev
+#!/usr/bin/env nutshell
+// #!/usr/bin/env -S tsx watch -r @rondymesquita/nutshell/bin-dev
 
+(async() => {
+  await run`echo "Hello"`
 
-// run('echo hello')
-// withContext(async () => {
-
-import { log } from 'console'
-
-// await ls()
-setOptions({ loggerLevel: 'error', })
-log({ options, })
-// printOptions()
-setOptions({ loggerLevel: 'info', })
-log({ options, })
-// printOptions()
-// })
+  await run`
+    echo "Multiline commands"
+    echo "using template literals"
+  `
+  await withContext(async() => {
+    await run`
+      echo "I am running"
+      echo "in a separated process"
+    `
+  })
+})()

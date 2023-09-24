@@ -17,6 +17,7 @@ Object.assign(global, t)
 
 declare global {
 	const run: typeof shell.run
+	const file: typeof shell.file
 	const runAsync: typeof shell.runAsync
 	const tasks: typeof t.tasks
 	const cd: typeof shell.cd

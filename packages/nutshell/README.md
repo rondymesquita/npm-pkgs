@@ -13,14 +13,14 @@ Create a `example.js`
 #!/usr/bin/env nutshell
 
 ;(async () => {
-  await $`echo "Hello"`
+  await run`echo "Hello"`
 
-  await $`
+  await run`
     echo "Multiline commands"
     echo "using template literals"
   `
   await withContext(async () => {
-    await $`
+    await run`
       echo "I am running"
       echo "in a separated process"
     `
