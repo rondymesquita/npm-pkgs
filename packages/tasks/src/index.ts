@@ -69,10 +69,7 @@ export const defineTasks = (defineArgs: typeof ArgsDefineArgs): DefineTasks => {
     const createTasks = defineTasksFunction()
     const tasks: PlainTasksObject = createTasks(taskDef)
     const task: Task = name && tasks[name] ? tasks[name] : tasks.default
-    console.log({
-      name,
-      tasks,
-    })
+
     definition = generateBasicDefinition(tasks)
 
     if (argv.options.help && !name) {
