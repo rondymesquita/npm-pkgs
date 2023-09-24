@@ -1,4 +1,9 @@
-#!/usr/bin/env nutshell
+#!/usr/bin/env -S tsx
+
+/**
+ * Enable type check
+ */
+import '@rondymesquita/nutshell/src/globals'
 
 const unit = async() => {
   run`echo "Hello"`
@@ -18,7 +23,5 @@ const unit = async() => {
 
   file('rondy').content('').write()
 }
-
-// unit()
 
 tasks({ default: unit, })

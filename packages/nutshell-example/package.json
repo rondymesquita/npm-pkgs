@@ -2,20 +2,15 @@
   "name": "example",
   "version": "0.15.0",
   "description": "",
-  "main": "example.js",
-  "types": "example.ts",
   "private": "true",
   "scripts": {
     "dev": "tsx watch example.ts",
     "build": "",
     "test": "",
     "docs": "",
-    "link": "npm uninstall --save @rondymesquita/nutshell && npm link --save ../"
+    "link": "npm uninstall --save @rondymesquita/nutshell && npm link ../nutshell"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@rondymesquita/nutshell": "^0.18.0"
-  }
+  "license": "ISC"
 }

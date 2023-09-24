@@ -1,29 +1,22 @@
-import { $, ls, tasks, withContext } from '@rondymesquita/nutshell'
-import { log } from 'console'
+import { file, ls, run, tasks, withContext } from '@rondymesquita/nutshell'
 
-// const s = new Shell({ loggerLevel: 'debug', shell: 'bash' })
+const unit = async() => {
+  await run`echo "Hello"`
 
-// setConfig({
-//   loggerLevel: 'debug',
-// })
-
-log($)
-
-const unit = async () => {
-  await $`echo "Hello"`
-
-  await $`
+  await run`
     echo "Multiline commands"
     echo "using template literals"
   `
-  await withContext(async () => {
-    await $`
+  await withContext(async() => {
+    await run`
       echo "I am running"
       echo "in a separated process"
     `
   })
 
   ls()
+
+  file('sicrano').content('').write()
 }
 
 tasks({ default: unit, })
