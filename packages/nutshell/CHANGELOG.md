@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.21.0](https://github.com/rondymesquita/nutshell/compare/@rondymesquita/nutshell@0.20.0...@rondymesquita/nutshell@0.21.0) (2023-09-24)
+
+**Note:** Version bump only for package @rondymesquita/nutshell
+
+
+
+
+
 ## [0.20.0](https://github.com/rondymesquita/nutshell/compare/@rondymesquita/nutshell@0.19.0...@rondymesquita/nutshell@0.20.0) (2023-09-24)
 
 
