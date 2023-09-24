@@ -1,8 +1,8 @@
-import { TaskNameNotInformedError, TaskNotFoundError } from './errors'
-import { defineTasks, Context } from './index'
+import { ArgsDefinition, defineArgs } from '@rondymesquita/args'
+import { describe, expect, it, vi } from 'vitest'
 
-import { ArgsDefinition, defineArgs, type } from '@rondymesquita/args'
-import { vi, describe, it, expect } from 'vitest'
+import { TaskNameNotInformedError, TaskNotFoundError } from './errors'
+import { Context, defineTasks } from './index'
 
 const createSut = () => {
   return defineTasks(defineArgs)
@@ -10,45 +10,41 @@ const createSut = () => {
 
 describe('tasks', () => {
   it('calls a task', () => {
-    process.argv = ['bin', 'file', 'fake', '--alpha=value', '-b=true']
+    process.argv = [
+      'bin', 'file', 'fake', '--alpha=value', '-b=true',
+    ]
 
-    const { tasks } = createSut()
+    const { tasks, } = createSut()
 
-    const tasksMock = {
-      fake: vi.fn(),
-    }
+    const tasksMock = { fake: vi.fn(), }
 
     expect(tasksMock.fake).not.toHaveBeenCalled()
     tasks(tasksMock)
     expect(tasksMock.fake).toBeCalledTimes(1)
   })
 
-  it('calls tasks in sequence when task is an array of tasks', async () => {
-    process.argv = ['bin', 'file', 'alpha']
+  it('calls tasks in sequence when task is an array of tasks', async() => {
+    process.argv = ['bin', 'file', 'alpha',]
 
-    const { tasks } = createSut()
+    const { tasks, } = createSut()
 
     const order: string[] = []
     const beta = vi.fn(() => order.push('beta'))
     const gamma = vi.fn(() => order.push('gamma'))
     const delta = vi.fn(() => order.push('delta'))
-    const tasksMock = {
-      alpha: [beta, gamma, delta],
-    }
+    const tasksMock = { alpha: [beta, gamma, delta,], }
 
     expect(order).toEqual([])
     await tasks(tasksMock)
-    expect(order).toEqual(['beta', 'gamma', 'delta'])
+    expect(order).toEqual(['beta', 'gamma', 'delta',])
   })
 
-  it('calls a default task when passing no param', () => {
-    process.argv = ['bin', 'file']
+  it('calls a default task when passing no name', () => {
+    process.argv = ['bin', 'file',]
 
-    const { tasks } = createSut()
+    const { tasks, } = createSut()
 
-    const tasksMock = {
-      default: vi.fn(),
-    }
+    const tasksMock = { default: vi.fn(), }
 
     expect(tasksMock.default).not.toHaveBeenCalled()
     tasks(tasksMock)
@@ -56,15 +52,11 @@ describe('tasks', () => {
   })
 
   it('calls a task in namespace', () => {
-    process.argv = ['bin', 'file', 'fake:alpha']
+    process.argv = ['bin', 'file', 'fake:alpha',]
 
-    const { tasks } = createSut()
+    const { tasks, } = createSut()
 
-    const tasksMock = {
-      fake: {
-        alpha: vi.fn(),
-      },
-    }
+    const tasksMock = { fake: { alpha: vi.fn(), }, }
 
     expect(tasksMock.fake.alpha).not.toHaveBeenCalled()
     tasks(tasksMock)
@@ -72,45 +64,37 @@ describe('tasks', () => {
   })
 
   it('calls a default task in namespace', () => {
-    process.argv = ['bin', 'file', 'fake']
-    const { tasks } = createSut()
+    process.argv = ['bin', 'file', 'fake',]
+    const { tasks, } = createSut()
 
-    const tasksMock = {
-      fake: {
-        default: vi.fn(),
-      },
-    }
+    const tasksMock = { fake: { default: vi.fn(), }, }
 
     expect(tasksMock.fake.default).not.toHaveBeenCalled()
     tasks(tasksMock)
     expect(tasksMock.fake.default).toBeCalledTimes(1)
   })
 
-  it('throws an error when no task name is informed and no default task exists', async () => {
-    process.argv = ['bin', 'file']
+  it('throws an error when no task name is informed and no default task exists', async() => {
+    process.argv = ['bin', 'file',]
 
-    const { tasks } = createSut()
+    const { tasks, } = createSut()
 
-    const tasksMock = {
-      fake: vi.fn(),
-    }
+    const tasksMock = { fake: vi.fn(), }
 
     await expect(() => tasks(tasksMock)).rejects.toThrowError(
-      new TaskNameNotInformedError(),
+      new TaskNameNotInformedError()
     )
   })
 
-  it('throws an error when task name is informed but task does not exist', async () => {
-    process.argv = ['bin', 'file', 'alpha']
+  it('throws an error when task name is informed but task does not exist', async() => {
+    process.argv = ['bin', 'file', 'alpha',]
 
-    const { tasks } = createSut()
+    const { tasks, } = createSut()
 
-    const tasksMock = {
-      beta: vi.fn(),
-    }
+    const tasksMock = { beta: vi.fn(), }
 
     await expect(() => tasks(tasksMock)).rejects.toThrowError(
-      new TaskNotFoundError('alpha'),
+      new TaskNotFoundError('alpha')
     )
   })
 
@@ -124,11 +108,9 @@ describe('tasks', () => {
       '--gamma=1',
     ]
 
-    const { tasks } = createSut()
+    const { tasks, } = createSut()
 
-    const tasksMock = {
-      fake: vi.fn(),
-    }
+    const tasksMock = { fake: vi.fn(), }
 
     tasks(tasksMock)
     expect(tasksMock.fake).toHaveBeenCalledWith(
@@ -149,19 +131,21 @@ describe('tasks', () => {
               beta: 'betavalue',
               gamma: 1,
             },
-            params: ['fake'],
+            params: ['fake',],
           },
         ],
-      ]),
+      ])
     )
   })
 
-  it('should share context between tasks calls tasks in sequence', async () => {
-    process.argv = ['bin', 'file', 'alpha', '--fake=1']
+  it('should share context between tasks calls tasks in sequence', async() => {
+    process.argv = [
+      'bin', 'file', 'alpha', '--fake=1',
+    ]
 
     function mapToObj(map: any) {
       const obj = {}
-      for (let [k, v] of map) {
+      for (const [k, v,] of map) {
         if (v instanceof Map) {
           obj[k] = mapToObj(v)
         } else {
@@ -171,7 +155,7 @@ describe('tasks', () => {
       return obj
     }
 
-    const { tasks } = createSut()
+    const { tasks, } = createSut()
 
     let betaContext
     const beta = vi.fn((options, ctx: Context) => {
@@ -188,9 +172,7 @@ describe('tasks', () => {
       deltaContext = mapToObj(ctx)
     })
 
-    const tasksMock = {
-      alpha: [beta, gamma, delta],
-    }
+    const tasksMock = { alpha: [beta, gamma, delta,], }
 
     await tasks(tasksMock)
     expect(betaContext).toEqual({
@@ -200,7 +182,7 @@ describe('tasks', () => {
           fake: 1,
           help: false,
         },
-        params: ['alpha'],
+        params: ['alpha',],
       },
     })
     expect(gammaContext).toEqual({
@@ -210,7 +192,7 @@ describe('tasks', () => {
           fake: 1,
           help: false,
         },
-        params: ['alpha'],
+        params: ['alpha',],
       },
       red: 'red-value',
     })
@@ -221,22 +203,18 @@ describe('tasks', () => {
           fake: 1,
           help: false,
         },
-        params: ['alpha'],
+        params: ['alpha',],
       },
       red: 'red-value',
       green: 'green-value',
     })
   })
 
-  it('should fill minimum args for each task when args in not defined', async () => {
-    process.argv = ['bin', 'file', 'fake:alpha']
-    const { tasks } = createSut()
+  it('should fill minimum args for each task when args in not defined', async() => {
+    process.argv = ['bin', 'file', 'fake:alpha',]
+    const { tasks, } = createSut()
 
-    const tasksMock = {
-      fake: {
-        alpha: vi.fn(),
-      },
-    }
+    const tasksMock = { fake: { alpha: vi.fn(), }, }
 
     // expect(definition).toEqual({})
     await tasks(tasksMock)
@@ -269,25 +247,23 @@ describe('tasks', () => {
     // })
   })
 
-  it('should call help', async () => {
+  it('should call help', async() => {
     const argv = {
       params: [],
-      options: { help: [] },
+      options: { help: [], },
     }
     const defineArgsMock = {
       parseArgs: vi.fn().mockImplementationOnce(() => argv),
       showHelp: vi.fn(),
       showErrors: vi.fn(),
     }
-    const { tasks } = defineTasks(
-      (argsDefinition: ArgsDefinition) => defineArgsMock,
+    const { tasks, } = defineTasks(
+      (argsDefinition: ArgsDefinition) => defineArgsMock
     )
 
     const alpha = vi.fn()
     expect(defineArgsMock.showHelp).not.toBeCalled()
-    tasks({
-      alpha,
-    })
+    tasks({ alpha, })
     expect(defineArgsMock.showHelp).toBeCalledTimes(1)
     expect(defineArgsMock.showHelp).toBeCalledWith()
   })

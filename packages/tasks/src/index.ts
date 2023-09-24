@@ -1,18 +1,15 @@
-import {
-  defineArgs as ArgsDefineArgs,
+import { ArgOptions,
   ArgsDefinition,
-  type,
   defaultValue,
+  defineArgs as ArgsDefineArgs,
   help as helpArgs,
-  ArgOptions,
-  Modifier,
-  ArgvOptions,
-} from '@rondymesquita/args'
+  type } from '@rondymesquita/args'
+import { flow, Status } from '@rondymesquita/flow'
+import { Stage } from '@rondymesquita/flow'
+
 import { TaskNameNotInformedError, TaskNotFoundError } from './errors'
 import { showGlobalHelp } from './help'
-import { generateBasicDefinition, defineTasksFunction } from './utils'
-import { flow, Context, Flow, Status } from '@rondymesquita/flow'
-import { Stage } from '@rondymesquita/flow'
+import { defineTasksFunction, generateBasicDefinition } from './utils'
 
 export * from '@rondymesquita/args'
 export * from '@rondymesquita/flow'
@@ -48,8 +45,12 @@ export interface DefineTasks {
 export const defineTasks = (defineArgs: typeof ArgsDefineArgs): DefineTasks => {
   let definition: TasksDefinition = {}
 
-  const tasks = async (taskDef: TasksObject) => {
-    const { parseArgs, showHelp, showErrors } = defineArgs({
+  const tasks = async(taskDef: TasksObject) => {
+    const {
+      parseArgs,
+      showErrors,
+      showHelp,
+    } = defineArgs({
       name: 'tasks',
       usage: 'tasks [task name] [task options]\nUsage: tasks [options]',
       options: {
@@ -67,8 +68,11 @@ export const defineTasks = (defineArgs: typeof ArgsDefineArgs): DefineTasks => {
 
     const createTasks = defineTasksFunction()
     const tasks: PlainTasksObject = createTasks(taskDef)
-    const task: Task = name ? tasks[name] : tasks.default
-
+    const task: Task = name && tasks[name] ? tasks[name] : tasks.default
+    console.log({
+      name,
+      tasks,
+    })
     definition = generateBasicDefinition(tasks)
 
     if (argv.options.help && !name) {
@@ -78,7 +82,7 @@ export const defineTasks = (defineArgs: typeof ArgsDefineArgs): DefineTasks => {
     }
 
     if (argv.errors.length > 0) {
-      console.log(`Errors`)
+      console.log('Errors')
       showErrors()
       return
     }
@@ -96,8 +100,8 @@ export const defineTasks = (defineArgs: typeof ArgsDefineArgs): DefineTasks => {
 
       const {
         parseArgs: parseTaskArgs,
-        showHelp: showTaskHelp,
         showErrors: showTaskErrors,
+        showHelp: showTaskHelp,
       } = defineArgs(taskArgDefinition)
 
       parseTaskArgs(process.argv.slice(2))
@@ -114,22 +118,25 @@ export const defineTasks = (defineArgs: typeof ArgsDefineArgs): DefineTasks => {
       }
     }
 
-    let results
-    let errors
-    let { runAsync, context, provideArgs, setStages } = flow()
+    const {
+      context,
+      provideArgs,
+      runAsync,
+      setStages,
+    } = flow()
     context.set('argv', argv)
     provideArgs((ctx) => {
-      return [argv.options, ctx]
+      return [argv.options, ctx,]
     })
 
     if (Array.isArray(task)) {
       setStages(task)
     } else {
-      setStages([task])
+      setStages([task,])
     }
-    results = await runAsync()
+    const results = await runAsync()
 
-    errors = results.filter((result) => result.status === Status.FAIL)
+    const errors = results.filter((result) => result.status === Status.FAIL)
     if (errors.length > 0) {
       errors.forEach((error) => {
         console.error(error)
@@ -147,5 +154,5 @@ const defineTasksFactory = () => {
   return defineTasks(ArgsDefineArgs)
 }
 
-const { tasks } = defineTasksFactory()
+const { tasks, } = defineTasksFactory()
 export { tasks }
