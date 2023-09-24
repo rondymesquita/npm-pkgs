@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.20.0](https://github.com/rondymesquita/nutshell/compare/@rondymesquita/nutshell@0.19.0...@rondymesquita/nutshell@0.20.0) (2023-09-24)
+
+
+### Features
+
+* adjust binary usage of nutshell ([0bb90f0](https://github.com/rondymesquita/nutshell/commit/0bb90f0bd31feb6ff940859e7f86e218f77cb971))
+
+
+
 ## [0.19.0](https://github.com/rondymesquita/nutshell/compare/@rondymesquita/nutshell@0.18.0...@rondymesquita/nutshell@0.19.0) (2023-09-22)
 
 
