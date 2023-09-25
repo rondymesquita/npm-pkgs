@@ -5,6 +5,7 @@ import * as Path from 'path'
 import * as Process from 'process'
 
 import { defineFile } from './file'
+import { defineJson } from './json'
 import { useGlobalOptions } from './shared'
 import { defineShell } from './shell'
 
@@ -27,3 +28,4 @@ export const {
 
 
 export const { file, } = defineFile(Process, FS, Path)
+export const { json, } = defineJson(defineFile(Process, FS, Path))

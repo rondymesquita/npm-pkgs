@@ -2,14 +2,7 @@ import * as FS from 'fs'
 import * as Path from 'path'
 import * as Process from 'process'
 
-import { useGlobalOptions } from './shared'
-
-interface File {
-	data: string | null,
-	content: (data: string) => File
-	read: () => void
-	write: () => void
-}
+import { IFileString } from '../models'
 
 
 export const defineFile = (
@@ -18,29 +11,20 @@ export const defineFile = (
   path: typeof Path
 ) => {
 
-  const { options, } = useGlobalOptions()
-
   const file = function(name:string) {
-    const self = {
-      data: '',
-      content(data: string) {
-        this.data = data
-        return self
-      },
-      write() {
-        fs.writeFileSync(path.resolve(process.cwd(), name), this.data, { encoding:'utf8', })
-      },
-      touch() {
-        this.write()
+
+    const self: IFileString = {
+      write(content: string = '') {
+        fs.writeFileSync(path.resolve(process.cwd(), name), content, { encoding:'utf8', })
       },
       read() {
-        const content = fs.readFileSync(path.resolve(process.cwd(), name), { encoding: 'utf8', })
-        return content
+        const _content = fs.readFileSync(path.resolve(process.cwd(), name), { encoding: 'utf8', })
+        return _content
       },
       replace(searchValue: string | RegExp, replaceValue: string){
-        const content = this.read()
-        this.data = content.replaceAll(searchValue, replaceValue)
-        this.write()
+        let content = self.read()
+        content = content.replaceAll(searchValue, replaceValue)
+        self.write(content)
       },
     }
     return self

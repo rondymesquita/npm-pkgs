@@ -23,3 +23,13 @@ export type DeepPartial<T> = T extends object
       [P in keyof T]?: DeepPartial<T[P]>
     }
   : T
+
+
+export interface IFile<T extends string | any> {
+  read: () => T
+  write: (content?: T) => void
+}
+
+export interface IFileString extends IFile<string>{
+  replace: (searchValue: string | RegExp, replaceValue: string) => void
+}

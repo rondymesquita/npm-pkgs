@@ -35,11 +35,14 @@ describe('file', () => {
     file('fake-file.txt')
     expect(mocks.fs.toJSON()).toEqual({ '/var/www': null, })
 
-    file('fake-file.txt').content('not a content yet')
+    file('fake-file.txt')
     expect(mocks.fs.toJSON()).toEqual({ '/var/www': null, })
 
-    file('fake-file.txt').content('fake-content').write()
+    file('fake-file.txt').write('fake-content')
     expect(mocks.fs.toJSON()).toEqual({ '/var/www/fake-file.txt': 'fake-content', })
+
+    file('fake-file.txt').write()
+    expect(mocks.fs.toJSON()).toEqual({ '/var/www/fake-file.txt': '', })
   })
 
   it('read file', async() => {
