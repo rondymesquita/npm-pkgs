@@ -15,10 +15,6 @@ const unit = async() => {
   })
 
   ls()
-
-  file('rondy').content('').write()
 }
 
-// unit()
-
-tasks({ default: unit, })
+tasks({ unit, })

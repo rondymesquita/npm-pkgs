@@ -13,14 +13,14 @@ Create a `example.js`
 #!/usr/bin/env nutshell
 
 ;(async () => {
-  await run`echo "Hello"`
+  run`echo "Hello"`
 
-  await run`
+  run`
     echo "Multiline commands"
     echo "using template literals"
   `
-  await withContext(async () => {
-    await run`
+  await withContext(() => {
+    run`
       echo "I am running"
       echo "in a separated process"
     `
@@ -28,50 +28,122 @@ Create a `example.js`
 })()
 ```
 
-Run with:
+Run:
 
 ```bash
 ./example.js
 ```
 
+### Require
+```js
+const {
+  ls,
+  run,
+  withContext,
+} = require('@rondymesquita/nutshell')
+
+;(async () => {
+  run`echo "Hello"`
+
+  await withContext(() => {
+    ls()
+  })
+})()
+```
+
+Run:
+
+```bash
+node example.js
+```
+
 ## Using Typescript
 
-For usage with Typescript, change intepreter to `ts-node`.
-You should have `ts-node` installed.
+For usage with Typescript, change intepreter to any typescript interpreter like `tsx` or `ts-node`.
+
+https://github.com/esbuild-kit/tsx
+https://www.npmjs.com/package/ts-node
+
 
 ```ts
-#!/usr/bin/env ts-node
+#!/usr/bin/env tsx
 
 // import to enable type checking
-import '@rondymesquita/nutshell'
-;(async () => {
-  await $`echo "Hello"`
+import '@rondymesquita/nutshell/src/globals'
 
-  await $`
+;(async () => {
+  run`echo "Hello"`
+
+  run`
     echo "Multiline commands"
     echo "using template literals"
   `
-  await withContext(async () => {
-    await $`
+  await withContext(() => {
+    run`
       echo "I am running"
       echo "in a separated process"
     `
   })
 })()
+```
+
+```bash
+./example.ts
+```
+
+### Import
+```ts
+import { ls, run, withContext } from '@rondymesquita/nutshell'
+
+;(async () => {
+  run`echo "Hello"`
+
+  await withContext(() => {
+    ls()
+  })
+})()
+```
+
+Run:
+
+```bash
+tsx example.ts
+```
+
+## Using with tasks
+
+[@rondymesquita/tasks](../tasks//README.md)
+
+```ts
+const unit = async() => {
+  run`echo "Hello"`
+
+  run`
+    echo "Multiline commands"
+    echo "using template literals"
+  `
+  await withContext(async() => {
+    run`
+      echo "I am running"
+      echo "in a separated process"
+    `
+  })
+
+  ls()
+}
+
+tasks({ unit, })
+```
+
+```bash
+$ node file.js unit
 ```
 
 ## Configuration
 
 Set custom configuration with `setConfig`
 
-```ts
-setConfig({
-  loggerLevel: 'verbose',
-})
-;(async () => {
-  await $`echo "Hello"`
-})()
-```
+TBD
 
 ## Configuration options
 

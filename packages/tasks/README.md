@@ -84,6 +84,8 @@ $ node tasks.js test:e2e
 
 ### Sequence
 
+Pass array of tasks.
+
 ```js
 async function clean() {
   await new Promise((res) => setTimeout(res, 2000))
