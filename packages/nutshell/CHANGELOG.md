@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.22.0](https://github.com/rondymesquita/shell/compare/@rondymesquita/nutshell@0.21.0...@rondymesquita/nutshell@0.22.0) (2023-09-26)
+
+
+### Features
+
+* add json file api on nutshell ([047c975](https://github.com/rondymesquita/shell/commit/047c975a2e03468f29ac30eecff806f172e40474))
+
+
+### Bug Fixes
+
+* remove api from dev script ([30636c1](https://github.com/rondymesquita/shell/commit/30636c1f545584e1c66f55b0a726620fdcb5d97b))
+
+
+
 ## [0.21.0](https://github.com/rondymesquita/nutshell/compare/@rondymesquita/nutshell@0.20.0...@rondymesquita/nutshell@0.21.0) (2023-09-24)
 
 **Note:** Version bump only for package @rondymesquita/nutshell
