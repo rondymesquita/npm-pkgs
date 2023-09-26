@@ -12,6 +12,6 @@ import { copy,  file,  ls } from './';
 ls()
 copy('./typedoc.json', './')
 // run()
-file('fulano.json').content('rondy').write()
+// file('fulano.json').write()
 const data = file('fulano.json').read()
 console.log({ data, });
