@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.15.0](https://github.com/rondymesquita/shell/compare/@rondymesquita/flow@0.14.0...@rondymesquita/flow@0.15.0) (2024-02-19)
+
+
+### Features
+
+* organize projects by browser or node ([6b432c5](https://github.com/rondymesquita/shell/commit/6b432c528f8df87ebe80ed91d1217fe94d9f9aa0))
+
+
+
 ## [0.14.0](https://github.com/rondymesquita/shell/compare/@rondymesquita/flow@0.13.0...@rondymesquita/flow@0.14.0) (2023-06-25)
 
 ### Features

@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.23.0](https://github.com/rondymesquita/shell/compare/@rondymesquita/nutshell@0.22.0...@rondymesquita/nutshell@0.23.0) (2024-02-19)
+
+
+### Features
+
+* organize projects by browser or node ([6b432c5](https://github.com/rondymesquita/shell/commit/6b432c528f8df87ebe80ed91d1217fe94d9f9aa0))
+
+
+
 ## [0.22.0](https://github.com/rondymesquita/shell/compare/@rondymesquita/nutshell@0.21.0...@rondymesquita/nutshell@0.22.0) (2023-09-26)
 
 
