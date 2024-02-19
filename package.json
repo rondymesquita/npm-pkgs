@@ -3,10 +3,11 @@
   "version": "0.0.0",
   "description": "",
   "main": "index.js",
+  "private": true,
   "scripts": {
-    "configure": "npx lerna run install",
-    "build": "npx lerna run build",
-    "test": "npx lerna run test"
+    "configure": "npx run install",
+    "build": "npx run build -ws",
+    "test": "npx run test -ws"
   },
   "repository": {
     "type": "git",
@@ -23,11 +24,11 @@
     "lerna": "^6.4.1"
   },
   "workspaces": [
-    "packages/args",
-    "packages/dotenv",
-    "packages/flow",
-    "packages/nutshell",
-    "packages/tasks"
+    "packages/node/args",
+    "packages/node/dotenv",
+    "packages/node/nutshell",
+    "packages/shared/flow",
+    "packages/shared/tasks"
   ],
   "devDependencies": {
     "@release-it/conventional-changelog": "^5.1.1",
