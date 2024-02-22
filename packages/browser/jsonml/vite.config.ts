@@ -1,12 +1,5 @@
-import { resolve } from 'path'
 import { defineConfig } from 'vite'
 
-export default defineConfig({
-  build: {
-    lib: {
-      entry: resolve(__dirname, 'src/main.ts'),
-      name: 'jsonml',
-      fileName: 'jsonml',
-    },
-  },
-})
+import baseConfig from '../base-vite.config'
+
+export default defineConfig({ ...baseConfig, })

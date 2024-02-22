@@ -24,6 +24,7 @@
     "lerna": "^6.4.1"
   },
   "workspaces": [
+    "packages/apps/cambio-delrey",
     "packages/node/args",
     "packages/node/dotenv",
     "packages/node/nutshell",
