@@ -6,7 +6,7 @@ const name = basename(process.cwd())
 export default defineConfig({
   build: {
     lib: {
-      entry: resolve(process.cwd(), 'src/main.ts'),
+      entry: resolve(process.cwd(), 'src/index.ts'),
       name,
       fileName: name,
     },
