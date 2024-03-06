@@ -12,15 +12,28 @@ const {
   span,
 } = createElement
 
-const app = div(
-  h2('subtitle'),
-  span(),
-  span(
-    { style: { border: '1px solid red', }, },
-    span('rondy '),
-    em('emphasys '),
-    'asd'
-  ),
-  createElement('div', 'rondy', 'mesquita')
-)
-document.body.appendChild(app)
+function Card({ color, }: any){
+  return div(
+    { style: {}, }
+  )
+}
+
+function App(){
+  return div(
+    {
+      title: ' ',
+      style: { backgroundColor: '#eee', },
+    },
+    h2('subtitle'),
+    div(
+      { style: { border: '1px solid red', }, },
+      span('rondy '),
+      em('emphasys '),
+      'span',
+      div('rondy')
+    ),
+    createElement('div', 'rondy', 'mesquita')
+  )
+}
+
+document.body.appendChild(App())

@@ -1,4 +1,4 @@
-import { Tag, tags } from './models/models'
+import { CreateElement, Tag, tags } from './models/models'
 
 
 export function define({ document,  }: {
@@ -39,8 +39,8 @@ export function define({ document,  }: {
     }
     return createElementTag
   }
-
-  const createElement = (tag: Tag, ...args: unknown[]) => {
+  //@ts-ignore
+  const createElement: CreateElement = (tag: Tag, ...args: unknown[]) => {
     const creator = defineElementCreator(tag);
     return creator(...args)
   }

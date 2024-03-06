@@ -114,9 +114,15 @@ export const tags = [
   'wbr',
 ] as const
 export type Tag = typeof tags[number]
-export type Attributes = Record<string, any> | null
+type HTMLElementNoStyle = Omit<HTMLElement, 'style'>
+export type Attributes = {
+  [P in keyof HTMLElementNoStyle]?: HTMLElementNoStyle[P];
+} & {
+  style: Partial<CSSStyleDeclaration>
+}
 export type Children = HTMLElement | string
-
+// const el = document.createElement('div')
+// el.style
 export type CreateElementInTag = {
   (...children: Children[]): HTMLElement
   (attrs: Attributes, ...children: Children[]): HTMLElement
@@ -131,4 +137,4 @@ export type CreateElementFunction = {
   (tag: Tag, attrs: Attributes, ...children: Children[]): HTMLElement
 }
 
-export type CreateElement = CreateElementObject
+export type CreateElement = CreateElementObject & CreateElementFunction
