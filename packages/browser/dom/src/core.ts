@@ -10,7 +10,7 @@ interface Core {
 	createElementTags: CreateElementObject,
 }
 
-export function defineCore({ document, }: CoreInput){
+export function defineCore({ document, }: CoreInput): Core{
 
   const createElement: CreateElement = (tag: Tag, ...args: unknown[]) => {
     const creator = defineElementCreator(tag, document);

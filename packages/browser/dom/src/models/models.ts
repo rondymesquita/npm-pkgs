@@ -119,8 +119,9 @@ type HTMLElementNoStyle = Omit<HTMLElement, 'style'>
 export type Attributes = {
   [P in keyof HTMLElementNoStyle]?: HTMLElementNoStyle[P];
 } & {
-  style?: Partial<CSSStyleDeclaration>
+  style?: Partial<CSSStyleDeclaration>,
 }
+
 export type Children = HTMLElement | string
 // const el = document.createElement('div')
 // el.style
@@ -136,4 +137,8 @@ export type CreateElementObject = {
 export type CreateElement = {
   (tag: Tag, ...children: Children[]): HTMLElement
   (tag: Tag, attrs: Attributes, ...children: Children[]): HTMLElement
+}
+
+export type Component = {
+  (...props: unknown[]): HTMLElement
 }
