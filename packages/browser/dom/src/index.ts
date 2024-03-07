@@ -1,57 +1,117 @@
-import { CreateElement, Tag, tags } from './models/models'
+import { defineCore } from './core';
 
-
-export function define({ document,  }: {
-  document: typeof window.document
-}){
-
-  function defineElementCreator(tag: Tag) {
-    const createElementTag = (...args: unknown[]): HTMLElement => {
-      const element = document.createElement(tag)
-
-      function processArg(arg: any) {
-        if (typeof arg === 'string') {
-          const textNode = document.createTextNode(arg)
-          element.appendChild(textNode)
-        } else if (arg instanceof HTMLElement) {
-          element.appendChild(arg)
-        } else if (typeof arg === 'object') {
-          console.log(arg, typeof arg, arg instanceof HTMLElement)
-
-          for (const key in arg) {
-            if (key === 'style') continue
-            element.setAttribute(key, arg[key]);
-          }
-          if (arg.style) {
-            Object.entries(arg.style).forEach(([key, value,]) => {
-              (element.style as any)[key] = value;
-            })
-          }
-
-        }
-      }
-
-      for (const index in args) {
-        processArg(args[index])
-      }
-
-      return element
-    }
-    return createElementTag
-  }
-  //@ts-ignore
-  const createElement: CreateElement = (tag: Tag, ...args: unknown[]) => {
-    const creator = defineElementCreator(tag);
-    return creator(...args)
-  }
-
-  tags.forEach((tag: Tag) => {
-    const creator = defineElementCreator(tag);
-    (createElement as any)[tag] = creator
-  })
-
-
-  return { createElement, }
-}
-
-export const { createElement, } = define({ document, })
+export const { createElement, createElementTags, } = defineCore({ document, })
+export const {
+  a,
+  abbr,
+  address,
+  area,
+  article,
+  aside,
+  audio,
+  b,
+  base,
+  bdi,
+  bdo,
+  blockquote,
+  body,
+  br,
+  button,
+  canvas,
+  caption,
+  cite,
+  code,
+  col,
+  colgroup,
+  data,
+  datalist,
+  dd,
+  del,
+  details,
+  dfn,
+  dialog,
+  div,
+  dl,
+  dt,
+  em,
+  embed,
+  fieldset,
+  figcaption,
+  figure,
+  footer,
+  form,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  head,
+  header,
+  hgroup,
+  hr,
+  html,
+  i,
+  iframe,
+  img,
+  input,
+  ins,
+  kbd,
+  label,
+  legend,
+  li,
+  link,
+  main,
+  map,
+  mark,
+  menu,
+  meta,
+  meter,
+  nav,
+  noscript,
+  object,
+  ol,
+  optgroup,
+  option,
+  output,
+  p,
+  picture,
+  pre,
+  progress,
+  q,
+  rp,
+  rt,
+  ruby,
+  s,
+  samp,
+  script,
+  search,
+  section,
+  select,
+  slot,
+  small,
+  source,
+  span,
+  strong,
+  style,
+  sub,
+  summary,
+  sup,
+  table,
+  tbody,
+  td,
+  template,
+  textarea,
+  tfoot,
+  th,
+  thead,
+  time,
+  title,
+  tr,
+  track,
+  u,
+  ul,
+  var: var_,
+  video,
+  wbr,
+} = createElementTags

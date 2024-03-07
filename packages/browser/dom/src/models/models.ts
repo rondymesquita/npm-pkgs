@@ -113,12 +113,13 @@ export const tags = [
   'video',
   'wbr',
 ] as const
+
 export type Tag = typeof tags[number]
 type HTMLElementNoStyle = Omit<HTMLElement, 'style'>
 export type Attributes = {
   [P in keyof HTMLElementNoStyle]?: HTMLElementNoStyle[P];
 } & {
-  style: Partial<CSSStyleDeclaration>
+  style?: Partial<CSSStyleDeclaration>
 }
 export type Children = HTMLElement | string
 // const el = document.createElement('div')
@@ -132,9 +133,7 @@ export type CreateElementObject = {
   [key in Tag]: CreateElementInTag
 }
 
-export type CreateElementFunction = {
+export type CreateElement = {
   (tag: Tag, ...children: Children[]): HTMLElement
   (tag: Tag, attrs: Attributes, ...children: Children[]): HTMLElement
 }
-
-export type CreateElement = CreateElementObject & CreateElementFunction
