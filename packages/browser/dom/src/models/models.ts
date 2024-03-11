@@ -1,3 +1,4 @@
+import { EventHandler } from '../bus'
 
 export const tags = [
   'a',
@@ -120,16 +121,14 @@ export type Attributes = {
   [P in keyof HTMLElementNoStyle]?: HTMLElementNoStyle[P];
 } & {
   style?: Partial<CSSStyleDeclaration>,
+  watch?: Array<EventHandler>
 }
 
-export type Children = HTMLElement | string
-// const el = document.createElement('div')
-// el.style
+export type Children = HTMLElement | Text | string | number | boolean | Date
 export type CreateElementInTag = {
   (...children: Children[]): HTMLElement
   (attrs: Attributes, ...children: Children[]): HTMLElement
 };
-// eslint-disable-next-line @typescript-eslint/ban-types
 export type CreateElementObject = {
   [key in Tag]: CreateElementInTag
 }

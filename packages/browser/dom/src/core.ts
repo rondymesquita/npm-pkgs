@@ -1,4 +1,6 @@
-import { defineElementCreator } from './element-creator';
+import { render } from './dom/element';
+import { defineElementCreator } from './dom/element-creator';
+import { createVDOM } from './dom/vdom';
 import { CreateElement, CreateElementObject, Tag, tags } from './models/models';
 
 interface CoreInput {
@@ -12,7 +14,7 @@ interface Core {
 
 export function defineCore({ document, }: CoreInput): Core{
 
-  const createElement: CreateElement = (tag: Tag, ...args: unknown[]) => {
+  const createElement: any = (tag: Tag, ...args: unknown[]) => {
     const creator = defineElementCreator(tag, document);
     return creator(...args)
   }
@@ -20,8 +22,11 @@ export function defineCore({ document, }: CoreInput): Core{
   const createElementTags: any = {}
 
   tags.forEach((tag: Tag) => {
-    const creator = defineElementCreator(tag, document);
-    createElementTags[tag] = creator
+    createElementTags[tag] = (...args: unknown[]): HTMLElement => {
+      const vdom = createVDOM(tag, args)
+      const element = render(document, vdom)
+      return element
+    }
   })
 
   return {

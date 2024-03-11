@@ -1,22 +1,31 @@
-import { Component, Tag } from './models/models'
+import { EventHandler } from '../bus'
+import { Attributes, Tag } from '../models/models'
+import { VDOM } from './vdom'
+
+
+function render(vdom: VDOM): HTMLElement{
+  const element = document.createElement(vdom.tag)
+  return element
+}
 
 export function defineElementCreator(tag: Tag, document: typeof window.document) {
   return (...args: unknown[]): HTMLElement => {
-    const element = document.createElement(tag)
 
+    const element = document.createElement(tag)
 
     for (const index in args) {
       const arg = args[index] as any
-
       const instanceOfAttributes = typeof arg === 'object' && !Array.isArray(arg)
-      // console.log({ arg, })
-      if (typeof arg === 'string') {
+
+      if (['string', 'number', 'Date',].includes(typeof arg)) {
         const textNode = document.createTextNode(arg)
         element.appendChild(textNode)
       } else if (arg instanceof HTMLElement) {
         element.appendChild(arg)
       } else if (instanceOfAttributes) {
-        for (const key in arg) {
+        const attrs: Attributes = arg
+
+        for (const key in attrs) {
           const attribute = arg[key]
           const isEventListener = key.startsWith('on')
           if (isEventListener) {
@@ -27,31 +36,23 @@ export function defineElementCreator(tag: Tag, document: typeof window.document)
           }
         }
 
-        if (arg.style) {
+        if (attrs.style) {
           Object.entries(arg.style).forEach(([key, value,]) => {
             (element.style as any)[key] = value;
           })
         }
 
-        if (arg.watch) {
-          // arg.watch.forEach((watcher: any) => {
-          //   console.log(watcher, watcher.name)
-          // })
+        if (attrs.watch) {
+          attrs.watch.forEach((eventHandler: EventHandler) => {
+            // console.log(eventHandler, eventHandler.name)
+            eventHandler('state:update', () => {
+              console.log('called here in fulano')
+            })
+          })
         }
-      } else if (typeof arg === 'function') {
-        console.log(' function')
-        const html = arg()
-        console.log(html)
-        element.appendChild(html)
       }
     }
 
     return element
-  }
-}
-
-export function defineComponentCreator(tag: Tag, document: typeof window.document): Component {
-  return (...args: unknown[]) => {
-
   }
 }

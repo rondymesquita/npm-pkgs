@@ -1,13 +1,12 @@
 export interface Subscriber {
 
 }
-type Event = string
-type Handler = (...args: any[]) => void
-export function defineBus(){
-  const subscribers: Map<Event, Handler[]> = new Map()
+export type EventHandler = (...args: any[]) => void
+export function defineEventBus(){
+  const subscribers: Map<string, EventHandler[]> = new Map()
 
   return {
-    on(event: Event, handler: Handler){
+    on(event: string, handler: EventHandler){
       if (!subscribers.get(event)){
         subscribers.set(event, [handler,])
       } else {
@@ -17,10 +16,10 @@ export function defineBus(){
     off(){
 
     },
-    emit(event: Event, ...data: any[]){
+    emit(event: string, ...data: any[]){
       const handlers = subscribers.get(event)
       if (Array.isArray(handlers)) {
-        handlers.forEach((handler: Handler) => {
+        handlers.forEach((handler: EventHandler) => {
           handler(...data)
         })
       }
