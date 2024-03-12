@@ -124,7 +124,7 @@ export type Attributes = {
   watch?: Array<EventHandler>
 }
 
-export type Children = HTMLElement | Text | string | number | boolean | Date
+export type Children = (() => Children) | HTMLElement | Text | string | number | boolean | Date
 export type CreateElementInTag = {
   (...children: Children[]): HTMLElement
   (attrs: Attributes, ...children: Children[]): HTMLElement

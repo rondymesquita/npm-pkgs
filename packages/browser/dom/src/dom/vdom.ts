@@ -1,5 +1,9 @@
 import { Attributes, Tag } from '../models/models'
 
+export type VDOMChildren = {
+  type: 'TextNode' | 'HTMLElement' | 'Function',
+  value: HTMLElement | Text |  string | number | Date | boolean | (() => any)
+}
 export interface VDOM {
   tag: string
   attrs: {
@@ -8,7 +12,8 @@ export interface VDOM {
     styles: Map<string, any>
     watchers: Map<string, any>
   }
-  children: (HTMLElement | Text)[]
+  // children: (HTMLElement | Text)[]
+  children: VDOMChildren[]
 }
 
 export function createVDOM(tag: Tag, args: unknown[]): VDOM {
@@ -27,15 +32,38 @@ export function createVDOM(tag: Tag, args: unknown[]): VDOM {
     if ([
       'string', 'number', 'Date', 'boolean',
     ].includes(typeof arg)) {
-      const textNode = document.createTextNode(arg)
-      vdom.children.push(textNode)
+      vdom.children.push({
+        type: 'TextNode',
+        value: arg,
+      })
+      // const textNode = document.createTextNode(arg)
+      // vdom.children.push(textNode)
     } else if (arg instanceof HTMLElement) {
-      vdom.children.push(arg)
+      vdom.children.push({
+        type: 'HTMLElement',
+        value: arg,
+      })
+      // vdom.children.push(arg)
+    }else if (typeof arg === 'function'){
+      vdom.children.push({
+        type: 'Function',
+        value: arg,
+      })
+      // vdom.children.push(arg)
+      // console.log({
+      //   index,
+      //   arg,
+      //   instance: arg,
+      // })
     } else if (typeof arg === 'object' && !Array.isArray(arg)) {
       const attrs: Attributes = arg
 
       for (const key in attrs) {
         const attribute = arg[key]
+        console.log({
+          attribute,
+          key,
+        })
         const isEventListener = key.startsWith('on')
         const isStyle = key === 'style'
         const isWatch = key === 'watch'

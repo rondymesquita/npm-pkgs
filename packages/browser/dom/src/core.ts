@@ -1,5 +1,4 @@
-import { render } from './dom/element';
-import { defineElementCreator } from './dom/element-creator';
+import { render } from './dom/render';
 import { createVDOM } from './dom/vdom';
 import { CreateElement, CreateElementObject, Tag, tags } from './models/models';
 
@@ -15,16 +14,30 @@ interface Core {
 export function defineCore({ document, }: CoreInput): Core{
 
   const createElement: any = (tag: Tag, ...args: unknown[]) => {
-    const creator = defineElementCreator(tag, document);
-    return creator(...args)
+    // const creator = defineElementCreator(tag, document);
+    // return creator(...args)
   }
 
   const createElementTags: any = {}
 
   tags.forEach((tag: Tag) => {
     createElementTags[tag] = (...args: unknown[]): HTMLElement => {
-      const vdom = createVDOM(tag, args)
-      const element = render(document, vdom)
+      let vdom = createVDOM(tag, args)
+      let element: HTMLElement = render(document, vdom)
+      vdom.attrs.watchers.forEach((value, key) => {
+        if(tag === 'h1') {
+          console.log({ vdom, })
+        }
+        value('state:update', () => {
+          const rerenderVdom = createVDOM(tag, args)
+          const rerenderElement = render(document, vdom)
+          element.replaceWith(rerenderElement)
+          element = rerenderElement
+          vdom = rerenderVdom
+          console.log('called here in fulano', element.innerHTML)
+        })
+      })
+
       return element
     }
   })

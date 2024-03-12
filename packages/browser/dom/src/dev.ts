@@ -68,10 +68,9 @@ const Counter = () => {
   }
   return div({
     title:'meu titulo',
-    onclick: increment,
     style: { color: 'red', },
   },
-  h1({ watch: [onCount,], }, 'Count ', count()),
+  h1({ watch: [onCount,], }, 'Count ', count),
   button({ onclick: increment, }, 'increment'))
 }
 
