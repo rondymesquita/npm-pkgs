@@ -1,5 +1,4 @@
-import { render } from './dom/render';
-import { createVDOM } from './dom/vdom';
+import { defineReactiveRender } from './dom/render';
 import { CreateElement, CreateElementObject, Tag, tags } from './models/models';
 
 interface CoreInput {
@@ -22,22 +21,7 @@ export function defineCore({ document, }: CoreInput): Core{
 
   tags.forEach((tag: Tag) => {
     createElementTags[tag] = (...args: unknown[]): HTMLElement => {
-      let vdom = createVDOM(tag, args)
-      let element: HTMLElement = render(document, vdom)
-      vdom.attrs.watchers.forEach((value, key) => {
-        if(tag === 'h1') {
-          console.log({ vdom, })
-        }
-        value('state:update', () => {
-          const rerenderVdom = createVDOM(tag, args)
-          const rerenderElement = render(document, vdom)
-          element.replaceWith(rerenderElement)
-          element = rerenderElement
-          vdom = rerenderVdom
-          console.log('called here in fulano', element.innerHTML)
-        })
-      })
-
+      const { element, } = defineReactiveRender(tag, args)
       return element
     }
   })
