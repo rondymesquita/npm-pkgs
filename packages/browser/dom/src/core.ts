@@ -19,7 +19,7 @@ export function defineCore({ document, }: CoreInput): Core{
 
   // createElement('a', { href: 'null', }, 'text')
 
-  const createElementTags: CreateElementTags | any = {}
+  const createElementTags: CreateElementTags
 
   tags.forEach((tag: Tag) => {
     (createElementTags as any)[tag] = (...args: unknown[]): HTMLElement => {

@@ -49,7 +49,7 @@ const Counter = () => {
     style: { color: 'red', },
   },
   link,
-  a({ href: {}, }, 'custom link'),
+  a({ href: 'asd', }, 'custom link'),
   h1({ watch: [onCount,], }, 'Count ', count),
   button({ onclick: increment, }, 'increment'))
 }
