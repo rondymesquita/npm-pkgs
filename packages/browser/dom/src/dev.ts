@@ -1,8 +1,9 @@
 /* eslint-disable new-cap */
 
-import { a, button, createElement, div, h1 } from '.'
+import { button, div, h1 } from '.'
 import { mount } from './dom/mount'
 import { useState } from './dom/state'
+import { watch } from './dom/watch'
 
 
 function Card({
@@ -41,18 +42,21 @@ const Counter = () => {
     console.log('opa')
   })
 
-  const link = createElement('a', {
-    href: '#/',
-    target: '_blank',
-  },  'my link')
+  const [date, setDate, onDate,] = useState(new Date())
+
+  setInterval(() => setDate(new Date()), 1000)
+
+  watch([onCount, onDate,], () => {
+    console.log('ambos atualizados')
+  })
 
   return div({
     title:'meu titulo',
     style: { color: 'red', },
   },
-  link,
-  a({ href: 'asd', }, 'custom link'),
+
   h1({ watch: [onCount,], }, 'Count ', count),
+  h1({ watch: [onDate,], }, 'Date', date),
   button({ onclick: increment, }, 'increment'))
 }
 function DateComponent(){
@@ -67,8 +71,7 @@ function DateComponent(){
 
 function App(){
   return div(
-    Card({ children: [Counter(),], }),
-    DateComponent()
+    Card({ children: [Counter(),], })
   )
 }
 
