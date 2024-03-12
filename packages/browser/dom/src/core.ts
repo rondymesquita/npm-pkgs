@@ -1,5 +1,5 @@
 import { defineReactiveRender } from './dom/render';
-import { CreateElement, CreateElementObject, Tag, tags } from './models/models';
+import { CreateElement, CreateElementTags, Tag, tags } from './models/models';
 
 interface CoreInput {
   document: typeof window.document
@@ -7,20 +7,22 @@ interface CoreInput {
 
 interface Core {
 	createElement: CreateElement,
-	createElementTags: CreateElementObject,
+	createElementTags: CreateElementTags,
 }
 
 export function defineCore({ document, }: CoreInput): Core{
 
-  const createElement: any = (tag: Tag, ...args: unknown[]) => {
-    // const creator = defineElementCreator(tag, document);
-    // return creator(...args)
+  const createElement: CreateElement = (tag: Tag, ...args: unknown[]) => {
+    const { element, } = defineReactiveRender(tag, args)
+    return element
   }
 
-  const createElementTags: any = {}
+  // createElement('a', { href: 'null', }, 'text')
+
+  const createElementTags: CreateElementTags | any = {}
 
   tags.forEach((tag: Tag) => {
-    createElementTags[tag] = (...args: unknown[]): HTMLElement => {
+    (createElementTags as any)[tag] = (...args: unknown[]): HTMLElement => {
       const { element, } = defineReactiveRender(tag, args)
       return element
     }

@@ -115,31 +115,26 @@ export const tags = [
   'wbr',
 ] as const
 
-export type Tag = typeof tags[number]
+// export type Tag = typeof tags[number]
+// export type Tag = keyof HTMLElementTagNameMap
 type HTMLElementNoStyle = Omit<HTMLElement, 'style'>
-export type Attributes = {
-  [P in keyof HTMLElementNoStyle]?: HTMLElementNoStyle[P];
-} & {
+export type Attributes<K extends keyof HTMLElementTagNameMap> = Partial<Omit<HTMLElementTagNameMap[K], 'style'>> & {
   style?: Partial<CSSStyleDeclaration>,
   watch?: Array<EventHandler>
 }
 
 export type Children = (() => Children) | HTMLElement | Text | string | number | boolean | Date
-export type CreateElementInTag = {
-  (...children: Children[]): HTMLElement
-  (attrs: Attributes, ...children: Children[]): HTMLElement
-};
-export type CreateElementObject = {
-  [key in Tag]: CreateElementInTag
+// Partial<HTMLElementTagNameMap[K]
+export type CreateElementTags = {
+  [key in keyof HTMLElementTagNameMap]: {
+    <K extends keyof HTMLElementTagNameMap>(...children: Children[]): HTMLElementTagNameMap[K]
+    <K extends keyof HTMLElementTagNameMap>(attrs: Partial<HTMLElementTagNameMap[K]>, ...children: Children[]): HTMLElementTagNameMap[K]
+  }
 }
 
 export type CreateElement = {
-  (tag: Tag, ...children: Children[]): HTMLElement
-  (tag: Tag, attrs: Attributes, ...children: Children[]): HTMLElement
-}
-
-export type Component = {
-  (...props: unknown[]): HTMLElement
+  <K extends keyof HTMLElementTagNameMap>(tag: K, ...children: Children[]): HTMLElementTagNameMap[K]
+  <K extends keyof HTMLElementTagNameMap>(tag: K, attrs: Partial<HTMLElementTagNameMap[K]>, ...children: Children[]): HTMLElementTagNameMap[K]
 }
 
 export type VDOMChildren = {

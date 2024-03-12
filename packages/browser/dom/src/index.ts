@@ -1,6 +1,7 @@
 import { defineCore } from './core';
 
-export const { createElement, createElementTags, } = defineCore({ document, })
+const { createElement, createElementTags, } = defineCore({ document, })
+export { createElement }
 export const {
   a,
   abbr,
