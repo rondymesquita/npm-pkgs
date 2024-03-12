@@ -1,19 +1,18 @@
 /* eslint-disable new-cap */
 
-import { a, button, createElement, div, h1, p } from '.'
-import { dom } from './dom/dom'
+import { a, button, createElement, div, h1 } from '.'
 import { mount } from './dom/mount'
 import { useState } from './dom/state'
 
 
 function Card({
+  children = [],
   color = 'gray',
-  description = '',
   title = '',
-}){
+}: any){
 
   const customTitle = () => h1({
-    title: 'meu titulo',
+    title,
     style: { color: 'red', },
   }, title)
 
@@ -28,16 +27,19 @@ function Card({
       },
     },
     customTitle(),
-    p(description)
+    ...children
   )
 }
 
 const Counter = () => {
-  // const { useState, } = dom()
   const [count, setCount, onCount,] = useState(5)
   const increment = () => {
     setCount(count() + 1)
   }
+
+  onCount('state:update', () => {
+    console.log('opa')
+  })
 
   const link = createElement('a', {
     href: '#/',
@@ -54,7 +56,6 @@ const Counter = () => {
   button({ onclick: increment, }, 'increment'))
 }
 function DateComponent(){
-  const { useState, } = dom()
   const [date, setDate, onDate,] = useState(new Date())
 
   setInterval(() => setDate(new Date()), 1000)
@@ -66,12 +67,10 @@ function DateComponent(){
 
 function App(){
   return div(
-    Counter(),
-    Counter(),
+    Card({ children: [Counter(),], }),
     DateComponent()
   )
 }
 
 
 mount(App, '#app')
-//document.body.appendChild(Counter())

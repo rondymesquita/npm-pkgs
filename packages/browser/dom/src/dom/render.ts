@@ -1,5 +1,5 @@
 import { EventHandler } from '../bus'
-import { Attributes, Tag, VDOM, VDOMChildren } from '../models/models'
+import { Attrs, Tag, VDOM, VDOMChildren } from '../models/models'
 
 export function defineReactiveRender(tag: Tag, args: unknown[]) {
   let vdom = createVDOM(tag, args)
@@ -51,21 +51,11 @@ export function createVDOM(tag: Tag, args: unknown[]): VDOM {
         type: 'Function',
         value: arg,
       })
-      // vdom.children.push(arg)
-      // console.log({
-      //   index,
-      //   arg,
-      //   instance: arg,
-      // })
     } else if (typeof arg === 'object' && !Array.isArray(arg)) {
-      const attrs: Attributes = arg
+      const attrs: Attrs<any> = arg
 
       for (const key in attrs) {
         const attribute = arg[key]
-        console.log({
-          attribute,
-          key,
-        })
         const isEventListener = key.startsWith('on')
         const isStyle = key === 'style'
         const isWatch = key === 'watch'
@@ -79,9 +69,6 @@ export function createVDOM(tag: Tag, args: unknown[]): VDOM {
         } else if (isWatch) {
           Object.entries(arg.watch).forEach(([key, eventHandler,]: any) => {
             vdom.attrs.watchers.set(key, eventHandler);
-            // eventHandler('state:update', () => {
-            //   console.log('called here in fulano')
-            // })
           })
         } else {
           vdom.attrs.values.set(key, attribute);

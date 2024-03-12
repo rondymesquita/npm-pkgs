@@ -123,17 +123,9 @@ export type Attributes2<K extends keyof HTMLElementTagNameMap> = Partial<Omit<HT
   watch?: Array<EventHandler>
 }
 
-type Tag = keyof HTMLElementTagNameMap
-// export type Attributes<K extends any> = {
-//   style?: Partial<CSSStyleDeclaration>,
-//   watch?: Array<EventHandler>
-// }
-// const xxx: Attributes<'a'> = {
-//   href: '',
-//   style:{},
-// }
+export type Tag = keyof HTMLElementTagNameMap
 
-type Attrs<K extends Tag> = Omit<Partial<HTMLElementTagNameMap[K]>, 'style'> & {
+export type Attrs<K extends Tag> = Omit<Partial<HTMLElementTagNameMap[K]>, 'style'> & {
   watch?: Array<EventHandler>,
   style?: Partial<CSSStyleDeclaration>,
 }

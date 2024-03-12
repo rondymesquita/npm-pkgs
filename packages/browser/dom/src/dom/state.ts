@@ -15,7 +15,6 @@ export function useState <T>(initialValue?: T): [
 
   const state: State<T> = new Proxy(model as any, {
     set: function(target: any, prop: any, value: any) {
-      console.log('state changed')
       setTimeout(() => emit('state:update'))
       return target[prop] = value;
     },
