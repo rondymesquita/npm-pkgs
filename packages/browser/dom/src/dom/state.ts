@@ -1,4 +1,4 @@
-import { defineEventBus, EventHandler } from '../bus';
+import { defineEventBus, EventHandler } from '../event-bus/event-bus';
 
 export type State<T> = {
   value: T

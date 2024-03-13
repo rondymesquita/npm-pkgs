@@ -1,5 +1,6 @@
+import { tags } from './data/tags';
 import { defineReactiveRender } from './dom/render';
-import { CreateElement, CreateElementTags, Tag, tags } from './models/models';
+import { CreateElement, CreateElementTags, Tag } from './models/models';
 
 interface CoreInput {
   document: typeof window.document

@@ -116,3 +116,10 @@ export const {
   video,
   wbr,
 } = createElementTags
+
+export * from './dom/computed'
+export * from './dom/mount'
+export * from './dom/render'
+export * from './dom/state'
+export * from './dom/vdom'
+export * from './dom/watch'
