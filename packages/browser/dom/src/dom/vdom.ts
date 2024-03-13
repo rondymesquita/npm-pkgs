@@ -1,6 +1,7 @@
-import { Attrs, Tag, VDOM } from '../models/models'
+import { Attrs, Tag, VDOM, VDOMArgs } from '../models/models'
 
-export function createVDOM(tag: Tag, args: unknown[]): VDOM {
+
+export function createVDOM(tag: Tag, args: VDOMArgs[]): VDOM {
   const vdom: VDOM = {
     tag,
     attrs: {
@@ -13,9 +14,7 @@ export function createVDOM(tag: Tag, args: unknown[]): VDOM {
   }
   for (const index in args) {
     const arg = args[index] as any
-    if ([
-      'string', 'number', 'Date', 'boolean',
-    ].includes(typeof arg)) {
+    if (['string', 'number', 'boolean',].includes(typeof arg)) {
       vdom.children.push({
         type: 'TextNode',
         value: arg,

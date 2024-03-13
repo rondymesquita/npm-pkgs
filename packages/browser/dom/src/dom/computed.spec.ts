@@ -1,21 +1,7 @@
 // @vitest-environment happy-dom
-import { describe, expect, Mock, test, vi } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 
 import { computed, useState } from '..'
-
-const waitUntilBeCalledTimes = async(cb: Mock<any, any>, number: number) => {
-  return new Promise(async(resolve) => {
-    const numberOfCalls = cb.mock.calls.length
-    while (true) {
-      console.log(cb.mock.calls, { numberOfCalls, })
-      await new Promise((res) => setTimeout(() => res, 500))
-      if (numberOfCalls == cb.mock.calls.length) {
-        break;
-      }
-
-    }
-  })
-}
 
 describe('use computed', () => {
   test('compute a value from state on created of computed', () => {

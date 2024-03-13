@@ -2,12 +2,6 @@ import { tags } from './data/tags';
 import { defineReactiveRender } from './dom/render';
 import { CreateElement, CreateElementTags, Tag } from './models/models';
 
-interface Core {
-	createElement: CreateElement,
-	createElementTags: CreateElementTags,
-}
-
-
 const createElement: CreateElement = (tag: Tag, ...args: unknown[]) => {
   const { element, } = defineReactiveRender(tag, args)
   return element

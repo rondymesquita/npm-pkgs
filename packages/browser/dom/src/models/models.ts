@@ -16,8 +16,7 @@ export type Attrs<K extends Tag> = Omit<Partial<HTMLElementTagNameMap[K]>, 'styl
   style?: Partial<CSSStyleDeclaration>,
 }
 
-export type Children = (() => Children) | HTMLElement | Text | string | number | boolean | Date
-// Partial<HTMLElementTagNameMap[K]
+export type Children = (() => Children) | StateGetter <any> | HTMLElement | Text | string | number | boolean
 export type CreateElementTags = {
   [K in Tag]: {
     (...children: Children[]): HTMLElementTagNameMap[K]
@@ -29,6 +28,8 @@ export type CreateElement = {
   <K extends keyof HTMLElementTagNameMap>(tag: K, ...children: Children[]): HTMLElementTagNameMap[K]
   <K extends keyof HTMLElementTagNameMap>(tag: K, attrs: Attrs<K>, ...children: Children[]): HTMLElementTagNameMap[K]
 }
+
+export type VDOMArgs = Children | Attrs<any>
 
 export type VDOMChildren = {
   type: 'TextNode' | 'HTMLElement' | 'Function',
