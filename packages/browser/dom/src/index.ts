@@ -1,6 +1,7 @@
-import { defineCore } from './core';
+// import { defineCore } from './core';
+import { createElement, createElementTags } from './core';
 
-const { createElement, createElementTags, } = defineCore({ document, })
+// const { createElement, createElementTags, } = defineCore({ document, })
 export { createElement }
 export const {
   a,

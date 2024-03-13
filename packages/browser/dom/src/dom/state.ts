@@ -20,7 +20,7 @@ export function useState <T>(initialValue?: T): [
 
   const state: State<T> = new Proxy(model as any, {
     set: function(target: any, prop: any, value: any) {
-      setTimeout(() => emit('state:update'))
+      setTimeout(() => emit('state:update', value))
       return target[prop] = value;
     },
   });

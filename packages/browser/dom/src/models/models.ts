@@ -45,3 +45,5 @@ export interface VDOM {
   }
   children: VDOMChildren[]
 }
+
+export type Component = (...props: unknown[]) => HTMLElement

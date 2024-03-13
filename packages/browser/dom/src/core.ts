@@ -2,33 +2,26 @@ import { tags } from './data/tags';
 import { defineReactiveRender } from './dom/render';
 import { CreateElement, CreateElementTags, Tag } from './models/models';
 
-interface CoreInput {
-  document: typeof window.document
-}
-
 interface Core {
 	createElement: CreateElement,
 	createElementTags: CreateElementTags,
 }
 
-export function defineCore({ document, }: CoreInput): Core{
 
-  const createElement: CreateElement = (tag: Tag, ...args: unknown[]) => {
+const createElement: CreateElement = (tag: Tag, ...args: unknown[]) => {
+  const { element, } = defineReactiveRender(tag, args)
+  return element
+}
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+const createElementTags: CreateElementTags = {}
+
+tags.forEach((tag: Tag) => {
+  (createElementTags as any)[tag] = (...args: unknown[]): HTMLElement => {
     const { element, } = defineReactiveRender(tag, args)
     return element
   }
+})
 
-  const createElementTags: any = {}
-
-  tags.forEach((tag: Tag) => {
-    (createElementTags as any)[tag] = (...args: unknown[]): HTMLElement => {
-      const { element, } = defineReactiveRender(tag, args)
-      return element
-    }
-  })
-
-  return {
-    createElement,
-    createElementTags,
-  }
-}
+export { createElement, createElementTags }

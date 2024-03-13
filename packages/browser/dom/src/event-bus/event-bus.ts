@@ -1,9 +1,7 @@
-export interface Subscriber {
-
-}
+export type Subscribers = Map<string, EventHandler[]>
 export type EventHandler = (...args: any[]) => void
 export function defineEventBus<T extends string>(){
-  const subscribers: Map<string, EventHandler[]> = new Map()
+  const subscribers: Subscribers = new Map()
 
   return {
     on(event: T, handler: EventHandler){
