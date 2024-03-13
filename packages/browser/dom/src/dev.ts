@@ -1,6 +1,7 @@
 /* eslint-disable new-cap */
 
 import { button, div, h1 } from '.'
+import { computed } from './dom/computed'
 import { mount } from './dom/mount'
 import { useState } from './dom/state'
 import { watch } from './dom/watch'
@@ -56,7 +57,7 @@ const Counter = () => {
   },
 
   h1({ watch: [onCount,], }, 'Count ', count),
-  h1({ watch: [onDate,], }, 'Date', date),
+  h1({ watch: [onDate,], }, 'Date is', () => date()),
   button({ onclick: increment, }, 'increment'))
 }
 function DateComponent(){
@@ -69,9 +70,34 @@ function DateComponent(){
   )
 }
 
+function User(){
+  const [name, setName, onName,] = useState('rondy')
+  const [surname, setSurname, onSurname,] = useState('mesquita')
+
+  const [fullname, _, onFullname,] = computed([onName, onSurname,], () => {
+    return name() + ' ' + surname()
+  })
+
+  // const fullname = () => {
+  //   return name() + ' ' + surname()
+  // }
+
+  setTimeout(() => {
+    setName('fulano')
+    setSurname('de tal')
+  }, 1000)
+
+  return div(
+    div('name is: ', name),
+    div('full name is: ', fullname),
+    div({ watch:[onFullname,], }, 'full name is: ', fullname)
+  )
+}
+
 function App(){
   return div(
-    Card({ children: [Counter(),], })
+    // Card({ children: [Counter(),], })
+    User()
   )
 }
 

@@ -1,4 +1,5 @@
 import { EventHandler } from '../bus'
+import { StateGetter } from '../dom/state'
 
 export const tags = [
   'a',
@@ -146,7 +147,7 @@ export type CreateElement = {
 
 export type VDOMChildren = {
   type: 'TextNode' | 'HTMLElement' | 'Function',
-  value: HTMLElement | Text |  string | number | Date | boolean | (() => any)
+  value: HTMLElement | Text |  string | number | Date | boolean | StateGetter<any>
 }
 
 export interface VDOM {

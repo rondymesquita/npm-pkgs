@@ -1,5 +1,6 @@
 import { EventHandler } from '../bus'
 import { Attrs, Tag, VDOM, VDOMChildren } from '../models/models'
+import { StateGetter } from './state'
 
 export function defineReactiveRender(tag: Tag, args: unknown[]) {
   let vdom = createVDOM(tag, args)
@@ -38,14 +39,11 @@ export function createVDOM(tag: Tag, args: unknown[]): VDOM {
         type: 'TextNode',
         value: arg,
       })
-      // const textNode = document.createTextNode(arg)
-      // vdom.children.push(textNode)
     } else if (arg instanceof HTMLElement) {
       vdom.children.push({
         type: 'HTMLElement',
         value: arg,
       })
-      // vdom.children.push(arg)
     }else if (typeof arg === 'function'){
       vdom.children.push({
         type: 'Function',
@@ -74,6 +72,8 @@ export function createVDOM(tag: Tag, args: unknown[]): VDOM {
           vdom.attrs.values.set(key, attribute);
         }
       }
+    } else {
+      console.log({ arg, })
     }
   }
   return vdom
@@ -98,7 +98,7 @@ export function render(vdom: VDOM): HTMLElement{
     } else if (child.type === 'HTMLElement') {
       childElement = child.value as Node
     } else {
-      childElement = document.createTextNode(`${(child.value as any)()}`)
+      childElement = document.createTextNode(`${(child.value as StateGetter<any>)()}`)
     }
     element.appendChild(childElement)
   })
