@@ -1,6 +1,6 @@
+import { CreateElement, CreateElementTags, Tag } from '.';
 import { tags } from './data/tags';
 import { defineReactiveRender } from './dom/render';
-import { CreateElement, CreateElementTags, Tag } from './models/models';
 
 const createElement: CreateElement = (tag: Tag, ...args: unknown[]) => {
   const { element, } = defineReactiveRender(tag, args)

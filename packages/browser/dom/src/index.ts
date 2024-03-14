@@ -1,7 +1,5 @@
-// import { defineCore } from './core';
 import { createElement, createElementTags } from './core';
 
-// const { createElement, createElementTags, } = defineCore({ document, })
 export { createElement }
 export const {
   a,
@@ -124,3 +122,8 @@ export * from './dom/render'
 export * from './dom/state'
 export * from './dom/vdom'
 export * from './dom/watch'
+export * from './models/attrs.model'
+export * from './models/component.model'
+export * from './models/create-element.model'
+export * from './models/tag.model'
+export * from './models/vdom.model'
