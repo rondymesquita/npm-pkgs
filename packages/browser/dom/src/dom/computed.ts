@@ -1,9 +1,9 @@
-import { StateEventListener, useState } from './state';
+import { createState, StateEventListener } from './state';
 
 export type ComputeHandler<T> = (...args: any[]) => T
 
-export function computed<T>(deps: StateEventListener[], computeHandler: ComputeHandler<T>): ReturnType<typeof useState<T>>{
-  const [state, setState, onState,] = useState<T>()
+export function computed<T>(deps: StateEventListener[], computeHandler: ComputeHandler<T>): ReturnType<typeof createState<T>>{
+  const [state, setState, onState,] = createState<T>()
   setState(computeHandler(state()))
 
   deps.forEach((dep:StateEventListener) => {

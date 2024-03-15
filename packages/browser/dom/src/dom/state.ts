@@ -9,7 +9,7 @@ export type StateSetter<T> = (v: T) => void
 export type StateEvent = 'state:update'
 export type StateEventListener = (event: StateEvent, handler: EventHandler) => void
 
-export function useState <T>(initialValue?: T): [
+export function createState <T>(initialValue?: T): [
   StateGetter<T>,
   StateSetter<T>,
   StateEventListener

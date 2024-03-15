@@ -1,11 +1,11 @@
 // @vitest-environment happy-dom
 import { describe, expect, test, vi } from 'vitest'
 
-import { computed, useState } from '..'
+import { computed, createState } from '..'
 
 describe('use computed', () => {
   test('compute a value from state on created of computed', () => {
-    const [state,, onState,] = useState('initial state')
+    const [state,, onState,] = createState('initial state')
     const [computedState,, onCompute,] = computed([onState,], () => {
       return state() + ' append'
     })
@@ -15,7 +15,7 @@ describe('use computed', () => {
     expect(computedState()).toEqual('initial state append')
   })
   test('compute a value from state on state change', async() => {
-    const [state, setState, onState,] = useState('initial state')
+    const [state, setState, onState,] = createState('initial state')
     const [computedState,, onCompute,] = computed([onState,], () => {
       return state() + ' append'
     })
@@ -30,8 +30,8 @@ describe('use computed', () => {
     expect(computedState()).toBe('new state append')
   })
   test('compute a value from multiples state on state change', async() => {
-    const [stateA, setStateA, onStateA,] = useState('initial state A')
-    const [stateB, setStateB, onStateB,] = useState('initial state B')
+    const [stateA, setStateA, onStateA,] = createState('initial state A')
+    const [stateB, setStateB, onStateB,] = createState('initial state B')
     const [computedState,, onCompute,] = computed([onStateA, onStateB,], () => {
       return stateA() + ' : ' + stateB()
     })

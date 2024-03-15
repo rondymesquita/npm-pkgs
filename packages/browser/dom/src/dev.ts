@@ -3,7 +3,7 @@
 import { button, createElement, div, h1 } from '.'
 import { computed } from './dom/computed'
 import { mount } from './dom/mount'
-import { useState } from './dom/state'
+import { createState } from './dom/state'
 import { watch } from './dom/watch'
 
 
@@ -34,7 +34,7 @@ function Card({
 }
 
 const Counter = () => {
-  const [count, setCount, onCount,] = useState(5)
+  const [count, setCount, onCount,] = createState(5)
   const increment = () => {
     setCount(count() + 1)
   }
@@ -43,7 +43,7 @@ const Counter = () => {
     console.log('opa')
   })
 
-  const [date, setDate, onDate,] = useState(new Date())
+  const [date, setDate, onDate,] = createState(new Date())
 
   setInterval(() => setDate(new Date()), 1000)
 
@@ -61,7 +61,7 @@ const Counter = () => {
   button({ onclick: increment, }, 'increment'))
 }
 function DateComponent(){
-  const [date, setDate, onDate,] = useState(new Date())
+  const [date, setDate, onDate,] = createState(new Date())
 
   setInterval(() => setDate(new Date()), 1000)
 
@@ -71,8 +71,8 @@ function DateComponent(){
 }
 
 function User(){
-  const [name, setName, onName,] = useState('rondy')
-  const [surname, setSurname, onSurname,] = useState('mesquita')
+  const [name, setName, onName,] = createState('rondy')
+  const [surname, setSurname, onSurname,] = createState('mesquita')
 
   const [fullname, _, onFullname,] = computed([onName, onSurname,], () => {
     return name() + ' ' + surname()

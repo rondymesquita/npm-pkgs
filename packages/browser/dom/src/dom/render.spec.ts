@@ -1,6 +1,6 @@
 import { describe, expect, test, vi } from 'vitest'
 
-import { render, useState } from '..'
+import { render, createState } from '..'
 import { defineEventBus } from '../event-bus/event-bus'
 
 describe('render', () => {
@@ -79,7 +79,7 @@ describe('render', () => {
 
   })
   test('rerender element when state changes', async() => {
-    const [state, setState, onState,] = useState('initial state')
+    const [state, setState, onState,] = createState('initial state')
     const attrs = {
       className: 'class',
       id: 'element',
