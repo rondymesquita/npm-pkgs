@@ -3,18 +3,6 @@ import { describe, test } from 'vitest'
 
 import { createElement } from '.'
 
-const parse = (element: HTMLElement) => {
-  const attrsNames = element.getAttributeNames()
-  const attributes = attrsNames.map(attrName => {
-    return [attrName, element.getAttribute(attrName),]
-  })
-  return {
-    tagName: element.tagName,
-    attributes: Object.fromEntries(attributes),
-    innerText: element.innerText,
-    // style: getComputedStyle(element),
-  }
-}
 
 describe('index', () => {
   test('create element with createElement', () => {

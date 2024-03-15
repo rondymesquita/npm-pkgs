@@ -1,4 +1,5 @@
-import { Attrs, Tag, VDOM, VDOMArgs } from '../models/models'
+import { StateGetter } from '..'
+import { Attrs, Tag, VDOM, VDOMArgs, VDOMChildren } from '../models/models'
 
 
 export function createVDOM(tag: Tag, args: VDOMArgs[]): VDOM {
@@ -57,4 +58,32 @@ export function createVDOM(tag: Tag, args: VDOMArgs[]): VDOM {
     }
   }
   return vdom
+}
+
+export function renderVDOM(vdom: VDOM): HTMLElement{
+  const element = document.createElement(vdom.tag)
+
+  vdom.attrs.values.forEach((value, key) => {
+    element.setAttribute(key, value)
+  })
+  vdom.attrs.events.forEach((value, key) => {
+    element.addEventListener(key, value)
+  })
+  vdom.attrs.styles.forEach((value, key) => {
+    (element.style as any)[key] = value;
+  })
+  vdom.children.forEach((child: VDOMChildren) =>{
+    let childElement: Node;
+    if (child.type === 'TextNode') {
+      childElement = document.createTextNode(`${child.value}`)
+    } else if (child.type === 'HTMLElement') {
+      childElement = child.value as Node
+    } else {
+      childElement = document.createTextNode(`${(child.value as StateGetter<any>)()}`)
+    }
+    element.appendChild(childElement)
+  })
+
+  return element
+
 }

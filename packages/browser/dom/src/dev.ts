@@ -1,6 +1,6 @@
 /* eslint-disable new-cap */
 
-import { button, div, h1 } from '.'
+import { button, createElement, div, h1 } from '.'
 import { computed } from './dom/computed'
 import { mount } from './dom/mount'
 import { useState } from './dom/state'
@@ -87,7 +87,10 @@ function User(){
     setSurname('de tal')
   }, 1000)
 
+  const heading = createElement('h2', 'User info')
+
   return div(
+    heading,
     div('name is: ', name),
     div('full name is: ', fullname),
     div({ watch:[onFullname,], }, 'full name is: ', fullname)
@@ -96,6 +99,7 @@ function User(){
 
 function App(){
   return div(
+    Counter(),
     // Card({ children: [Counter(),], })
     User()
   )

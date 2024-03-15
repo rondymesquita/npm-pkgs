@@ -1,28 +1,28 @@
 import { describe, expect, test } from 'vitest'
 
-import { createVDOM } from '..'
+import { createVDOM, renderVDOM } from '..'
 import { Attrs } from '../models/models'
 
+const attrs: Attrs<'div'> = {
+  id: '1',
+  onclick: () => {},
+  style: {
+    color: 'red',
+    fontSize: '12px',
+  },
+  watch: [() => {},],
+}
+
+const vdom = createVDOM('button', [
+  'text node',
+  true,
+  document.createElement('div'),
+  () => 'text',
+  attrs,
+])
 
 describe('vdom', () => {
   test('create vdom', () => {
-    const attrs: Attrs<'div'> = {
-      id: '1',
-      onclick: () => {},
-      style: {
-        color: 'red',
-        fontSize: '12px',
-      },
-      watch: [() => {},],
-    }
-
-    const vdom = createVDOM('button', [
-      'text node',
-      true,
-      document.createElement('div'),
-      () => 'text',
-      attrs,
-    ])
     const expectedVdom = {
       'tag': 'button',
       'attrs':  {
@@ -52,5 +52,17 @@ describe('vdom', () => {
 
     }
     expect(JSON.stringify(vdom)).toEqual(JSON.stringify(expectedVdom));
+  })
+  test('render vdom', () => {
+    const vdom = createVDOM('button', [
+      'text node',
+      true,
+      document.createElement('div'),
+      () => 'text',
+      attrs,
+    ])
+
+    const element = renderVDOM(vdom)
+    expect(element.outerHTML).toBe('<button id="1" style="color: red; font-size: 12px;">text nodetrue<div></div>text</button>')
   })
 })
